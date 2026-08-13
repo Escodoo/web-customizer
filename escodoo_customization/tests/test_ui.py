@@ -392,6 +392,66 @@ class TestCustomizationUiApi(CustomizationCase):
             hide.generated_view_id.arch,
         )
 
+    def test_create_from_ui_add_after_on_list(self):
+        bundle = self._create_bundle(code="client_ui_list")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.list_view.id,
+                "view_type": "list",
+                "anchor_name": "email",
+                "payload": {
+                    "ttype": "char",
+                    "string": "List Reference",
+                    "name": "x_esc_ui_list_ref",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        self.assertIn("x_esc_ui_list_ref", self.list_view.get_combined_arch())
+
+    def test_create_from_ui_hide_on_list(self):
+        bundle = self._create_bundle(code="client_ui_list_hide")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.list_view.id,
+                "view_type": "list",
+                "anchor_name": "email",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.view_type, "list")
+        self.assertIn("column_invisible", hide.generated_view_id.arch)
+
+    def test_create_from_ui_add_after_on_search(self):
+        bundle = self._create_bundle(code="client_ui_search")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.search_view.id,
+                "view_type": "search",
+                "anchor_name": "email",
+                "payload": {
+                    "ttype": "char",
+                    "string": "Search Reference",
+                    "name": "x_esc_ui_search_ref",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        self.assertIn("x_esc_ui_search_ref", self.search_view.get_combined_arch())
+
     def test_create_from_ui_requires_manager(self):
         bundle = self._create_bundle(code="client_ui_acl")
         user = self.env["res.users"].create(

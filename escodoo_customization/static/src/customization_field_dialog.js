@@ -111,6 +111,12 @@ export class CustomizationFieldDialog extends Component {
         if (this.anchorKind === "button") {
             return _t("Customize button %s", label);
         }
+        if (this.props.viewType === "list") {
+            return _t("Customize list field %s", label);
+        }
+        if (this.props.viewType === "search") {
+            return _t("Customize search field %s", label);
+        }
         return _t("Customize field %s", label);
     }
 

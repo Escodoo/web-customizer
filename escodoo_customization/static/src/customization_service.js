@@ -13,7 +13,9 @@ export const customizationService = {
                 state.enabled = !state.enabled;
                 if (state.enabled) {
                     notification.add(
-                        _t("Customization mode is on. Click a field, page or button."),
+                        _t(
+                            "Customization mode is on. Click a field, page, button, list column or search field."
+                        ),
                         {type: "info"}
                     );
                 }
@@ -43,24 +45,55 @@ export function isFormRootField(component) {
     return true;
 }
 
+export function isListRoot(component) {
+    const config = component.env.config || {};
+    return config.viewType === "list" && Boolean(config.viewId);
+}
+
+function fieldLabelOf(component, fieldName, extra) {
+    return (
+        extra.fieldLabel ||
+        component.props.string ||
+        component.props.record?.fields?.[fieldName]?.string ||
+        fieldName
+    );
+}
+
+function customizationTarget(component, extra) {
+    const viewType = extra.viewType || component.env.config?.viewType || "form";
+    if (viewType === "form" && !isFormRootField(component)) {
+        return null;
+    }
+    if (viewType === "list" && !isListRoot(component)) {
+        return null;
+    }
+    const viewId = extra.viewId || component.env.config?.viewId;
+    if (!viewId) {
+        return null;
+    }
+    return {viewType, viewId};
+}
+
 export function openCustomizationFor(component, fieldName, ev, extra = {}) {
     const customization = component.customization;
-    if (!customization?.state.enabled || !isFormRootField(component) || !fieldName) {
+    if (!customization?.state.enabled || !fieldName) {
         return false;
     }
-    ev.preventDefault();
-    ev.stopPropagation();
+    const target = customizationTarget(component, extra);
+    if (!target) {
+        return false;
+    }
+    if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
     const record = formRecord(component);
     customization.openFieldDialog({
         fieldName,
-        fieldLabel:
-            extra.fieldLabel ||
-            component.props.string ||
-            component.props.record?.fields?.[fieldName]?.string ||
-            fieldName,
-        model: record?.resModel,
-        viewId: component.env.config.viewId,
-        viewType: component.env.config.viewType || "form",
+        fieldLabel: fieldLabelOf(component, fieldName, extra),
+        model: extra.model || record?.resModel,
+        viewId: target.viewId,
+        viewType: target.viewType,
         anchorKind: extra.anchorKind || "field",
     });
     return true;

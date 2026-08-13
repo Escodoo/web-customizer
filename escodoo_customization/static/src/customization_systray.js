@@ -1,4 +1,6 @@
 import "./customization_field_patch";
+import "./customization_list_patch";
+import "./customization_search_patch";
 import "./customization_service";
 import {Component, onWillStart, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
@@ -24,7 +26,7 @@ export class CustomizationSystray extends Component {
     get title() {
         return this.state.enabled
             ? _t("Exit customization mode")
-            : _t("Customize this form");
+            : _t("Customize this view");
     }
 
     toggle() {

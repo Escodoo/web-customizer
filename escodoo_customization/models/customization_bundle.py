@@ -164,10 +164,11 @@ class CustomizationBundle(models.Model):
 
     @api.model
     def create_from_ui(self, params):
-        """Create (and optionally apply) operations from the in-place form UI.
+        """Create (and optionally apply) operations from the in-place UI.
 
         ``params`` keys: bundle_id, action, model, view_id, view_type,
         anchor_name, anchor_kind, anchor_index, anchor_page, payload, apply.
+        ``view_type`` may be form, list or search.
         """
         self._check_ui_access()
         params = params or {}
