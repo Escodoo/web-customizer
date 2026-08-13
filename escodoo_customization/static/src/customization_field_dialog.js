@@ -2,6 +2,7 @@ import {Component, onWillStart, useState} from "@odoo/owl";
 import {browser} from "@web/core/browser/browser";
 import {Dialog} from "@web/core/dialog/dialog";
 import {_t} from "@web/core/l10n/translation";
+import {RecordSelector} from "@web/core/record_selectors/record_selector";
 import {useService} from "@web/core/utils/hooks";
 
 const FIELD_TYPES = [
@@ -18,7 +19,7 @@ const FIELD_TYPES = [
 
 export class CustomizationFieldDialog extends Component {
     static template = "escodoo_customization.FieldDialog";
-    static components = {Dialog};
+    static components = {Dialog, RecordSelector};
     static props = {
         close: Function,
         fieldName: String,
@@ -41,6 +42,8 @@ export class CustomizationFieldDialog extends Component {
             name: "",
             relation: "",
             newLabel: "",
+            existingFieldId: false,
+            existingFieldName: "",
             apply: true,
             busy: false,
             anchorCount: 0,
@@ -64,8 +67,25 @@ export class CustomizationFieldDialog extends Component {
         return _t("Customize field %s", this.props.fieldLabel || this.props.fieldName);
     }
 
+    get existingFieldDomain() {
+        return [
+            ["model", "=", this.props.model],
+            ["name", "!=", this.props.fieldName],
+        ];
+    }
+
     onBundleChange(ev) {
         this.state.bundleId = parseInt(ev.target.value, 10) || false;
+    }
+
+    async onExistingFieldUpdate(resId) {
+        this.state.existingFieldId = resId || false;
+        this.state.existingFieldName = "";
+        if (!resId) {
+            return;
+        }
+        const [data] = await this.orm.read("ir.model.fields", [resId], ["name"]);
+        this.state.existingFieldName = data?.name || "";
     }
 
     async onApply() {
@@ -88,6 +108,14 @@ export class CustomizationFieldDialog extends Component {
             if (["many2one", "many2many"].includes(this.state.ttype)) {
                 payload.relation = this.state.relation;
             }
+        } else if (this.state.action === "place_after") {
+            if (!this.state.existingFieldName) {
+                this.notification.add(_t("Select an existing field to place."), {
+                    type: "danger",
+                });
+                return;
+            }
+            payload.field_name = this.state.existingFieldName;
         } else if (this.state.action === "rename") {
             payload.string = this.state.newLabel;
         }

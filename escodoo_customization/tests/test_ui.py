@@ -33,6 +33,102 @@ class TestCustomizationUiApi(CustomizationCase):
         field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_ref")
         self.assertTrue(field)
 
+    def test_create_from_ui_add_after_custom_field(self):
+        bundle = self._create_bundle(code="client_ui_chain")
+        first = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "payload": {
+                    "ttype": "boolean",
+                    "string": "VIP Customer",
+                    "name": "x_esc_vip_ui",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(first["broken"])
+        second = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "x_esc_vip_ui",
+                "payload": {
+                    "ttype": "char",
+                    "string": "Juvenal",
+                    "name": "x_esc_juvenal_ui",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(second["broken"])
+        arch = self.form_view.get_combined_arch()
+        self.assertIn("x_esc_vip_ui", arch)
+        self.assertIn("x_esc_juvenal_ui", arch)
+
+    def test_create_from_ui_place_after_existing_field(self):
+        bundle = self._create_bundle(code="client_ui_place")
+        Field = self.env["ir.model.fields"]
+        count_before = Field.search_count(
+            [("model", "=", "res.partner"), ("name", "like", "x_esc_")]
+        )
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "place_after",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "payload": {"field_name": "vat"},
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        arch = self.form_view.get_combined_arch()
+        self.assertIn('name="vat"', arch)
+        self.assertLess(arch.index('name="email"'), arch.index('name="vat"'))
+        self.assertEqual(
+            Field.search_count(
+                [("model", "=", "res.partner"), ("name", "like", "x_esc_")]
+            ),
+            count_before,
+        )
+        self.assertEqual(len(bundle.operation_ids), 1)
+        self.assertEqual(bundle.operation_ids.type, "place_field")
+
+    def test_create_from_ui_place_after_requires_existing_field(self):
+        bundle = self._create_bundle(code="client_ui_place_missing")
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "place_after",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "anchor_name": "email",
+                    "payload": {"field_name": "does_not_exist"},
+                }
+            )
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "place_after",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "anchor_name": "email",
+                    "payload": {"field_name": "email"},
+                }
+            )
+
     def test_create_from_ui_hide_and_rename(self):
         bundle = self._create_bundle(code="client_ui_attrs")
         hide = self.env["customization.bundle"].create_from_ui(

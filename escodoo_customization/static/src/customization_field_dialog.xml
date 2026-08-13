@@ -36,6 +36,12 @@
                         >
                             Add field after this one
                         </option>
+                        <option
+                            value="place_after"
+                            t-att-selected="state.action === 'place_after'"
+                        >
+                            Place existing field after this one
+                        </option>
                         <option value="hide" t-att-selected="state.action === 'hide'">
                             Hide this field
                         </option>
@@ -93,6 +99,19 @@
                             placeholder="res.partner"
                             t-att-value="state.relation"
                             t-on-input="(ev) => state.relation = ev.target.value"
+                        />
+                    </div>
+                </t>
+                <t t-if="state.action === 'place_after'">
+                    <div class="mb-3">
+                        <label class="form-label">Existing field</label>
+                        <RecordSelector
+                            resId="state.existingFieldId"
+                            resModel="'ir.model.fields'"
+                            domain="existingFieldDomain"
+                            update.bind="onExistingFieldUpdate"
+                            fieldString.translate="Existing field"
+                            placeholder.translate="Search a field..."
                         />
                     </div>
                 </t>

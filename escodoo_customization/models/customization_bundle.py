@@ -146,8 +146,8 @@ class CustomizationBundle(models.Model):
     def create_from_ui(self, params):
         """Create (and optionally apply) operations from the in-place form UI.
 
-        ``params`` keys: bundle_id, action (add_after, hide, rename), model,
-        view_id, view_type, anchor_name, payload, apply.
+        ``params`` keys: bundle_id, action (add_after, place_after, hide,
+        rename), model, view_id, view_type, anchor_name, payload, apply.
         """
         self._check_ui_access()
         params = params or {}
@@ -155,7 +155,7 @@ class CustomizationBundle(models.Model):
         if not bundle.exists():
             raise UserError(self.env._("Select a customization bundle first."))
         action = params.get("action")
-        if action not in ("add_after", "hide", "rename"):
+        if action not in ("add_after", "place_after", "hide", "rename"):
             raise UserError(self.env._("Unknown customization action '%s'.") % action)
         model_name = params.get("model")
         model = self.env["ir.model"]._get(model_name) if model_name else False
@@ -192,23 +192,31 @@ class CustomizationBundle(models.Model):
             if apply:
                 add_op.action_apply()
                 field_name = (add_op.payload or {}).get("name") or field_name
-            place_op = Operation.create(
-                {
-                    "bundle_id": bundle.id,
-                    "sequence": sequence + 10,
-                    "type": "place_field",
-                    "model_id": model.id,
-                    "view_id": view.id,
-                    "view_type": view_type,
-                    "anchor_kind": "field",
-                    "anchor_name": anchor_name,
-                    "position": "after",
-                    "payload": {"field_name": field_name},
-                }
+            place_op = self._ui_place_field(
+                bundle,
+                sequence + 10,
+                model,
+                view,
+                view_type,
+                anchor_name,
+                field_name,
+                apply,
             )
-            if apply:
-                place_op.action_apply()
             operations = add_op | place_op
+        elif action == "place_after":
+            field_name = self._ui_existing_field_name(
+                model_name, payload.get("field_name"), anchor_name
+            )
+            operations = self._ui_place_field(
+                bundle,
+                sequence,
+                model,
+                view,
+                view_type,
+                anchor_name,
+                field_name,
+                apply,
+            )
         elif action == "hide":
             operations = Operation.create(
                 {
@@ -255,6 +263,48 @@ class CustomizationBundle(models.Model):
             ],
             "reload": bool(operations.ids) and not broken.ids and apply,
         }
+
+    def _ui_existing_field_name(self, model_name, field_name, anchor_name):
+        """Return a field that already exists on ``model_name``."""
+        field_name = (field_name or "").strip()
+        if not field_name:
+            raise UserError(self.env._("Select an existing field to place."))
+        field = self.env["ir.model.fields"]._get(model_name, field_name)
+        if not field:
+            raise UserError(
+                self.env._(
+                    "Field '%s' does not exist on %s.",
+                    field_name,
+                    model_name,
+                )
+            )
+        if field_name == anchor_name:
+            raise UserError(
+                self.env._("Choose a field other than the one you clicked.")
+            )
+        return field.name
+
+    def _ui_place_field(
+        self, bundle, sequence, model, view, view_type, anchor_name, field_name, apply
+    ):
+        """Create a place_field operation and optionally compile it."""
+        operation = self.env["customization.operation"].create(
+            {
+                "bundle_id": bundle.id,
+                "sequence": sequence,
+                "type": "place_field",
+                "model_id": model.id,
+                "view_id": view.id,
+                "view_type": view_type,
+                "anchor_kind": "field",
+                "anchor_name": anchor_name,
+                "position": "after",
+                "payload": {"field_name": field_name},
+            }
+        )
+        if apply:
+            operation.action_apply()
+        return operation
 
     def _check_ui_access(self):
         if not self.env.user.has_group(
