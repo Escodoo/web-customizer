@@ -8,6 +8,10 @@ named view). A compiler turns those operations into regular `ir.model.fields`
 (`x_esc_*`) and inherited views. Applied bundles can be **exported** as a
 plain Odoo addon to version in git.
 
+Customization managers can turn on customization mode from the systray and
+click a field on a form to add a field after it, hide it, or change its
+label. That writes the same ledger operations as the backend form.
+
 On upgrade, a health check re-resolves anchors. Missing anchors are marked
 `broken` with a reason; other operations are left intact. Customizations never
 disappear silently.

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="escodoo_customization.FieldDialog">
+        <Dialog title="title" size="'md'">
+            <div class="o_esc_customization_dialog">
+                <p class="text-muted" t-if="!state.anchorUnique">
+                    Anchor field "<t t-esc="props.fieldName" />" matches
+                    <t t-esc="state.anchorCount" /> nodes. Apply will mark the
+                    operation broken if the match is not unique.
+                </p>
+                <p class="text-danger" t-if="!state.bundles.length">
+                    Create a bundle under Settings → Technical → Customization
+                    before customizing this form.
+                </p>
+                <div class="mb-3" t-if="state.bundles.length">
+                    <label class="form-label">Bundle</label>
+                    <select class="form-select" t-on-change="onBundleChange">
+                        <t t-foreach="state.bundles" t-as="bundle" t-key="bundle.id">
+                            <option
+                                t-att-value="bundle.id"
+                                t-att-selected="bundle.id === state.bundleId"
+                                t-esc="bundle.name"
+                            />
+                        </t>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Action</label>
+                    <select
+                        class="form-select"
+                        t-on-change="(ev) => state.action = ev.target.value"
+                    >
+                        <option
+                            value="add_after"
+                            t-att-selected="state.action === 'add_after'"
+                        >
+                            Add field after this one
+                        </option>
+                        <option value="hide" t-att-selected="state.action === 'hide'">
+                            Hide this field
+                        </option>
+                        <option
+                            value="rename"
+                            t-att-selected="state.action === 'rename'"
+                        >
+                            Change label
+                        </option>
+                    </select>
+                </div>
+                <t t-if="state.action === 'add_after'">
+                    <div class="mb-3">
+                        <label class="form-label">Field type</label>
+                        <select
+                            class="form-select"
+                            t-on-change="(ev) => state.ttype = ev.target.value"
+                        >
+                            <t t-foreach="fieldTypes" t-as="ftype" t-key="ftype[0]">
+                                <option
+                                    t-att-value="ftype[0]"
+                                    t-att-selected="state.ttype === ftype[0]"
+                                    t-esc="ftype[1]"
+                                />
+                            </t>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Label</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            t-att-value="state.string"
+                            t-on-input="(ev) => state.string = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Technical name (optional)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="x_esc_..."
+                            t-att-value="state.name"
+                            t-on-input="(ev) => state.name = ev.target.value"
+                        />
+                    </div>
+                    <div
+                        class="mb-3"
+                        t-if="state.ttype === 'many2one' || state.ttype === 'many2many'"
+                    >
+                        <label class="form-label">Relation model</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="res.partner"
+                            t-att-value="state.relation"
+                            t-on-input="(ev) => state.relation = ev.target.value"
+                        />
+                    </div>
+                </t>
+                <t t-if="state.action === 'rename'">
+                    <div class="mb-3">
+                        <label class="form-label">New label</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            t-att-value="state.newLabel"
+                            t-on-input="(ev) => state.newLabel = ev.target.value"
+                        />
+                    </div>
+                </t>
+                <div class="form-check mb-2">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="esc_cust_apply"
+                        t-att-checked="state.apply"
+                        t-on-change="(ev) => state.apply = ev.target.checked"
+                    />
+                    <label class="form-check-label" for="esc_cust_apply">
+                        Apply immediately
+                    </label>
+                </div>
+            </div>
+            <t t-set-slot="footer">
+                <button
+                    class="btn btn-primary"
+                    t-att-disabled="state.busy || !state.bundles.length"
+                    t-on-click="onApply"
+                >
+                    Apply
+                </button>
+                <button class="btn btn-secondary" t-on-click="() => props.close()">
+                    Cancel
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

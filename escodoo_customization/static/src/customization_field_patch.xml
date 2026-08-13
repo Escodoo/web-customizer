@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t
+        t-name="escodoo_customization.Field"
+        t-inherit="web.Field"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//div" position="attributes">
+            <attribute name="t-on-click">onCustomizationClick</attribute>
+        </xpath>
+    </t>
+    <t
+        t-name="escodoo_customization.FormLabel"
+        t-inherit="web.FormLabel"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//label" position="attributes">
+            <attribute name="t-on-click">onCustomizationClick</attribute>
+        </xpath>
+    </t>
+</templates>

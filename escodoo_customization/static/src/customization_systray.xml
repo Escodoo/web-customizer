@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="escodoo_customization.Systray">
+        <div
+            t-if="isManager"
+            class="o-dropdown dropdown o-dropdown--no-caret o_esc_customization_systray"
+        >
+            <button
+                class="dropdown-toggle o-dropdown--narrow"
+                t-att-class="{ o_esc_customization_systray_active: state.enabled }"
+                t-att-title="title"
+                t-on-click="toggle"
+            >
+                <i class="fa fa-fw fa-magic" role="img" />
+            </button>
+        </div>
+    </t>
+</templates>

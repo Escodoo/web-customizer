@@ -1,0 +1,13 @@
+.o_esc_customization_systray_active {
+    color: #714b67;
+}
+
+.o_esc_customization_target {
+    outline: 1px dashed #714b67;
+    cursor: pointer !important;
+}
+
+.o_esc_customization_target:hover {
+    outline: 2px solid #714b67;
+    background-color: rgba(113, 75, 103, 0.08);
+}

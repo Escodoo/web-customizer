@@ -11,7 +11,7 @@
     "website": "https://github.com/Escodoo/escodoo-customization",
     "development_status": "Beta",
     "maintainers": ["marcelsavegnago"],
-    "depends": ["base"],
+    "depends": ["web"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
@@ -20,6 +20,11 @@
         "views/menu.xml",
         "wizards/customization_export_wizard_views.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "escodoo_customization/static/src/**/*",
+        ],
+    },
     "uninstall_hook": "uninstall_hook",
     "installable": True,
     "application": False,

@@ -3,8 +3,12 @@
 
 import re
 
+from lxml import etree
+
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
+
+from .compiler import ensure_field_name, slugify_field_suffix
 
 
 class CustomizationBundle(models.Model):
@@ -114,6 +118,151 @@ class CustomizationBundle(models.Model):
             "view_mode": "form",
             "target": "new",
         }
+
+    @api.model
+    def get_ui_context(self, view_id, anchor_name):
+        """Return bundles and whether ``anchor_name`` is unique on the view."""
+        self._check_ui_access()
+        view = self.env["ir.ui.view"].browse(view_id)
+        count = 0
+        if view.exists() and anchor_name:
+            arch = view.get_combined_arch()
+            tree = etree.fromstring(arch.encode()) if isinstance(arch, str) else arch
+            if re.match(r"^[\w.]+$", anchor_name):
+                count = len(tree.xpath(f"//field[@name='{anchor_name}']"))
+        bundles = self.search_read(
+            [],
+            ["name", "code", "state"],
+            order="write_date desc, id desc",
+            limit=80,
+        )
+        return {
+            "bundles": bundles,
+            "anchor_count": count,
+            "anchor_unique": count == 1,
+        }
+
+    @api.model
+    def create_from_ui(self, params):
+        """Create (and optionally apply) operations from the in-place form UI.
+
+        ``params`` keys: bundle_id, action (add_after, hide, rename), model,
+        view_id, view_type, anchor_name, payload, apply.
+        """
+        self._check_ui_access()
+        params = params or {}
+        bundle = self.browse(params.get("bundle_id"))
+        if not bundle.exists():
+            raise UserError(self.env._("Select a customization bundle first."))
+        action = params.get("action")
+        if action not in ("add_after", "hide", "rename"):
+            raise UserError(self.env._("Unknown customization action '%s'.") % action)
+        model_name = params.get("model")
+        model = self.env["ir.model"]._get(model_name) if model_name else False
+        if not model:
+            raise UserError(self.env._("A model is required."))
+        view = self.env["ir.ui.view"].browse(params.get("view_id"))
+        if not view.exists():
+            raise UserError(self.env._("The target view is missing."))
+        anchor_name = params.get("anchor_name")
+        if not anchor_name:
+            raise UserError(self.env._("Click a field to set the anchor."))
+        view_type = params.get("view_type") or "form"
+        payload = dict(params.get("payload") or {})
+        apply = params.get("apply", True)
+        sequence = max(bundle.operation_ids.mapped("sequence") or [0]) + 10
+        Operation = self.env["customization.operation"]
+        if action == "add_after":
+            if not payload.get("ttype"):
+                raise UserError(self.env._("A field type is required."))
+            requested = payload.get("name") or slugify_field_suffix(
+                payload.get("string") or ""
+            )
+            field_name = ensure_field_name(requested)
+            payload["name"] = field_name
+            add_op = Operation.create(
+                {
+                    "bundle_id": bundle.id,
+                    "sequence": sequence,
+                    "type": "add_field",
+                    "model_id": model.id,
+                    "payload": payload,
+                }
+            )
+            if apply:
+                add_op.action_apply()
+                field_name = (add_op.payload or {}).get("name") or field_name
+            place_op = Operation.create(
+                {
+                    "bundle_id": bundle.id,
+                    "sequence": sequence + 10,
+                    "type": "place_field",
+                    "model_id": model.id,
+                    "view_id": view.id,
+                    "view_type": view_type,
+                    "anchor_kind": "field",
+                    "anchor_name": anchor_name,
+                    "position": "after",
+                    "payload": {"field_name": field_name},
+                }
+            )
+            if apply:
+                place_op.action_apply()
+            operations = add_op | place_op
+        elif action == "hide":
+            operations = Operation.create(
+                {
+                    "bundle_id": bundle.id,
+                    "sequence": sequence,
+                    "type": "hide_field",
+                    "model_id": model.id,
+                    "view_id": view.id,
+                    "view_type": view_type,
+                    "anchor_kind": "field",
+                    "anchor_name": anchor_name,
+                    "payload": {},
+                }
+            )
+            if apply:
+                operations.action_apply()
+        else:
+            string = payload.get("string")
+            if not string:
+                raise UserError(self.env._("A new label is required."))
+            operations = Operation.create(
+                {
+                    "bundle_id": bundle.id,
+                    "sequence": sequence,
+                    "type": "set_string",
+                    "model_id": model.id,
+                    "view_id": view.id,
+                    "view_type": view_type,
+                    "anchor_kind": "field",
+                    "anchor_name": anchor_name,
+                    "position": "attributes",
+                    "payload": {"string": string},
+                }
+            )
+            if apply:
+                operations.action_apply()
+        broken = operations.filtered(lambda o: o.state == "broken")
+        return {
+            "operation_ids": operations.ids,
+            "state": bundle.state,
+            "broken": [
+                {"id": op.id, "name": op.name, "reason": op.broken_reason or ""}
+                for op in broken
+            ],
+            "reload": bool(operations.ids) and not broken.ids and apply,
+        }
+
+    def _check_ui_access(self):
+        if not self.env.user.has_group(
+            "escodoo_customization.group_customization_manager"
+        ):
+            raise AccessError(
+                self.env._("Only customization managers can edit forms in place.")
+            )
 
     def unlink(self):
         # Cascade at SQL level would skip operation.unlink() and leak generated
