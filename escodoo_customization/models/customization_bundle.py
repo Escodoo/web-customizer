@@ -9,10 +9,10 @@ from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .compiler import (
-    ANCHOR_TAGS,
     MODIFIER_KEYS,
     SUPPORTED_ANCHOR_KINDS,
     ensure_field_name,
+    list_anchor_candidates,
     resolve_related_field,
     slugify_field_suffix,
 )
@@ -141,14 +141,13 @@ class CustomizationBundle(models.Model):
         """Return bundles and whether the semantic anchor is unique on the view."""
         self._check_ui_access()
         view = self.env["ir.ui.view"].browse(view_id)
-        count = 0
         kind = anchor_kind or "field"
-        tag = ANCHOR_TAGS.get(kind, "field")
-        if view.exists() and anchor_name:
+        candidates = []
+        if view.exists() and anchor_name and re.match(r"^[\w.]+$", anchor_name):
             arch = view.get_combined_arch()
             tree = etree.fromstring(arch.encode()) if isinstance(arch, str) else arch
-            if re.match(r"^[\w.]+$", anchor_name):
-                count = len(tree.xpath(f"//{tag}[@name='{anchor_name}']"))
+            candidates = list_anchor_candidates(tree, anchor_name, kind)
+        count = len(candidates)
         bundles = self.search_read(
             [],
             ["name", "code", "state"],
@@ -160,6 +159,7 @@ class CustomizationBundle(models.Model):
             "anchor_count": count,
             "anchor_unique": count == 1,
             "anchor_kind": kind,
+            "candidates": candidates,
         }
 
     @api.model
@@ -167,7 +167,7 @@ class CustomizationBundle(models.Model):
         """Create (and optionally apply) operations from the in-place form UI.
 
         ``params`` keys: bundle_id, action, model, view_id, view_type,
-        anchor_name, anchor_kind, payload, apply.
+        anchor_name, anchor_kind, anchor_index, anchor_page, payload, apply.
         """
         self._check_ui_access()
         params = params or {}
@@ -205,6 +205,7 @@ class CustomizationBundle(models.Model):
         apply = params.get("apply", True)
         sequence = max(bundle.operation_ids.mapped("sequence") or [0]) + 10
         place_position = "inside" if anchor_kind == "page" else "after"
+        occurrence, anchor_page = self._ui_anchor_qualifier(params)
         if action == "add_after":
             operations = self._ui_action_add_after(
                 bundle,
@@ -218,6 +219,8 @@ class CustomizationBundle(models.Model):
                 apply,
                 anchor_kind=anchor_kind,
                 position=place_position,
+                occurrence=occurrence,
+                anchor_page=anchor_page,
             )
         elif action == "place_after":
             field_name = self._ui_existing_field_name(
@@ -234,6 +237,8 @@ class CustomizationBundle(models.Model):
                 apply,
                 anchor_kind=anchor_kind,
                 position=place_position,
+                occurrence=occurrence,
+                anchor_page=anchor_page,
             )
         else:
             operations = self._ui_action_on_anchor(
@@ -247,6 +252,8 @@ class CustomizationBundle(models.Model):
                 payload,
                 apply,
                 anchor_kind=anchor_kind,
+                occurrence=occurrence,
+                anchor_page=anchor_page,
             )
         broken = operations.filtered(lambda o: o.state == "broken")
         return {
@@ -272,6 +279,8 @@ class CustomizationBundle(models.Model):
         apply,
         anchor_kind="field",
         position="after",
+        occurrence=0,
+        anchor_page=False,
     ):
         """Create add_field plus place_field after/inside the clicked anchor."""
         if not payload.get("ttype") and not payload.get("related"):
@@ -309,6 +318,8 @@ class CustomizationBundle(models.Model):
             apply,
             anchor_kind=anchor_kind,
             position=position,
+            occurrence=occurrence,
+            anchor_page=anchor_page,
         )
         return add_op | place_op
 
@@ -324,6 +335,8 @@ class CustomizationBundle(models.Model):
         payload,
         apply,
         anchor_kind="field",
+        occurrence=0,
+        anchor_page=False,
     ):
         """Create a hide/rename/widget/groups/modifier operation on the anchor."""
         vals = {
@@ -335,6 +348,7 @@ class CustomizationBundle(models.Model):
             "anchor_kind": anchor_kind,
             "anchor_name": anchor_name,
         }
+        vals.update(self._ui_anchor_extra(occurrence, anchor_page))
         if action == "hide":
             vals.update({"type": "hide_field", "payload": {}})
         elif action == "rename":
@@ -429,25 +443,49 @@ class CustomizationBundle(models.Model):
         apply,
         anchor_kind="field",
         position="after",
+        occurrence=0,
+        anchor_page=False,
     ):
         """Create a place_field operation and optionally compile it."""
-        operation = self.env["customization.operation"].create(
-            {
-                "bundle_id": bundle.id,
-                "sequence": sequence,
-                "type": "place_field",
-                "model_id": model.id,
-                "view_id": view.id,
-                "view_type": view_type,
-                "anchor_kind": anchor_kind,
-                "anchor_name": anchor_name,
-                "position": position,
-                "payload": {"field_name": field_name},
-            }
-        )
+        vals = {
+            "bundle_id": bundle.id,
+            "sequence": sequence,
+            "type": "place_field",
+            "model_id": model.id,
+            "view_id": view.id,
+            "view_type": view_type,
+            "anchor_kind": anchor_kind,
+            "anchor_name": anchor_name,
+            "position": position,
+            "payload": {"field_name": field_name},
+        }
+        vals.update(self._ui_anchor_extra(occurrence, anchor_page))
+        operation = self.env["customization.operation"].create(vals)
         if apply:
             operation.action_apply()
         return operation
+
+    def _ui_anchor_qualifier(self, params):
+        """Return (anchor_occurrence, anchor_page) from UI params.
+
+        The UI sends a 0-based ``anchor_index``; the ledger stores a 1-based
+        occurrence so 0 can mean "the name must be unique".
+        """
+        if "anchor_index" not in params or params.get("anchor_index") in (None, ""):
+            occurrence = 0
+        else:
+            occurrence = int(params.get("anchor_index")) + 1
+        page = (params.get("anchor_page") or "").strip() or False
+        return occurrence, page
+
+    def _ui_anchor_extra(self, anchor_occurrence, anchor_page):
+        """Fields that qualify an otherwise ambiguous semantic anchor."""
+        extra = {}
+        if anchor_occurrence:
+            extra["anchor_occurrence"] = anchor_occurrence
+        if anchor_page:
+            extra["anchor_page"] = anchor_page
+        return extra
 
     def _check_ui_access(self):
         if not self.env.user.has_group(

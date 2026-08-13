@@ -79,6 +79,9 @@ export class CustomizationFieldDialog extends Component {
             busy: false,
             anchorCount: 0,
             anchorUnique: true,
+            candidates: [],
+            anchorIndex: 0,
+            anchorPage: "",
         });
         onWillStart(async () => {
             const info = await this.orm.call("customization.bundle", "get_ui_context", [
@@ -89,6 +92,11 @@ export class CustomizationFieldDialog extends Component {
             this.state.bundles = info.bundles || [];
             this.state.anchorCount = info.anchor_count || 0;
             this.state.anchorUnique = Boolean(info.anchor_unique);
+            this.state.candidates = info.candidates || [];
+            if (this.state.candidates.length) {
+                this.state.anchorIndex = this.state.candidates[0].index;
+                this.state.anchorPage = this.state.candidates[0].page || "";
+            }
             if (this.state.bundles.length) {
                 this.state.bundleId = this.state.bundles[0].id;
             }
@@ -147,6 +155,24 @@ export class CustomizationFieldDialog extends Component {
 
     onBundleChange(ev) {
         this.state.bundleId = parseInt(ev.target.value, 10) || false;
+    }
+
+    onCandidateChange(ev) {
+        const index = parseInt(ev.target.value, 10);
+        const candidate = this.state.candidates.find((item) => item.index === index);
+        this.state.anchorIndex = Number.isNaN(index) ? 0 : index;
+        this.state.anchorPage = candidate?.page || "";
+    }
+
+    anchorQualifier() {
+        if (this.state.candidates.length <= 1) {
+            return {};
+        }
+        const extra = {anchor_index: this.state.anchorIndex};
+        if (this.state.anchorPage) {
+            extra.anchor_page = this.state.anchorPage;
+        }
+        return extra;
     }
 
     async onExistingFieldUpdate(resId) {
@@ -258,6 +284,7 @@ export class CustomizationFieldDialog extends Component {
                         view_type: this.props.viewType || "form",
                         anchor_name: this.props.fieldName,
                         anchor_kind: this.anchorKind,
+                        ...this.anchorQualifier(),
                         payload,
                         apply: this.state.apply,
                     },

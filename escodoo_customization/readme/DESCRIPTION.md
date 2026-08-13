@@ -11,7 +11,8 @@ plain Odoo addon to version in git.
 Customization managers can turn on customization mode from the systray and
 click a field, named page tab, or named button on a form to add a field,
 place an existing field, hide it, change its label, set a widget, restrict
-it to groups, or set modifiers. That writes the same ledger operations as
+it to groups, or set modifiers. Duplicate names (for example two `email`
+fields) are chosen in the dialog. That writes the same ledger operations as
 the backend form.
 
 On upgrade, a health check re-resolves anchors. Missing anchors are marked

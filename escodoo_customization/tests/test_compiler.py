@@ -354,6 +354,89 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertEqual(bundle.operation_ids.state, "broken")
         self.assertIn("ambiguous", bundle.operation_ids.broken_reason)
 
+    def test_ambiguous_anchor_with_index_applies(self):
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.ambiguous.index",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <field name="name"/>
+                        <field name="email"/>
+                        <group>
+                            <field name="email"/>
+                        </group>
+                    </form>
+                """,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_ambiguous_index",
+            operations=[
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_name": "email",
+                        "anchor_occurrence": 2,
+                        "position": "after",
+                        "payload": {"field_name": "phone"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn("(//field[@name='email'])[2]", generated)
+        self.assertIn('name="phone"', view.get_combined_arch())
+
+    def test_ambiguous_anchor_with_page_applies(self):
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.ambiguous.page",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <notebook>
+                            <page name="contact" string="Contact">
+                                <field name="email"/>
+                            </page>
+                            <page name="extra_info" string="Extra">
+                                <field name="email"/>
+                            </page>
+                        </notebook>
+                    </form>
+                """,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_ambiguous_page",
+            operations=[
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_name": "email",
+                        "anchor_page": "extra_info",
+                        "position": "after",
+                        "payload": {"field_name": "phone"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn("//page[@name='extra_info']//field[@name='email']", generated)
+        self.assertNotIn("(//field[@name='email'])", generated)
+
     def test_place_field_on_search_view(self):
         bundle = self._create_bundle(
             code="client_search",

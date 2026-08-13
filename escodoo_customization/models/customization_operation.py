@@ -108,6 +108,14 @@ class CustomizationOperation(models.Model):
     anchor_name = fields.Char(
         help="Semantic anchor, for example the field name partner_id."
     )
+    anchor_occurrence = fields.Integer(
+        default=0,
+        help="1-based occurrence when the name is not unique. "
+        "0 means the name must be unique.",
+    )
+    anchor_page = fields.Char(
+        help="Parent notebook page name, used to disambiguate the anchor.",
+    )
     position = fields.Selection(
         selection=[
             ("before", "Before"),

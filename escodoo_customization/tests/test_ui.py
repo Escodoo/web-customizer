@@ -284,6 +284,65 @@ class TestCustomizationUiApi(CustomizationCase):
         )
         self.assertTrue(button["anchor_unique"])
 
+    def test_get_ui_context_lists_ambiguous_candidates(self):
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.ui.ambiguous",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <field name="name"/>
+                        <field name="email"/>
+                        <notebook>
+                            <page name="extra_info" string="Extra">
+                                <field name="email"/>
+                            </page>
+                        </notebook>
+                    </form>
+                """,
+            }
+        )
+        info = self.env["customization.bundle"].get_ui_context(view.id, "email")
+        self.assertFalse(info["anchor_unique"])
+        self.assertEqual(len(info["candidates"]), 2)
+        self.assertEqual(info["candidates"][1]["index"], 1)
+        self.assertEqual(info["candidates"][1]["page"], "extra_info")
+        self.assertIn("page extra_info", info["candidates"][1]["label"])
+
+    def test_create_from_ui_disambiguates_anchor(self):
+        bundle = self._create_bundle(code="client_ui_ambiguous")
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.ui.ambiguous.apply",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <field name="name"/>
+                        <field name="email"/>
+                        <field name="email"/>
+                    </form>
+                """,
+            }
+        )
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "anchor_index": 1,
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.anchor_occurrence, 2)
+        self.assertIn("(//field[@name='email'])[2]", hide.generated_view_id.arch)
+
     def test_create_from_ui_add_field_inside_page(self):
         bundle = self._create_bundle(code="client_ui_page")
         view = self._form_with_page()

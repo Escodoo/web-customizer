@@ -382,8 +382,9 @@ version in git.</p>
 <p>Customization managers can turn on customization mode from the systray
 and click a field, named page tab, or named button on a form to add a
 field, place an existing field, hide it, change its label, set a widget,
-restrict it to groups, or set modifiers. That writes the same ledger
-operations as the backend form.</p>
+restrict it to groups, or set modifiers. Duplicate names (for example
+two <tt class="docutils literal">email</tt> fields) are chosen in the dialog. That writes the same
+ledger operations as the backend form.</p>
 <p>On upgrade, a health check re-resolves anchors. Missing anchors are
 marked <tt class="docutils literal">broken</tt> with a reason; other operations are left intact.
 Customizations never disappear silently.</p>
@@ -418,7 +419,8 @@ restrict it to groups, or set modifiers (invisible / readonly /
 required). The clicked node is the semantic anchor. To mirror another
 field, fill <strong>Related path</strong> (for example <tt class="docutils literal">parent_id.email</tt>)
 instead of a field type. Pages and buttons need a technical <tt class="docutils literal">name</tt>
-in the view.</li>
+in the view. If the same name appears more than once, choose the node
+in the dialog.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
 the selected type. The <strong>Raw JSON</strong> tab shows the stored intent.</li>
 <li>Click <strong>Apply</strong> to compile fields and inherited views.</li>

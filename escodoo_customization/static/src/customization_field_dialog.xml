@@ -3,15 +3,31 @@
     <t t-name="escodoo_customization.FieldDialog">
         <Dialog title="title" size="'md'">
             <div class="o_esc_customization_dialog">
-                <p class="text-muted" t-if="!state.anchorUnique">
+                <p class="text-muted" t-if="state.candidates.length > 1">
                     Anchor "<t t-esc="props.fieldName" />" matches
-                    <t t-esc="state.anchorCount" /> nodes. Apply will mark the
-                    operation broken if the match is not unique.
+                    <t t-esc="state.anchorCount" /> nodes. Choose which one
+                    to customize.
                 </p>
                 <p class="text-danger" t-if="!state.bundles.length">
                     Create a bundle under Settings → Technical → Customization
                     before customizing this form.
                 </p>
+                <div class="mb-3" t-if="state.candidates.length > 1">
+                    <label class="form-label">Which node</label>
+                    <select class="form-select" t-on-change="onCandidateChange">
+                        <t
+                            t-foreach="state.candidates"
+                            t-as="candidate"
+                            t-key="candidate.index"
+                        >
+                            <option
+                                t-att-value="candidate.index"
+                                t-att-selected="candidate.index === state.anchorIndex"
+                                t-esc="candidate.label"
+                            />
+                        </t>
+                    </select>
+                </div>
                 <div class="mb-3" t-if="state.bundles.length">
                     <label class="form-label">Bundle</label>
                     <select class="form-select" t-on-change="onBundleChange">

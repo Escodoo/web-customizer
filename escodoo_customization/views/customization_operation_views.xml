@@ -58,6 +58,11 @@
                         <group>
                             <field name="anchor_kind" />
                             <field name="anchor_name" invisible="type == 'add_field'" />
+                            <field
+                                name="anchor_occurrence"
+                                invisible="type == 'add_field'"
+                            />
+                            <field name="anchor_page" invisible="type == 'add_field'" />
                             <field name="position" invisible="type == 'add_field'" />
                             <field name="generated_field_id" readonly="1" />
                             <field name="generated_view_id" readonly="1" />

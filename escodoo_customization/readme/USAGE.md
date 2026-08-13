@@ -9,7 +9,8 @@
    required). The clicked node is the semantic anchor. To mirror another
    field, fill **Related path** (for example `parent_id.email`) instead
    of a field type. Pages and buttons need a technical ``name`` in the
-   view.
+   view. If the same name appears more than once, choose the node in the
+   dialog.
 4. Or add operations from the bundle form. Fill the payload fields for the
    selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.

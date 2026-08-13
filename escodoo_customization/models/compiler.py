@@ -178,8 +178,48 @@ def combined_arch_for_operation(view, operation):
             was_active.write({"active": True})
 
 
-def resolve_anchor(arch_tree, anchor_name, anchor_kind="field"):
-    """Return the unique semantic anchor node or raise AnchorError."""
+def list_anchor_candidates(arch_tree, anchor_name, anchor_kind="field"):
+    """Describe every node that matches the semantic anchor name."""
+    kind = anchor_kind or "field"
+    tag = ANCHOR_TAGS.get(kind, "field")
+    if not anchor_name or not re.match(r"^[\w.]+$", anchor_name):
+        return []
+    candidates = []
+    for index, node in enumerate(arch_tree.xpath(f"//{tag}[@name='{anchor_name}']")):
+        page_names = node.xpath("ancestor::page[@name][1]/@name")
+        page = page_names[0] if page_names else ""
+        previous = node.getprevious()
+        after = ""
+        if previous is not None:
+            after = previous.get("name") or previous.get("string") or ""
+        extras = []
+        if page:
+            extras.append(_("page %s") % page)
+        if after:
+            extras.append(_("after %s") % after)
+        suffix = f" ({', '.join(extras)})" if extras else ""
+        candidates.append(
+            {
+                "index": index,
+                "page": page,
+                "after": after,
+                "label": f"{index + 1}. {anchor_name}{suffix}",
+            }
+        )
+    return candidates
+
+
+def resolve_anchor(
+    arch_tree,
+    anchor_name,
+    anchor_kind="field",
+    occurrence=0,
+    anchor_page=None,
+):
+    """Return the unique semantic anchor node or raise AnchorError.
+
+    ``occurrence`` is 1-based. 0 means the remaining matches must be unique.
+    """
     kind = anchor_kind or "field"
     tag = ANCHOR_TAGS.get(kind)
     if not tag:
@@ -189,6 +229,7 @@ def resolve_anchor(arch_tree, anchor_name, anchor_kind="field"):
     if not re.match(r"^[\w.]+$", anchor_name):
         raise AnchorError(_("Anchor name '%s' is invalid.") % anchor_name)
     nodes = arch_tree.xpath(f"//{tag}[@name='{anchor_name}']")
+    page = (anchor_page or "").strip()
     if not nodes:
         raise AnchorError(
             _(
@@ -197,17 +238,58 @@ def resolve_anchor(arch_tree, anchor_name, anchor_kind="field"):
                 name=anchor_name,
             )
         )
-    if len(nodes) > 1:
-        raise AnchorError(
-            _(
-                "Anchor %(kind)s '%(name)s' is ambiguous "
-                "(%(count)s matches in the target view).",
-                kind=kind,
-                name=anchor_name,
-                count=len(nodes),
+    if occurrence:
+        index = int(occurrence) - 1
+        if not 0 <= index < len(nodes):
+            raise AnchorError(
+                _(
+                    "Anchor %(kind)s '%(name)s' has no occurrence %(index)s.",
+                    kind=kind,
+                    name=anchor_name,
+                    index=int(occurrence),
+                )
             )
+        node = nodes[index]
+        if page:
+            node_page = (node.xpath("ancestor::page[@name][1]/@name") or [""])[0]
+            if node_page != page:
+                raise AnchorError(
+                    _(
+                        "Anchor %(kind)s '%(name)s' occurrence %(index)s "
+                        "is not on page '%(page)s'.",
+                        kind=kind,
+                        name=anchor_name,
+                        index=int(occurrence),
+                        page=page,
+                    )
+                )
+        return node
+    if page:
+        nodes = [
+            node
+            for node in nodes
+            if (node.xpath("ancestor::page[@name][1]/@name") or [""])[0] == page
+        ]
+        if not nodes:
+            raise AnchorError(
+                _(
+                    "Anchor %(kind)s '%(name)s' was not found on page '%(page)s'.",
+                    kind=kind,
+                    name=anchor_name,
+                    page=page,
+                )
+            )
+    if len(nodes) == 1:
+        return nodes[0]
+    raise AnchorError(
+        _(
+            "Anchor %(kind)s '%(name)s' is ambiguous "
+            "(%(count)s matches in the target view).",
+            kind=kind,
+            name=anchor_name,
+            count=len(nodes),
         )
-    return nodes[0]
+    )
 
 
 def resolve_field_anchor(arch_tree, anchor_name):
@@ -230,7 +312,13 @@ def health_check_operation(operation):
         return False, _("A target view is required.")
     try:
         arch_tree = combined_arch_for_operation(operation.view_id, operation)
-        resolve_anchor(arch_tree, operation.anchor_name, operation.anchor_kind)
+        resolve_anchor(
+            arch_tree,
+            operation.anchor_name,
+            operation.anchor_kind,
+            operation.anchor_occurrence,
+            operation.anchor_page,
+        )
     except AnchorError as err:
         return False, err.reason
     except (ValueError, etree.ParseError) as err:
@@ -360,6 +448,14 @@ def _inherit_arch(operation, inner_xml, position):
     kind = operation.anchor_kind or "field"
     tag = ANCHOR_TAGS.get(kind, "field")
     anchor = operation.anchor_name
+    page = (operation.anchor_page or "").strip()
+    occurrence = operation.anchor_occurrence or 0
+    if occurrence:
+        expr = f"(//{tag}[@name='{anchor}'])[{int(occurrence)}]"
+        return f'<xpath expr="{expr}" position="{position}">{inner_xml}</xpath>'
+    if page:
+        expr = f"//page[@name='{page}']//{tag}[@name='{anchor}']"
+        return f'<xpath expr="{expr}" position="{position}">{inner_xml}</xpath>'
     return f'<{tag} name="{anchor}" position="{position}">{inner_xml}</{tag}>'
 
 

@@ -36,8 +36,9 @@ version in git.
 Customization managers can turn on customization mode from the systray
 and click a field, named page tab, or named button on a form to add a
 field, place an existing field, hide it, change its label, set a widget,
-restrict it to groups, or set modifiers. That writes the same ledger
-operations as the backend form.
+restrict it to groups, or set modifiers. Duplicate names (for example
+two ``email`` fields) are chosen in the dialog. That writes the same
+ledger operations as the backend form.
 
 On upgrade, a health check re-resolves anchors. Missing anchors are
 marked ``broken`` with a reason; other operations are left intact.
@@ -67,7 +68,8 @@ Usage
    required). The clicked node is the semantic anchor. To mirror another
    field, fill **Related path** (for example ``parent_id.email``)
    instead of a field type. Pages and buttons need a technical ``name``
-   in the view.
+   in the view. If the same name appears more than once, choose the node
+   in the dialog.
 4. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.
