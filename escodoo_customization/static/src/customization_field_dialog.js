@@ -45,9 +45,10 @@ export class CustomizationFieldDialog extends Component {
         close: Function,
         fieldName: String,
         fieldLabel: {type: String, optional: true},
-        model: String,
+        model: {type: String, optional: true},
         viewId: Number,
         viewType: {type: String, optional: true},
+        anchorKind: {type: String, optional: true},
     };
 
     setup() {
@@ -55,10 +56,11 @@ export class CustomizationFieldDialog extends Component {
         this.notification = useService("notification");
         this.fieldTypes = FIELD_TYPES;
         this.fieldWidgets = FIELD_WIDGETS;
+        this.anchorKind = this.props.anchorKind || "field";
         this.state = useState({
             bundles: [],
             bundleId: false,
-            action: "add_after",
+            action: this.anchorKind === "button" ? "hide" : "add_after",
             ttype: "char",
             string: "",
             name: "",
@@ -82,6 +84,7 @@ export class CustomizationFieldDialog extends Component {
             const info = await this.orm.call("customization.bundle", "get_ui_context", [
                 this.props.viewId,
                 this.props.fieldName,
+                this.anchorKind,
             ]);
             this.state.bundles = info.bundles || [];
             this.state.anchorCount = info.anchor_count || 0;
@@ -93,7 +96,42 @@ export class CustomizationFieldDialog extends Component {
     }
 
     get title() {
-        return _t("Customize field %s", this.props.fieldLabel || this.props.fieldName);
+        const label = this.props.fieldLabel || this.props.fieldName;
+        if (this.anchorKind === "page") {
+            return _t("Customize page %s", label);
+        }
+        if (this.anchorKind === "button") {
+            return _t("Customize button %s", label);
+        }
+        return _t("Customize field %s", label);
+    }
+
+    get actions() {
+        if (this.anchorKind === "page") {
+            return [
+                {value: "add_after", label: _t("Add field in this page")},
+                {value: "place_after", label: _t("Place existing field in this page")},
+                {value: "hide", label: _t("Hide this page")},
+                {value: "rename", label: _t("Change page title")},
+            ];
+        }
+        if (this.anchorKind === "button") {
+            return [
+                {value: "hide", label: _t("Hide this button")},
+                {value: "rename", label: _t("Change label")},
+                {value: "set_groups", label: _t("Restrict to groups")},
+                {value: "set_modifier", label: _t("Set modifiers")},
+            ];
+        }
+        return [
+            {value: "add_after", label: _t("Add field after this one")},
+            {value: "place_after", label: _t("Place existing field after this one")},
+            {value: "hide", label: _t("Hide this field")},
+            {value: "rename", label: _t("Change label")},
+            {value: "set_widget", label: _t("Set widget")},
+            {value: "set_groups", label: _t("Restrict to groups")},
+            {value: "set_modifier", label: _t("Set modifiers")},
+        ];
     }
 
     get existingFieldDomain() {
@@ -219,6 +257,7 @@ export class CustomizationFieldDialog extends Component {
                         view_id: this.props.viewId,
                         view_type: this.props.viewType || "form",
                         anchor_name: this.props.fieldName,
+                        anchor_kind: this.anchorKind,
                         payload,
                         apply: this.state.apply,
                     },

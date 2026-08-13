@@ -56,6 +56,33 @@ class CustomizationCase(TransactionCase):
             }
         )
 
+    def _form_with_page(self):
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.notebook",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <header>
+                            <button name="toggle_active" type="object" string="Archive"/>
+                        </header>
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                                <field name="email"/>
+                            </group>
+                            <notebook>
+                                <page name="extra_info" string="Extra">
+                                    <field name="phone"/>
+                                </page>
+                            </notebook>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
     def _create_bundle(self, code="client_test", operations=None):
         vals = {
             "name": "Test bundle",

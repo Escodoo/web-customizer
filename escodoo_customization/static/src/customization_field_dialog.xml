@@ -4,7 +4,7 @@
         <Dialog title="title" size="'md'">
             <div class="o_esc_customization_dialog">
                 <p class="text-muted" t-if="!state.anchorUnique">
-                    Anchor field "<t t-esc="props.fieldName" />" matches
+                    Anchor "<t t-esc="props.fieldName" />" matches
                     <t t-esc="state.anchorCount" /> nodes. Apply will mark the
                     operation broken if the match is not unique.
                 </p>
@@ -30,45 +30,13 @@
                         class="form-select"
                         t-on-change="(ev) => state.action = ev.target.value"
                     >
-                        <option
-                            value="add_after"
-                            t-att-selected="state.action === 'add_after'"
-                        >
-                            Add field after this one
-                        </option>
-                        <option
-                            value="place_after"
-                            t-att-selected="state.action === 'place_after'"
-                        >
-                            Place existing field after this one
-                        </option>
-                        <option value="hide" t-att-selected="state.action === 'hide'">
-                            Hide this field
-                        </option>
-                        <option
-                            value="rename"
-                            t-att-selected="state.action === 'rename'"
-                        >
-                            Change label
-                        </option>
-                        <option
-                            value="set_widget"
-                            t-att-selected="state.action === 'set_widget'"
-                        >
-                            Set widget
-                        </option>
-                        <option
-                            value="set_groups"
-                            t-att-selected="state.action === 'set_groups'"
-                        >
-                            Restrict to groups
-                        </option>
-                        <option
-                            value="set_modifier"
-                            t-att-selected="state.action === 'set_modifier'"
-                        >
-                            Set modifiers
-                        </option>
+                        <t t-foreach="actions" t-as="act" t-key="act.value">
+                            <option
+                                t-att-value="act.value"
+                                t-att-selected="state.action === act.value"
+                                t-esc="act.label"
+                            />
+                        </t>
                     </select>
                 </div>
                 <t t-if="state.action === 'add_after'">

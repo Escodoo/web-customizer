@@ -9,7 +9,9 @@ from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .compiler import (
+    ANCHOR_TAGS,
     MODIFIER_KEYS,
+    SUPPORTED_ANCHOR_KINDS,
     ensure_field_name,
     resolve_related_field,
     slugify_field_suffix,
@@ -135,16 +137,18 @@ class CustomizationBundle(models.Model):
         }
 
     @api.model
-    def get_ui_context(self, view_id, anchor_name):
-        """Return bundles and whether ``anchor_name`` is unique on the view."""
+    def get_ui_context(self, view_id, anchor_name, anchor_kind="field"):
+        """Return bundles and whether the semantic anchor is unique on the view."""
         self._check_ui_access()
         view = self.env["ir.ui.view"].browse(view_id)
         count = 0
+        kind = anchor_kind or "field"
+        tag = ANCHOR_TAGS.get(kind, "field")
         if view.exists() and anchor_name:
             arch = view.get_combined_arch()
             tree = etree.fromstring(arch.encode()) if isinstance(arch, str) else arch
             if re.match(r"^[\w.]+$", anchor_name):
-                count = len(tree.xpath(f"//field[@name='{anchor_name}']"))
+                count = len(tree.xpath(f"//{tag}[@name='{anchor_name}']"))
         bundles = self.search_read(
             [],
             ["name", "code", "state"],
@@ -155,6 +159,7 @@ class CustomizationBundle(models.Model):
             "bundles": bundles,
             "anchor_count": count,
             "anchor_unique": count == 1,
+            "anchor_kind": kind,
         }
 
     @api.model
@@ -162,7 +167,7 @@ class CustomizationBundle(models.Model):
         """Create (and optionally apply) operations from the in-place form UI.
 
         ``params`` keys: bundle_id, action, model, view_id, view_type,
-        anchor_name, payload, apply.
+        anchor_name, anchor_kind, payload, apply.
         """
         self._check_ui_access()
         params = params or {}
@@ -181,11 +186,25 @@ class CustomizationBundle(models.Model):
             raise UserError(self.env._("The target view is missing."))
         anchor_name = params.get("anchor_name")
         if not anchor_name:
-            raise UserError(self.env._("Click a field to set the anchor."))
+            raise UserError(
+                self.env._("Click a field, page or button to set the anchor.")
+            )
+        anchor_kind = params.get("anchor_kind") or "field"
+        if anchor_kind not in SUPPORTED_ANCHOR_KINDS:
+            raise UserError(
+                self.env._("Anchor kind '%s' is not supported.") % anchor_kind
+            )
+        if action == "set_widget" and anchor_kind != "field":
+            raise UserError(self.env._("Widgets can only be set on fields."))
+        if action in ("add_after", "place_after") and anchor_kind == "button":
+            raise UserError(
+                self.env._("Place a field on a page or after another field.")
+            )
         view_type = params.get("view_type") or "form"
         payload = dict(params.get("payload") or {})
         apply = params.get("apply", True)
         sequence = max(bundle.operation_ids.mapped("sequence") or [0]) + 10
+        place_position = "inside" if anchor_kind == "page" else "after"
         if action == "add_after":
             operations = self._ui_action_add_after(
                 bundle,
@@ -197,6 +216,8 @@ class CustomizationBundle(models.Model):
                 anchor_name,
                 payload,
                 apply,
+                anchor_kind=anchor_kind,
+                position=place_position,
             )
         elif action == "place_after":
             field_name = self._ui_existing_field_name(
@@ -211,6 +232,8 @@ class CustomizationBundle(models.Model):
                 anchor_name,
                 field_name,
                 apply,
+                anchor_kind=anchor_kind,
+                position=place_position,
             )
         else:
             operations = self._ui_action_on_anchor(
@@ -223,6 +246,7 @@ class CustomizationBundle(models.Model):
                 anchor_name,
                 payload,
                 apply,
+                anchor_kind=anchor_kind,
             )
         broken = operations.filtered(lambda o: o.state == "broken")
         return {
@@ -246,8 +270,10 @@ class CustomizationBundle(models.Model):
         anchor_name,
         payload,
         apply,
+        anchor_kind="field",
+        position="after",
     ):
-        """Create add_field plus place_field after the clicked anchor."""
+        """Create add_field plus place_field after/inside the clicked anchor."""
         if not payload.get("ttype") and not payload.get("related"):
             raise UserError(self.env._("A field type or a related path is required."))
         if payload.get("related") and not payload.get("ttype"):
@@ -281,6 +307,8 @@ class CustomizationBundle(models.Model):
             anchor_name,
             field_name,
             apply,
+            anchor_kind=anchor_kind,
+            position=position,
         )
         return add_op | place_op
 
@@ -295,15 +323,16 @@ class CustomizationBundle(models.Model):
         anchor_name,
         payload,
         apply,
+        anchor_kind="field",
     ):
-        """Create a hide/rename/widget/groups/modifier operation on the field."""
+        """Create a hide/rename/widget/groups/modifier operation on the anchor."""
         vals = {
             "bundle_id": bundle.id,
             "sequence": sequence,
             "model_id": model.id,
             "view_id": view.id,
             "view_type": view_type,
-            "anchor_kind": "field",
+            "anchor_kind": anchor_kind,
             "anchor_name": anchor_name,
         }
         if action == "hide":
@@ -389,7 +418,17 @@ class CustomizationBundle(models.Model):
         return field.name
 
     def _ui_place_field(
-        self, bundle, sequence, model, view, view_type, anchor_name, field_name, apply
+        self,
+        bundle,
+        sequence,
+        model,
+        view,
+        view_type,
+        anchor_name,
+        field_name,
+        apply,
+        anchor_kind="field",
+        position="after",
     ):
         """Create a place_field operation and optionally compile it."""
         operation = self.env["customization.operation"].create(
@@ -400,9 +439,9 @@ class CustomizationBundle(models.Model):
                 "model_id": model.id,
                 "view_id": view.id,
                 "view_type": view_type,
-                "anchor_kind": "field",
+                "anchor_kind": anchor_kind,
                 "anchor_name": anchor_name,
-                "position": "after",
+                "position": position,
                 "payload": {"field_name": field_name},
             }
         )

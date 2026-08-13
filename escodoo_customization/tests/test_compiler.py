@@ -380,3 +380,90 @@ class TestCustomizationCompiler(CustomizationCase):
         uninstall_hook(self.env)
         self.assertFalse(self.env["ir.model.fields"].browse(field_id).exists())
         self.assertFalse(self.env["ir.ui.view"].browse(view_id).exists())
+
+    def test_place_field_inside_named_page(self):
+        view = self._form_with_page()
+        bundle = self._create_bundle(
+            code="client_page_inside",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "char",
+                            "string": "Page Note",
+                            "name": "x_esc_page_note",
+                        },
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "sequence": 20,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "page",
+                        "anchor_name": "extra_info",
+                        "position": "inside",
+                        "payload": {"field_name": "x_esc_page_note"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        self.assertIn(
+            '<page name="extra_info" position="inside">',
+            place.generated_view_id.arch,
+        )
+        self.assertIn("x_esc_page_note", view.get_combined_arch())
+
+    def test_hide_named_page_and_button(self):
+        view = self._form_with_page()
+        bundle = self._create_bundle(
+            code="client_page_button",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "page",
+                        "anchor_name": "extra_info",
+                        "payload": {},
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 20,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "button",
+                        "anchor_name": "toggle_active",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        arch = view.get_combined_arch()
+        self.assertIn("invisible", arch)
+        page_op = bundle.operation_ids.filtered(lambda o: o.anchor_kind == "page")
+        button_op = bundle.operation_ids.filtered(lambda o: o.anchor_kind == "button")
+        self.assertIn(
+            '<page name="extra_info" position="attributes">',
+            page_op.generated_view_id.arch,
+        )
+        self.assertIn(
+            '<button name="toggle_active" position="attributes">',
+            button_op.generated_view_id.arch,
+        )

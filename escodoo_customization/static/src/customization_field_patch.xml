@@ -18,4 +18,15 @@
             <attribute name="t-on-click">onCustomizationClick</attribute>
         </xpath>
     </t>
+    <t
+        t-name="escodoo_customization.Notebook"
+        t-inherit="web.Notebook"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//a[hasclass('nav-link')]" position="attributes">
+            <attribute
+                name="t-on-click.prevent"
+            >(ev) => this.onCustomizationNavClick(ev, navItem)</attribute>
+        </xpath>
+    </t>
 </templates>

@@ -7,6 +7,11 @@
     cursor: pointer !important;
 }
 
+.nav-link.o_esc_customization_target,
+.btn.o_esc_customization_target {
+    outline: 1px dashed #714b67;
+}
+
 .o_esc_customization_target:hover {
     outline: 2px solid #714b67;
     background-color: rgba(113, 75, 103, 0.08);

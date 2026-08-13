@@ -13,7 +13,7 @@ export const customizationService = {
                 state.enabled = !state.enabled;
                 if (state.enabled) {
                     notification.add(
-                        _t("Customization mode is on. Click a field on the form."),
+                        _t("Customization mode is on. Click a field, page or button."),
                         {type: "info"}
                     );
                 }
@@ -27,34 +27,41 @@ export const customizationService = {
 
 registry.category("services").add("escodoo_customization", customizationService);
 
-export function isFormRootField(component) {
-    const record = component.props.record;
-    const config = component.env.config || {};
-    return Boolean(
-        config.viewType === "form" &&
-            config.viewId &&
-            record &&
-            record.model &&
-            record === record.model.root
-    );
+function formRecord(component) {
+    return component.props.record || component.env.model?.root;
 }
 
-export function openCustomizationFor(component, fieldName, ev) {
+export function isFormRootField(component) {
+    const config = component.env.config || {};
+    if (config.viewType !== "form" || !config.viewId) {
+        return false;
+    }
+    const record = formRecord(component);
+    if (record?.model && record !== record.model.root) {
+        return false;
+    }
+    return true;
+}
+
+export function openCustomizationFor(component, fieldName, ev, extra = {}) {
     const customization = component.customization;
     if (!customization?.state.enabled || !isFormRootField(component) || !fieldName) {
         return false;
     }
     ev.preventDefault();
     ev.stopPropagation();
+    const record = formRecord(component);
     customization.openFieldDialog({
         fieldName,
         fieldLabel:
+            extra.fieldLabel ||
             component.props.string ||
             component.props.record?.fields?.[fieldName]?.string ||
             fieldName,
-        model: component.props.record.resModel,
+        model: record?.resModel,
         viewId: component.env.config.viewId,
         viewType: component.env.config.viewType || "form",
+        anchorKind: extra.anchorKind || "field",
     });
     return true;
 }

@@ -25,8 +25,13 @@ SUPPORTED_TTYPES = (
     "binary",
     "monetary",
 )
-SUPPORTED_ANCHOR_KINDS = ("field",)
-FIELD_POSITIONS = ("before", "after", "replace")
+SUPPORTED_ANCHOR_KINDS = ("field", "page", "button")
+ANCHOR_TAGS = {
+    "field": "field",
+    "page": "page",
+    "button": "button",
+}
+FIELD_POSITIONS = ("before", "after", "inside", "replace")
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -173,30 +178,41 @@ def combined_arch_for_operation(view, operation):
             was_active.write({"active": True})
 
 
-def resolve_field_anchor(arch_tree, anchor_name):
-    """Locate a unique ``field`` node named ``anchor_name``.
-
-    :raises AnchorError: when the anchor is missing or ambiguous
-    """
+def resolve_anchor(arch_tree, anchor_name, anchor_kind="field"):
+    """Return the unique semantic anchor node or raise AnchorError."""
+    kind = anchor_kind or "field"
+    tag = ANCHOR_TAGS.get(kind)
+    if not tag:
+        raise AnchorError(_("Anchor kind '%s' is not supported yet.") % kind)
     if not anchor_name:
-        raise AnchorError(_("Anchor field name is missing."))
+        raise AnchorError(_("Anchor name is missing."))
     if not re.match(r"^[\w.]+$", anchor_name):
-        raise AnchorError(_("Anchor field name '%s' is invalid.") % anchor_name)
-    nodes = arch_tree.xpath(f"//field[@name='{anchor_name}']")
+        raise AnchorError(_("Anchor name '%s' is invalid.") % anchor_name)
+    nodes = arch_tree.xpath(f"//{tag}[@name='{anchor_name}']")
     if not nodes:
         raise AnchorError(
-            _("Anchor field '%s' was not found in the target view.") % anchor_name
+            _(
+                "Anchor %(kind)s '%(name)s' was not found in the target view.",
+                kind=kind,
+                name=anchor_name,
+            )
         )
     if len(nodes) > 1:
         raise AnchorError(
             _(
-                "Anchor field '%(name)s' is ambiguous "
+                "Anchor %(kind)s '%(name)s' is ambiguous "
                 "(%(count)s matches in the target view).",
+                kind=kind,
                 name=anchor_name,
                 count=len(nodes),
             )
         )
     return nodes[0]
+
+
+def resolve_field_anchor(arch_tree, anchor_name):
+    """Backward-compatible wrapper around :func:`resolve_anchor`."""
+    return resolve_anchor(arch_tree, anchor_name, "field")
 
 
 def health_check_operation(operation):
@@ -214,7 +230,7 @@ def health_check_operation(operation):
         return False, _("A target view is required.")
     try:
         arch_tree = combined_arch_for_operation(operation.view_id, operation)
-        resolve_field_anchor(arch_tree, operation.anchor_name)
+        resolve_anchor(arch_tree, operation.anchor_name, operation.anchor_kind)
     except AnchorError as err:
         return False, err.reason
     except (ValueError, etree.ParseError) as err:
@@ -341,8 +357,10 @@ def _apply_add_field(operation):
 
 
 def _inherit_arch(operation, inner_xml, position):
+    kind = operation.anchor_kind or "field"
+    tag = ANCHOR_TAGS.get(kind, "field")
     anchor = operation.anchor_name
-    return f'<field name="{anchor}" position="{position}">{inner_xml}</field>'
+    return f'<{tag} name="{anchor}" position="{position}">{inner_xml}</{tag}>'
 
 
 def _upsert_generated_view(operation, arch, active=True):

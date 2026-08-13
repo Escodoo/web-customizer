@@ -273,6 +273,65 @@ class TestCustomizationUiApi(CustomizationCase):
         )
         self.assertFalse(missing["anchor_unique"])
         self.assertEqual(missing["anchor_count"], 0)
+        view = self._form_with_page()
+        page = self.env["customization.bundle"].get_ui_context(
+            view.id, "extra_info", "page"
+        )
+        self.assertTrue(page["anchor_unique"])
+        self.assertEqual(page["anchor_kind"], "page")
+        button = self.env["customization.bundle"].get_ui_context(
+            view.id, "toggle_active", "button"
+        )
+        self.assertTrue(button["anchor_unique"])
+
+    def test_create_from_ui_add_field_inside_page(self):
+        bundle = self._create_bundle(code="client_ui_page")
+        view = self._form_with_page()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": "extra_info",
+                "anchor_kind": "page",
+                "payload": {
+                    "ttype": "char",
+                    "string": "Page Note",
+                    "name": "x_esc_ui_page_note",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        self.assertEqual(place.anchor_kind, "page")
+        self.assertEqual(place.position, "inside")
+        self.assertIn("x_esc_ui_page_note", view.get_combined_arch())
+
+    def test_create_from_ui_hide_button(self):
+        bundle = self._create_bundle(code="client_ui_button")
+        view = self._form_with_page()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": "toggle_active",
+                "anchor_kind": "button",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.anchor_kind, "button")
+        self.assertIn(
+            '<button name="toggle_active" position="attributes">',
+            hide.generated_view_id.arch,
+        )
 
     def test_create_from_ui_requires_manager(self):
         bundle = self._create_bundle(code="client_ui_acl")
