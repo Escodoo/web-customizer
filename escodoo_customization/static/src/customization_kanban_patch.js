@@ -23,6 +23,28 @@ patch(KanbanCompiler.prototype, {
         combineAttributes(compiled, "class", ["o_esc_kanban_field"]);
         return compiled;
     },
+    compileButton(el, params) {
+        const compiled = super.compileButton(el, params);
+        const name = el.getAttribute("name") || "";
+        const type = el.getAttribute("type") || "";
+        const anchor = /^\w+$/.test(name) ? name : /^\w+$/.test(type) ? type : "";
+        if (!anchor) {
+            return compiled;
+        }
+        const tag = (compiled.tagName || "").toLowerCase();
+        if (tag === "viewbutton") {
+            return compiled;
+        }
+        const label = el.getAttribute("string") || anchor;
+        const previous = compiled.getAttribute("t-on-click") || "";
+        const fallback = previous || "() => {}";
+        compiled.setAttribute(
+            "t-on-click",
+            `(ev) => __comp__.onCustomizationButtonClick(ev, ${JSON.stringify(anchor)}, ${JSON.stringify(label)}, () => {(${fallback})()})`
+        );
+        combineAttributes(compiled, "class", ["o_esc_kanban_button"]);
+        return compiled;
+    },
 });
 
 patch(KanbanRecord.prototype, {
@@ -47,5 +69,22 @@ patch(KanbanRecord.prototype, {
             fieldLabel: label,
             model: this.props.record?.resModel,
         });
+    },
+    onCustomizationButtonClick(ev, anchor, label, original) {
+        if (
+            this.customization?.state.enabled &&
+            isKanbanRoot(this) &&
+            openCustomizationFor(this, anchor, ev, {
+                viewType: "kanban",
+                anchorKind: "button",
+                fieldLabel: label || anchor,
+                model: this.props.record?.resModel,
+            })
+        ) {
+            return;
+        }
+        if (typeof original === "function") {
+            original();
+        }
     },
 });

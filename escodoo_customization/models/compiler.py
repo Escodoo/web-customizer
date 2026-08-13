@@ -56,6 +56,15 @@ ATTRIBUTE_TYPES = (
     "hide_field",
 )
 MODIFIER_KEYS = ("invisible", "readonly", "required", "column_invisible")
+BUTTON_TYPE_ANCHORS = (
+    "edit",
+    "open",
+    "delete",
+    "url",
+    "set_cover",
+    "archive",
+    "unarchive",
+)
 XMLID_MODULE = "escodoo_customization"
 
 
@@ -320,7 +329,10 @@ def _anchor_nodes(arch_tree, tag, anchor_name, anchor_string=None):
     if name:
         if not re.match(r"^[\w.]+$", name):
             return []
-        return arch_tree.xpath(f"//{tag}[@name='{name}']")
+        nodes = arch_tree.xpath(f"//{tag}[@name='{name}']")
+        if nodes or tag != "button" or name not in BUTTON_TYPE_ANCHORS:
+            return nodes
+        return arch_tree.xpath(f"//{tag}[@type='{name}']")
     title = (anchor_string or "").strip()
     if tag not in ("page", "group") or not title:
         return []
@@ -827,6 +839,29 @@ def _unnamed_node_expr(arch_tree, node):
     return f"(//{tag}[not(@name)])[{index}]"
 
 
+def _button_type_expr(operation, arch_tree, tag, anchor, page, occurrence):
+    """Return an inherit xpath for a button anchored by ``@type``, or None."""
+    if tag != "button" or not anchor:
+        return None
+    if arch_tree is None:
+        arch_tree = combined_arch_for_operation(operation.view_id, operation)
+    node = resolve_anchor(
+        arch_tree,
+        operation.anchor_name,
+        operation.anchor_kind,
+        operation.anchor_occurrence,
+        operation.anchor_page,
+        operation.anchor_string,
+    )
+    if node.get("name") == anchor or node.get("type") != anchor:
+        return None
+    if occurrence:
+        return f"(//button[@type='{anchor}'])[{int(occurrence)}]"
+    if page:
+        return f"//page[@name='{page}']//button[@type='{anchor}']"
+    return f"//button[@type='{anchor}']"
+
+
 def _inherit_arch(operation, inner_xml, position, arch_tree=None):
     kind = operation.anchor_kind or "field"
     tag = ANCHOR_TAGS.get(kind, "field")
@@ -848,6 +883,14 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
         expr = _unnamed_node_expr(arch_tree, node)
         return (
             f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
+            f"{inner_xml}</xpath>"
+        )
+    type_expr = _button_type_expr(
+        operation, arch_tree, tag, anchor, page, occurrence
+    )
+    if type_expr:
+        return (
+            f'<xpath expr="{_xml_attr(type_expr)}" position="{position}">'
             f"{inner_xml}</xpath>"
         )
     if occurrence:

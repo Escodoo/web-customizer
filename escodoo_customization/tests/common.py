@@ -53,6 +53,12 @@ class CustomizationCase(TransactionCase):
                             <t t-name="card">
                                 <field name="name"/>
                                 <field name="email"/>
+                                <button
+                                    name="toggle_active"
+                                    type="object"
+                                    string="Archive"
+                                />
+                                <button type="edit" string="Edit"/>
                             </t>
                         </templates>
                     </kanban>

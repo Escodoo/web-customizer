@@ -126,6 +126,9 @@ export class CustomizationFieldDialog extends Component {
             return _t("Customize group %s", label);
         }
         if (this.anchorKind === "button") {
+            if (this.props.viewType === "kanban") {
+                return _t("Customize kanban button %s", label);
+            }
             return _t("Customize button %s", label);
         }
         if (this.anchorKind === "menu") {

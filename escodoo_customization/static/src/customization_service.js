@@ -20,7 +20,7 @@ export const customizationService = {
                 if (state.enabled) {
                     notification.add(
                         _t(
-                            "Customization mode is on. Click a field, page, group, button, list column, kanban card field, search field or menu."
+                            "Customization mode is on. Click a field, page, group, button, list column, kanban card field or button, search field or menu."
                         ),
                         {type: "info"}
                     );

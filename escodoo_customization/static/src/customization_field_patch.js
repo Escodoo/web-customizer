@@ -92,7 +92,11 @@ patch(ViewButton.prototype, {
     getClassName() {
         const names = super.getClassName();
         const name = this.clickParams?.name;
-        if (name && this.customization?.state.enabled && isFormRootField(this)) {
+        if (
+            name &&
+            this.customization?.state.enabled &&
+            (isFormRootField(this) || isKanbanRoot(this))
+        ) {
             return `${names} o_esc_customization_target`.trim();
         }
         return names;

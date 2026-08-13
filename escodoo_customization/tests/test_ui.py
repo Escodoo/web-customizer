@@ -520,6 +520,49 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertIn("invisible", hide.generated_view_id.arch)
         self.assertNotIn("column_invisible", hide.generated_view_id.arch)
 
+    def test_create_from_ui_hide_kanban_button(self):
+        bundle = self._create_bundle(code="client_ui_kanban_button")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.kanban_view.id,
+                "view_type": "kanban",
+                "anchor_kind": "button",
+                "anchor_name": "toggle_active",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.anchor_kind, "button")
+        self.assertEqual(hide.view_type, "kanban")
+        self.assertIn(
+            '<button name="toggle_active" position="attributes">',
+            hide.generated_view_id.arch,
+        )
+
+    def test_create_from_ui_hide_kanban_button_type(self):
+        bundle = self._create_bundle(code="client_ui_kanban_edit")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.kanban_view.id,
+                "view_type": "kanban",
+                "anchor_kind": "button",
+                "anchor_name": "edit",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            'expr="//button[@type=\'edit\']"',
+            bundle.operation_ids.generated_view_id.arch,
+        )
+
     def test_create_from_ui_add_after_on_search(self):
         bundle = self._create_bundle(code="client_ui_search")
         result = self.env["customization.bundle"].create_from_ui(

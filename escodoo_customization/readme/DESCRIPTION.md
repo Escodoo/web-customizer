@@ -10,7 +10,7 @@ plain Odoo addon to version in git.
 
 Customization managers can turn on customization mode from the systray and
 click a field, page tab, group title, or named button on a form, a list column
-header, a kanban card field, or a search field to add a field, place an
+header, a kanban card field or button, or a search field to add a field, place an
 existing field, add a notebook page or group, hide it, change its label, set a
 widget, restrict it to groups, or set modifiers. Click a navbar menu to hide
 it, rename it, restrict it to groups, add a sibling or submenu (bound to a

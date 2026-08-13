@@ -539,6 +539,57 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertIn('invisible="True"', arch)
         self.assertNotIn("column_invisible", generated)
 
+    def test_hide_named_kanban_button(self):
+        bundle = self._create_bundle(
+            code="client_kanban_button",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": self.kanban_view.id,
+                        "view_type": "kanban",
+                        "anchor_kind": "button",
+                        "anchor_name": "toggle_active",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn(
+            '<button name="toggle_active" position="attributes">',
+            generated,
+        )
+        self.assertIn('<attribute name="invisible">True</attribute>', generated)
+
+    def test_hide_kanban_button_by_type(self):
+        bundle = self._create_bundle(
+            code="client_kanban_button_type",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": self.kanban_view.id,
+                        "view_type": "kanban",
+                        "anchor_kind": "button",
+                        "anchor_name": "edit",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn('expr="//button[@type=\'edit\']"', generated)
+        self.assertIn('<attribute name="invisible">True</attribute>', generated)
+
     def test_place_field_on_search_view(self):
         bundle = self._create_bundle(
             code="client_search",
