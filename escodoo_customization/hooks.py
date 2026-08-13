@@ -3,21 +3,22 @@
 
 import logging
 
-from .models.compiler import MENU_TYPES, restore_menu_operation
+from .models.compiler import MENU_WRITE_TYPES, restore_menu_operation
 
 _logger = logging.getLogger(__name__)
 
 
 def uninstall_hook(env):
-    """Remove compiler-generated fields and views that live only in the database."""
+    """Remove compiler-generated fields, views and menus from the database."""
     operations = env["customization.operation"].sudo().search([])
-    menu_ops = operations.filtered(lambda rec: rec.type in MENU_TYPES).sorted(
+    menu_ops = operations.filtered(lambda rec: rec.type in MENU_WRITE_TYPES).sorted(
         "sequence", reverse=True
     )
     for operation in menu_ops:
         restore_menu_operation(operation)
     views = operations.mapped("generated_view_id").exists()
     fields = operations.mapped("generated_field_id").exists()
+    menus = operations.mapped("generated_menu_id").exists()
     if views:
         _logger.info(
             "Uninstalling escodoo_customization: removing %s generated views",
@@ -30,3 +31,9 @@ def uninstall_hook(env):
             len(fields),
         )
         fields.unlink()
+    if menus:
+        _logger.info(
+            "Uninstalling escodoo_customization: removing %s generated menus",
+            len(menus),
+        )
+        menus.unlink()

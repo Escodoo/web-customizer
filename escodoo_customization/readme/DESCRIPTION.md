@@ -13,8 +13,8 @@ click a field, page tab, group title, or named button on a form, a list column
 header, a kanban card field, or a search field to add a field, place an
 existing field, add a notebook page or group, hide it, change its label, set a
 widget, restrict it to groups, or set modifiers. Click a navbar menu to hide
-it, rename it, or restrict it to groups. Duplicate names (for example
-two `email`
+it, rename it, restrict it to groups, or add a sibling or submenu (bound to a
+window action with an XML ID). Duplicate names (for example two `email`
 fields) are chosen in the dialog. That writes the same ledger operations as
 the backend form.
 

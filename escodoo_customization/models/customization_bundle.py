@@ -12,6 +12,7 @@ from .compiler import (
     SUPPORTED_ANCHOR_KINDS,
     arch_tree,
     ensure_field_name,
+    ensure_menu_xmlid_name,
     list_anchor_candidates,
     resolve_related_field,
     slugify_field_suffix,
@@ -28,6 +29,8 @@ UI_ACTIONS = (
     "set_modifier",
     "add_page",
     "add_group",
+    "add_menu",
+    "add_submenu",
 )
 
 
@@ -179,6 +182,7 @@ class CustomizationBundle(models.Model):
         payload, apply. ``view_type`` may be form, list, search or kanban.
         Pages without a technical name are anchored with ``anchor_string``.
         Menus pass ``anchor_kind='menu'`` and ``menu_id`` instead of a view.
+        ``add_menu`` / ``add_submenu`` create a sibling or child menu.
         """
         self._check_ui_access()
         params = params or {}
@@ -323,10 +327,10 @@ class CustomizationBundle(models.Model):
         }
 
     def _create_menu_from_ui(self, bundle, action, params):
-        """Create a hide/rename/groups operation for a navbar menu."""
-        if action not in ("hide", "rename", "set_groups"):
+        """Create a hide/rename/groups/add operation for a navbar menu."""
+        if action not in ("hide", "rename", "set_groups", "add_menu", "add_submenu"):
             raise UserError(
-                self.env._("Menus can only be hidden, renamed or restricted.")
+                self.env._("Menus can only be hidden, renamed, restricted or added.")
             )
         menu = self.env["ir.ui.menu"].browse(params.get("menu_id"))
         if not menu.exists():
@@ -347,6 +351,8 @@ class CustomizationBundle(models.Model):
             "anchor_kind": "menu",
             "anchor_name": xmlid,
         }
+        if action in ("add_menu", "add_submenu"):
+            return self._ui_action_add_menu(bundle, vals, action, payload, apply, xmlid)
         if action == "hide":
             vals.update({"type": "hide_menu", "payload": {"xmlid": xmlid}})
         elif action == "rename":
@@ -371,6 +377,64 @@ class CustomizationBundle(models.Model):
         if apply:
             operation.action_apply()
         return self._ui_result(bundle, operation, apply)
+
+    def _ui_action_add_menu(self, bundle, vals, action, payload, apply, xmlid):
+        """Create an add_menu sibling (after) or child (inside) of the anchor."""
+        string = (payload.get("string") or "").strip()
+        if not string:
+            raise UserError(self.env._("A label is required."))
+        action_xmlid = self._ui_action_xmlid(payload)
+        name = (payload.get("name") or "").strip()
+        if name:
+            name = ensure_menu_xmlid_name(name)
+        position = "inside" if action == "add_submenu" else "after"
+        menu_payload = {
+            "string": string,
+            "action_xmlid": action_xmlid,
+            "xmlid": xmlid,
+        }
+        if name:
+            menu_payload["name"] = name
+        vals.update(
+            {
+                "type": "add_menu",
+                "position": position,
+                "payload": menu_payload,
+            }
+        )
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return self._ui_result(bundle, operation, apply)
+
+    def _ui_action_xmlid(self, payload):
+        """Return a window-action XML ID from xmlid or record id."""
+        action_xmlid = (payload.get("action_xmlid") or "").strip()
+        if action_xmlid:
+            try:
+                action = self.env.ref(action_xmlid)
+            except ValueError as err:
+                raise UserError(
+                    self.env._("Action '%s' is missing.") % action_xmlid
+                ) from err
+            if action._name != "ir.actions.act_window":
+                raise UserError(
+                    self.env._("Select a window action with an XML ID.")
+                )
+            return action_xmlid
+        action_id = payload.get("action_id")
+        if not action_id:
+            raise UserError(self.env._("Select a window action with an XML ID."))
+        action = self.env["ir.actions.act_window"].browse(int(action_id))
+        if not action.exists():
+            raise UserError(self.env._("The window action is missing."))
+        xmlid = action.get_external_id().get(action.id)
+        if not xmlid:
+            raise UserError(
+                self.env._("Action '%s' has no XML ID and cannot be used.")
+                % action.display_name
+            )
+        return xmlid
 
     def _ui_action_add_after(
         self,

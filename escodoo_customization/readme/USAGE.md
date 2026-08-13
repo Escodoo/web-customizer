@@ -10,8 +10,10 @@
    existing field**,
    add a **page** or **group**, hide it, change its label, set a widget,
    restrict it to groups (search by name), or set modifiers (invisible /
-   readonly / required). Click a **menu** to hide it, rename it, or restrict
-   it to groups. The clicked node is the semantic anchor. To
+   readonly / required). Click a **menu** to hide it, rename it, restrict
+   it to groups, add a **sibling menu** after it, or add a **submenu**.
+   New menus need a window action that already has an XML ID. The clicked
+   node is the semantic anchor. To
    mirror another field, fill **Related path** (for example
    `parent_id.email`) instead of a field type. Pages and groups without
    a technical ``name`` are anchored by their title (stored on the

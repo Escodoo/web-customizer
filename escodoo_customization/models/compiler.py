@@ -35,7 +35,8 @@ ANCHOR_TAGS = {
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
 STRUCTURE_TYPES = ("add_page", "add_group")
-MENU_TYPES = ("hide_menu", "set_menu_string", "set_menu_groups")
+MENU_TYPES = ("hide_menu", "set_menu_string", "set_menu_groups", "add_menu")
+MENU_WRITE_TYPES = ("hide_menu", "set_menu_string", "set_menu_groups")
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -91,6 +92,27 @@ def ensure_field_name(name):
                 "single underscores after the x_esc_ prefix."
             )
             % name
+        )
+    return name
+
+
+def ensure_menu_xmlid_name(name):
+    """Normalize and validate an exported menu XML ID (client addon)."""
+    name = (name or "").strip()
+    if not name:
+        raise ValidationError(_("A menu XML ID is required."))
+    name = name.split(".", 1)[-1]
+    name = re.sub(r"[^a-zA-Z0-9_]+", "_", name).strip("_").lower()
+    name = re.sub(r"_+", "_", name)
+    if name and name[0].isdigit():
+        name = f"menu_{name}"
+    if not re.match(r"^[a-z][a-z0-9_]*$", name) or "__" in name:
+        raise ValidationError(
+            _(
+                "Menu XML ID '%s' is invalid. Use lowercase letters, digits "
+                "and single underscores, starting with a letter."
+            )
+            % (name or _("(empty)"))
         )
     return name
 
@@ -460,6 +482,14 @@ def _health_check_menu(operation):
     xmlid = menu.get_external_id().get(menu.id)
     if not xmlid:
         return False, _("Menu '%s' has no XML ID.") % menu.display_name
+    if operation.type == "add_menu":
+        action_xmlid = (_payload(operation).get("action_xmlid") or "").strip()
+        if not action_xmlid:
+            return False, _("add_menu requires a window action with an XML ID.")
+        try:
+            operation.env.ref(action_xmlid)
+        except ValueError:
+            return False, _("Action '%s' is missing.") % action_xmlid
     return True, ""
 
 
@@ -487,6 +517,9 @@ def _apply_menu(operation):
     ok, reason = _health_check_menu(operation)
     if not ok:
         raise AnchorError(reason)
+    if operation.type == "add_menu":
+        _apply_add_menu(operation)
+        return
     menu = operation.menu_id
     xmlid = menu.get_external_id().get(menu.id)
     payload = dict(_payload(operation))
@@ -511,6 +544,58 @@ def _apply_menu(operation):
         raise UserError(_("Unsupported operation type '%s'.") % operation.type)
     payload["xmlid"] = xmlid
     payload["previous"] = previous
+    operation.payload = payload
+
+
+def _apply_add_menu(operation):
+    """Create a sibling or child menu next to the clicked navbar item."""
+    anchor = operation.menu_id
+    payload = dict(_payload(operation))
+    string = (payload.get("string") or "").strip()
+    if not string:
+        raise UserError(_("add_menu requires payload.string."))
+    position = operation.position or "after"
+    if position == "inside":
+        parent = anchor
+        sequence = max(parent.child_id.mapped("sequence") or [0]) + 10
+    else:
+        parent = anchor.parent_id
+        sequence = (anchor.sequence or 10) + 1
+    action_xmlid = (payload.get("action_xmlid") or "").strip()
+    if not action_xmlid:
+        raise UserError(_("add_menu requires a window action with an XML ID."))
+    action = operation.env.ref(action_xmlid)
+    if action._name != "ir.actions.act_window":
+        raise UserError(_("add_menu requires a window action with an XML ID."))
+    vals = {
+        "name": string,
+        "parent_id": parent.id if parent else False,
+        "sequence": sequence,
+        "action": f"{action._name},{action.id}",
+    }
+    menu = operation.generated_menu_id
+    if menu:
+        menu.write(vals)
+    else:
+        menu = operation.env["ir.ui.menu"].create(vals)
+        operation.env["ir.model.data"].create(
+            {
+                "name": f"generated_menu_{operation.id}",
+                "model": "ir.ui.menu",
+                "module": XMLID_MODULE,
+                "res_id": menu.id,
+                "noupdate": True,
+            }
+        )
+        operation.generated_menu_id = menu
+    if not (payload.get("name") or "").strip():
+        payload["name"] = ensure_menu_xmlid_name(
+            f"menu_{slugify_field_suffix(string)}_{operation.id}"
+        )
+    else:
+        payload["name"] = ensure_menu_xmlid_name(payload["name"])
+    payload["xmlid"] = f"{XMLID_MODULE}.generated_menu_{operation.id}"
+    payload["action_xmlid"] = action_xmlid
     operation.payload = payload
 
 

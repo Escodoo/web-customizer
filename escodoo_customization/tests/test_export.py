@@ -208,3 +208,57 @@ class TestCustomizationExport(CustomizationCase):
         )
         self.assertIn("escodoo_customization", manifest["depends"])
         self.assertIn("data/ir_ui_menu.xml", manifest["data"])
+
+    def test_export_includes_new_menu_record(self):
+        menu = self.env["ir.ui.menu"].create(
+            {
+                "name": "Export Add Menu Parent",
+                "parent_id": self.env.ref("base.menu_administration").id,
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "name": "tester_export_add_menu",
+                "module": "escodoo_customization",
+                "model": "ir.ui.menu",
+                "res_id": menu.id,
+                "noupdate": True,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_export_add_menu",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_menu",
+                        "sequence": 10,
+                        "menu_id": menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": "escodoo_customization.tester_export_add_menu",
+                        "position": "after",
+                        "payload": {
+                            "string": "People",
+                            "action_xmlid": "base.action_partner_form",
+                            "name": "menu_people",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        files = export_bundle_files(bundle)
+        menus_xml = files["data/ir_ui_menu.xml"]
+        self.assertIn('id="menu_people"', menus_xml)
+        self.assertIn("People", menus_xml)
+        self.assertIn("base.action_partner_form", menus_xml)
+        self.assertIn("base.menu_administration", menus_xml)
+        self.assertNotIn("escodoo_customization.tester_export_add_menu", menus_xml)
+        manifest = ast.literal_eval(
+            "\n".join(
+                line
+                for line in files["__manifest__.py"].splitlines()
+                if line and not line.startswith("#")
+            )
+        )
+        self.assertIn("base", manifest["depends"])
+        self.assertNotIn("escodoo_customization", manifest["depends"])

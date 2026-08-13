@@ -11,7 +11,7 @@ from lxml import etree
 from odoo import _
 from odoo.exceptions import UserError
 
-from .compiler import MENU_TYPES
+from .compiler import MENU_TYPES, slugify_field_suffix
 
 XML_HEADER = """<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2026 Escodoo
@@ -247,14 +247,30 @@ def _view_modules(views):
     return modules
 
 
+def _add_xmlid_module(modules, xmlid):
+    if xmlid and "." in xmlid:
+        modules.add(xmlid.split(".", 1)[0])
+
+
 def _menu_modules(operations):
     modules = set()
     for operation in operations:
+        if operation.type == "add_menu":
+            payload = operation.payload or {}
+            _add_xmlid_module(modules, payload.get("action_xmlid"))
+            parent = (
+                operation.menu_id
+                if operation.position == "inside"
+                else operation.menu_id.parent_id
+            )
+            if parent:
+                parent_xmlid = parent.get_external_id().get(parent.id)
+                _add_xmlid_module(modules, parent_xmlid)
+            continue
         xmlid = (operation.payload or {}).get("xmlid")
         if not xmlid and operation.menu_id:
             xmlid = operation.menu_id.get_external_id().get(operation.menu_id.id)
-        if xmlid and "." in xmlid:
-            modules.add(xmlid.split(".", 1)[0])
+        _add_xmlid_module(modules, xmlid)
     return modules
 
 
@@ -264,6 +280,8 @@ def _menus_xml(operations):
 
 
 def _menu_record(operation):
+    if operation.type == "add_menu":
+        return _add_menu_record(operation)
     menu = operation.menu_id
     xmlid = _record_xmlid(
         menu,
@@ -287,5 +305,40 @@ def _menu_record(operation):
                 _("Menu groups operation '%s' has no group XML IDs.") % operation.name
             )
         lines.append(f'        <field name="groups_id" eval="[(6, 0, [{refs}])]"/>')
+    lines.append("    </record>")
+    return "\n".join(lines)
+
+
+def _add_menu_record(operation):
+    """Export a newly created menu as a record in the client addon."""
+    payload = operation.payload or {}
+    record_id = (payload.get("name") or "").strip()
+    if not record_id:
+        slug = slugify_field_suffix(payload.get("string") or "menu")
+        record_id = f"menu_{slug}_{operation.id}"
+    string = payload.get("string") or ""
+    if operation.generated_menu_id:
+        string = string or operation.generated_menu_id.name or ""
+    action_xmlid = (payload.get("action_xmlid") or "").strip()
+    if not action_xmlid:
+        raise UserError(
+            _("Menu '%s' has no window action XML ID.") % operation.display_name
+        )
+    position = operation.position or "after"
+    anchor = operation.menu_id
+    parent = anchor if position == "inside" else anchor.parent_id
+    lines = [f'    <record id="{escape(record_id)}" model="ir.ui.menu">']
+    lines.append(f'        <field name="name">{escape(string)}</field>')
+    if parent:
+        parent_xmlid = _record_xmlid(
+            parent,
+            _("Parent menu '%s' has no XML ID and cannot be exported.")
+            % parent.display_name,
+        )
+        lines.append(f'        <field name="parent_id" ref="{escape(parent_xmlid)}"/>')
+    lines.append(f'        <field name="action" ref="{escape(action_xmlid)}"/>')
+    if operation.generated_menu_id:
+        sequence = int(operation.generated_menu_id.sequence or 10)
+        lines.append(f'        <field name="sequence" eval="{sequence}"/>')
     lines.append("    </record>")
     return "\n".join(lines)

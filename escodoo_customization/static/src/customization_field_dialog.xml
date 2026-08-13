@@ -183,6 +183,40 @@
                         />
                     </div>
                 </t>
+                <t t-if="state.action === 'add_menu' || state.action === 'add_submenu'">
+                    <div class="mb-3">
+                        <label class="form-label">Menu label</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            t-att-value="state.string"
+                            t-on-input="(ev) => state.string = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Window action</label>
+                        <RecordSelector
+                            resId="state.actionId"
+                            resModel="'ir.actions.act_window'"
+                            update.bind="onWindowActionUpdate"
+                            fieldString.translate="Window action"
+                            placeholder.translate="Search a window action..."
+                        />
+                        <div class="form-text">
+                            The action must have an XML ID.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Technical name (optional)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="menu_people"
+                            t-att-value="state.name"
+                            t-on-input="(ev) => state.name = ev.target.value"
+                        />
+                    </div>
+                </t>
                 <t t-if="state.action === 'place_after'">
                     <div class="mb-3">
                         <label class="form-label">Existing field</label>

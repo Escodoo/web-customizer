@@ -79,6 +79,7 @@ export class CustomizationFieldDialog extends Component {
             storeRelated: false,
             existingFieldId: false,
             existingFieldName: "",
+            actionId: false,
             widget: "",
             groupIds: [],
             modInvisible: "",
@@ -177,6 +178,8 @@ export class CustomizationFieldDialog extends Component {
                 {value: "hide", label: _t("Hide this menu")},
                 {value: "rename", label: _t("Change label")},
                 {value: "set_groups", label: _t("Restrict to groups")},
+                {value: "add_menu", label: _t("Add menu after this one")},
+                {value: "add_submenu", label: _t("Add submenu")},
             ];
         }
         const fieldActions = [
@@ -242,6 +245,10 @@ export class CustomizationFieldDialog extends Component {
         }
         const [data] = await this.orm.read("ir.model.fields", [resId], ["name"]);
         this.state.existingFieldName = data?.name || "";
+    }
+
+    onWindowActionUpdate(resId) {
+        this.state.actionId = resId || false;
     }
 
     onGroupsUpdate(resIds) {
@@ -340,6 +347,22 @@ export class CustomizationFieldDialog extends Component {
                 return false;
             }
             const payload = {string};
+            if (this.state.name) {
+                payload.name = this.state.name;
+            }
+            return payload;
+        }
+        if (action === "add_menu" || action === "add_submenu") {
+            const string = this.state.string.trim();
+            if (!string) {
+                this.notifyError(_t("A label is required."));
+                return false;
+            }
+            if (!this.state.actionId) {
+                this.notifyError(_t("Select a window action with an XML ID."));
+                return false;
+            }
+            const payload = {string, action_id: this.state.actionId};
             if (this.state.name) {
                 payload.name = this.state.name;
             }

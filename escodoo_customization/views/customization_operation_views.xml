@@ -53,19 +53,19 @@
                             <field name="type" />
                             <field
                                 name="model_id"
-                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
                             />
                             <field
                                 name="view_id"
-                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
                             />
                             <field
                                 name="view_type"
-                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
                             />
                             <field
                                 name="menu_id"
-                                invisible="type not in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                                invisible="type not in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
                             />
                         </group>
                         <group>
@@ -83,22 +83,30 @@
                             <field name="position" invisible="type == 'add_field'" />
                             <field name="generated_field_id" readonly="1" />
                             <field name="generated_view_id" readonly="1" />
+                            <field name="generated_menu_id" readonly="1" />
                         </group>
                     </group>
                     <notebook>
                         <page string="Payload" name="payload">
                             <group
-                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group')"
+                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu')"
                             >
                                 <field
                                     name="payload_string"
-                                    required="type in ('set_string', 'set_menu_string', 'add_page', 'add_group')"
+                                    required="type in ('set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu')"
                                 />
                             </group>
                             <group
                                 string="Add Page or Group"
                                 invisible="type not in ('add_page', 'add_group')"
                             >
+                                <field name="payload_name" />
+                            </group>
+                            <group string="Add Menu" invisible="type != 'add_menu'">
+                                <field
+                                    name="payload_action_xmlid"
+                                    required="type == 'add_menu'"
+                                />
                                 <field name="payload_name" />
                             </group>
                             <group string="Add Field" invisible="type != 'add_field'">
