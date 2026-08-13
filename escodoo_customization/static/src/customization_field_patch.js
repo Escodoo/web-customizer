@@ -1,4 +1,8 @@
-import {isFormRootField, openCustomizationFor} from "./customization_service";
+import {
+    isFormRootField,
+    isKanbanRoot,
+    openCustomizationFor,
+} from "./customization_service";
 import {Notebook} from "@web/core/notebook/notebook";
 import {useService} from "@web/core/utils/hooks";
 import {patch} from "@web/core/utils/patch";
@@ -16,7 +20,10 @@ patch(Field.prototype, {
     },
     get classNames() {
         const names = super.classNames;
-        if (this.customization?.state.enabled && isFormRootField(this)) {
+        if (
+            this.customization?.state.enabled &&
+            (isFormRootField(this) || isKanbanRoot(this))
+        ) {
             names.o_esc_customization_target = true;
         }
         return names;

@@ -125,6 +125,9 @@ export class CustomizationFieldDialog extends Component {
         if (this.props.viewType === "list") {
             return _t("Customize list field %s", label);
         }
+        if (this.props.viewType === "kanban") {
+            return _t("Customize kanban field %s", label);
+        }
         if (this.props.viewType === "search") {
             return _t("Customize search field %s", label);
         }

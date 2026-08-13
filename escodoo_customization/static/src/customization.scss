@@ -10,9 +10,12 @@
 .nav-link.o_esc_customization_target,
 .nav-link.active.o_esc_customization_target,
 .btn.o_esc_customization_target,
-th.o_esc_customization_target {
+th.o_esc_customization_target,
+.o_kanban_record .o_esc_customization_target,
+.o_kanban_record.o_esc_customization_mode .o_esc_kanban_field {
     outline: 1px dashed #714b67 !important;
     outline-offset: -1px;
+    cursor: pointer !important;
 }
 
 .o_horizontal_separator.o_esc_customization_target,
@@ -21,7 +24,8 @@ th.o_esc_customization_target {
     outline-offset: 2px;
 }
 
-.o_esc_customization_target:hover {
+.o_esc_customization_target:hover,
+.o_kanban_record.o_esc_customization_mode .o_esc_kanban_field:hover {
     outline: 2px solid #714b67;
     background-color: rgba(113, 75, 103, 0.08);
 }

@@ -1,4 +1,5 @@
 import "./customization_field_patch";
+import "./customization_kanban_patch";
 import "./customization_list_patch";
 import "./customization_search_patch";
 import "./customization_service";

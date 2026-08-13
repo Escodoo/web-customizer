@@ -1,11 +1,12 @@
 1. Go to **Settings → Technical → Customization → Bundles** (debug mode).
 2. Create a bundle (`code` is the future addon technical name, for example
    `client_acme`).
-3. On any form, list or search view, click the magic-wand icon in the
+3. On any form, list, kanban or search view, click the magic-wand icon in the
    systray (customization managers). Fields, page tabs, group titles and
-   named buttons are outlined on forms; list column headers and search
-   fields are outlined on those views. Click one to add a **new** field
-   after it (or **inside** a page or group), **place an existing field**,
+   named buttons are outlined on forms; list column headers, kanban card
+   fields and search fields are outlined on those views. Click one to add a
+   **new** field after it (or **inside** a page or group), **place an
+   existing field**,
    add a **page** or **group**, hide it, change its label, set a widget,
    restrict it to groups (search by name), or set modifiers (invisible /
    readonly / required). The clicked node is the semantic anchor. To

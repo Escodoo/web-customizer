@@ -480,6 +480,46 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertEqual(hide.view_type, "list")
         self.assertIn("column_invisible", hide.generated_view_id.arch)
 
+    def test_create_from_ui_add_after_on_kanban(self):
+        bundle = self._create_bundle(code="client_ui_kanban")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.kanban_view.id,
+                "view_type": "kanban",
+                "anchor_name": "email",
+                "payload": {
+                    "ttype": "char",
+                    "string": "Kanban Reference",
+                    "name": "x_esc_ui_kanban_ref",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        self.assertIn("x_esc_ui_kanban_ref", self.kanban_view.get_combined_arch())
+
+    def test_create_from_ui_hide_on_kanban(self):
+        bundle = self._create_bundle(code="client_ui_kanban_hide")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.kanban_view.id,
+                "view_type": "kanban",
+                "anchor_name": "email",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.view_type, "kanban")
+        self.assertIn("invisible", hide.generated_view_id.arch)
+        self.assertNotIn("column_invisible", hide.generated_view_id.arch)
+
     def test_create_from_ui_add_after_on_search(self):
         bundle = self._create_bundle(code="client_ui_search")
         result = self.env["customization.bundle"].create_from_ui(

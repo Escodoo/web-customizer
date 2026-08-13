@@ -176,7 +176,7 @@ class CustomizationBundle(models.Model):
 
         ``params`` keys: bundle_id, action, model, view_id, view_type,
         anchor_name, anchor_kind, anchor_string, anchor_index, anchor_page,
-        payload, apply. ``view_type`` may be form, list or search.
+        payload, apply. ``view_type`` may be form, list, search or kanban.
         Pages without a technical name are anchored with ``anchor_string``.
         """
         self._check_ui_access()
@@ -205,7 +205,9 @@ class CustomizationBundle(models.Model):
         if not anchor_name:
             if anchor_kind not in ("page", "group") or not raw_string:
                 raise UserError(
-                    self.env._("Click a field, page, group or button to set the anchor.")
+                    self.env._(
+                        "Click a field, page, group or button to set the anchor."
+                    )
                 )
             anchor_string = (
                 source_unnamed_page_string(view, raw_string, tag=anchor_kind)
@@ -512,9 +514,7 @@ class CustomizationBundle(models.Model):
             xmlid = xmlid_map.get(group.id)
             if not xmlid:
                 raise UserError(
-                    self.env._(
-                        "Group '%s' has no XML ID and cannot be used in a view."
-                    )
+                    self.env._("Group '%s' has no XML ID and cannot be used in a view.")
                     % group.display_name
                 )
             resolved.append(xmlid)

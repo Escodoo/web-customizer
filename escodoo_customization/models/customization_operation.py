@@ -97,6 +97,7 @@ class CustomizationOperation(models.Model):
             ("form", "Form"),
             ("list", "List"),
             ("search", "Search"),
+            ("kanban", "Kanban"),
         ],
         default="form",
     )

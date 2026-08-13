@@ -501,6 +501,44 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertIn("//page[@name='extra_info']//field[@name='email']", generated)
         self.assertNotIn("(//field[@name='email'])", generated)
 
+    def test_place_field_on_kanban_view(self):
+        bundle = self._create_bundle(
+            code="client_kanban",
+            operations=self._ops_add_and_place(
+                "x_esc_kanban_ref",
+                self.kanban_view,
+                view_type="kanban",
+            ),
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        arch = self.kanban_view.get_combined_arch()
+        self.assertIn('name="x_esc_kanban_ref"', arch)
+
+    def test_hide_field_on_kanban_uses_invisible(self):
+        bundle = self._create_bundle(
+            code="client_kanban_hide",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": self.kanban_view.id,
+                        "view_type": "kanban",
+                        "anchor_name": "email",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        arch = self.kanban_view.get_combined_arch()
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn('invisible="True"', arch)
+        self.assertNotIn("column_invisible", generated)
+
     def test_place_field_on_search_view(self):
         bundle = self._create_bundle(
             code="client_search",

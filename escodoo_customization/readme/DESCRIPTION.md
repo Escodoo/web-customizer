@@ -10,9 +10,10 @@ plain Odoo addon to version in git.
 
 Customization managers can turn on customization mode from the systray and
 click a field, page tab, group title, or named button on a form, a list column
-header, or a search field to add a field, place an existing field, add a
-notebook page or group, hide it, change its label, set a widget, restrict
-it to groups, or set modifiers. Duplicate names (for example two `email`
+header, a kanban card field, or a search field to add a field, place an
+existing field, add a notebook page or group, hide it, change its label, set a
+widget, restrict it to groups, or set modifiers. Duplicate names (for example
+two `email`
 fields) are chosen in the dialog. That writes the same ledger operations as
 the backend form.
 

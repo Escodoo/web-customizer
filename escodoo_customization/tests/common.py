@@ -42,6 +42,23 @@ class CustomizationCase(TransactionCase):
                 """,
             }
         )
+        cls.kanban_view = cls.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.kanban",
+                "model": "res.partner",
+                "type": "kanban",
+                "arch": """
+                    <kanban>
+                        <templates>
+                            <t t-name="card">
+                                <field name="name"/>
+                                <field name="email"/>
+                            </t>
+                        </templates>
+                    </kanban>
+                """,
+            }
+        )
         cls.search_view = cls.env["ir.ui.view"].create(
             {
                 "name": "customization.tester.partner.search",
@@ -65,7 +82,11 @@ class CustomizationCase(TransactionCase):
                 "arch": """
                     <form>
                         <header>
-                            <button name="toggle_active" type="object" string="Archive"/>
+                            <button
+                                name="toggle_active"
+                                type="object"
+                                string="Archive"
+                            />
                         </header>
                         <sheet>
                             <group>

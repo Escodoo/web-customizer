@@ -14,7 +14,7 @@ export const customizationService = {
                 if (state.enabled) {
                     notification.add(
                         _t(
-                            "Customization mode is on. Click a field, page, group, button, list column or search field."
+                            "Customization mode is on. Click a field, page, group, button, list column, kanban card field or search field."
                         ),
                         {type: "info"}
                     );
@@ -50,6 +50,11 @@ export function isListRoot(component) {
     return config.viewType === "list" && Boolean(config.viewId);
 }
 
+export function isKanbanRoot(component) {
+    const config = component.env.config || {};
+    return config.viewType === "kanban" && Boolean(config.viewId);
+}
+
 function fieldLabelOf(component, fieldName, extra) {
     return (
         extra.fieldLabel ||
@@ -65,6 +70,9 @@ function customizationTarget(component, extra) {
         return null;
     }
     if (viewType === "list" && !isListRoot(component)) {
+        return null;
+    }
+    if (viewType === "kanban" && !isKanbanRoot(component)) {
         return null;
     }
     const viewId = extra.viewId || component.env.config?.viewId;
