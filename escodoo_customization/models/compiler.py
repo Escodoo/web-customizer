@@ -100,9 +100,28 @@ def _payload(operation):
     return operation.payload or {}
 
 
-def combined_arch_without_bundle(view, bundle):
-    """Combined arch of ``view`` excluding this bundle's generated inherits."""
-    generated = bundle.operation_ids.mapped("generated_view_id").filtered("id")
+def _is_same_or_later_operation(other, current):
+    """Return whether ``other`` must be hidden while compiling ``current``."""
+    if other == current:
+        return True
+    if other.sequence != current.sequence:
+        return other.sequence > current.sequence
+    return other.id >= current.id
+
+
+def combined_arch_for_operation(view, operation):
+    """Combined arch as seen when compiling ``operation``.
+
+    Earlier operations of the same bundle stay active so a field can be
+    anchored on another custom field (for example place after ``x_esc_vip``).
+    This operation and later ones are excluded so re-apply does not see
+    its own inherit.
+    """
+    later = operation.bundle_id.operation_ids.filtered(
+        lambda other: other.generated_view_id
+        and _is_same_or_later_operation(other, operation)
+    )
+    generated = later.mapped("generated_view_id").filtered("id")
     was_active = generated.filtered("active")
     if was_active:
         was_active.write({"active": False})
@@ -149,7 +168,7 @@ def health_check_operation(operation):
     if not operation.view_id:
         return False, _("A target view is required.")
     try:
-        arch_tree = combined_arch_without_bundle(operation.view_id, operation.bundle_id)
+        arch_tree = combined_arch_for_operation(operation.view_id, operation)
         resolve_field_anchor(arch_tree, operation.anchor_name)
     except AnchorError as err:
         return False, err.reason
@@ -275,7 +294,7 @@ def _upsert_generated_view(operation, arch, active=True):
         "mode": "extension",
         "arch": arch,
         "active": active,
-        "priority": 99,
+        "priority": 100 + (operation.sequence or 0),
     }
     if view:
         view.write(values)

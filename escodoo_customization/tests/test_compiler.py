@@ -53,6 +53,47 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertIn('name="x_esc_site_ref"', arch)
         self.assertIn('name="email"', arch)
 
+    def test_place_field_after_custom_field_same_bundle(self):
+        bundle = self._create_bundle(
+            code="client_chain",
+            operations=self._ops_add_and_place("x_esc_vip_flag", self.form_view)
+            + [
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 30,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "char",
+                            "string": "Site Code",
+                            "name": "x_esc_site_code",
+                        },
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "sequence": 40,
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "x_esc_vip_flag",
+                        "position": "after",
+                        "payload": {"field_name": "x_esc_site_code"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        arch = self.form_view.get_combined_arch()
+        self.assertIn('name="x_esc_vip_flag"', arch)
+        self.assertIn('name="x_esc_site_code"', arch)
+        self.assertLess(
+            arch.index('name="x_esc_vip_flag"'),
+            arch.index('name="x_esc_site_code"'),
+        )
+
     def test_health_check_marks_missing_anchor_broken(self):
         bundle = self._create_bundle(
             code="client_health",
