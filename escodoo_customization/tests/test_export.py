@@ -126,10 +126,13 @@ class TestCustomizationExport(CustomizationCase):
 
     def test_export_wizard_builds_attachment(self):
         bundle = self._applied_bundle(code="client_export_wizard")
-        wizard = (
-            self.env["customization.export.wizard"]
-            .with_context(default_bundle_id=bundle.id)
-            .create({})
-        )
+        action = bundle.action_export()
+        self.assertEqual(action["type"], "ir.actions.act_window")
+        self.assertTrue(action.get("res_id"))
+        wizard = self.env["customization.export.wizard"].browse(action["res_id"])
         self.assertTrue(wizard.data)
         self.assertEqual(wizard.filename, "client_export_wizard.zip")
+        download = wizard.action_download()
+        self.assertEqual(download["type"], "ir.actions.act_url")
+        self.assertIn("download=true", download["url"])
+        self.assertIn("client_export_wizard.zip", download["url"])

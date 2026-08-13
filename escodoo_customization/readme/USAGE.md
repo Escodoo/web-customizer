@@ -8,7 +8,8 @@
 4. Click **Apply** to compile fields and inherited views.
 5. After an Odoo upgrade, click **Health Check**. Broken operations keep their
    generated field and show `broken_reason`. **Re-apply** retries them.
-6. When the bundle is applied, click **Export Addon** to download a zip. Put that
-   module in git; it does not depend on this ledger at runtime.
+6. When the bundle is applied, click **Export Addon**. In the dialog, click
+   **Download ZIP** and put that module in git; it does not depend on this
+   ledger at runtime.
 
 Generated field names always start with `x_esc_` and cannot contain `__`.

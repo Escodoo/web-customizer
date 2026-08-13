@@ -103,15 +103,16 @@ class CustomizationBundle(models.Model):
         return True
 
     def action_export(self):
-        """Download an installable addon generated from applied operations."""
+        """Open a dialog with the generated zip ready to download."""
         self.ensure_one()
+        wizard = self.env["customization.export.wizard"]._create_from_bundle(self)
         return {
             "name": self.env._("Export Addon"),
             "type": "ir.actions.act_window",
             "res_model": "customization.export.wizard",
+            "res_id": wizard.id,
             "view_mode": "form",
             "target": "new",
-            "context": {"default_bundle_id": self.id},
         }
 
     def unlink(self):
