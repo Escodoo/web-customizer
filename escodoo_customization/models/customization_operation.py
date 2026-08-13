@@ -53,6 +53,7 @@ PAYLOAD_UI_FIELDS = (
     "payload_mod_required",
     "payload_mod_column_invisible",
     "payload_action_xmlid",
+    "payload_target_xmlid",
 )
 
 
@@ -84,6 +85,7 @@ class CustomizationOperation(models.Model):
             ("set_menu_string", "Set Menu Label"),
             ("set_menu_groups", "Set Menu Groups"),
             ("add_menu", "Add Menu"),
+            ("move_menu", "Move Menu"),
         ],
         required=True,
         default="place_field",
@@ -251,6 +253,12 @@ class CustomizationOperation(models.Model):
         string="Window Action",
         help="XML ID of the window action, for example base.action_partner_form.",
     )
+    payload_target_xmlid = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Destination Menu",
+        help="XML ID of the destination menu, for example base.menu_administration.",
+    )
     state = fields.Selection(
         selection=[
             ("draft", "Draft"),
@@ -304,6 +312,11 @@ class CustomizationOperation(models.Model):
                     f"Add menu {payload.get('string') or '?'} "
                     f"{rec.position or 'after'} {rec.menu_id.display_name or anchor}"
                 )
+            elif rec.type == "move_menu":
+                rec.name = (
+                    f"Move menu {rec.menu_id.display_name or anchor} "
+                    f"{rec.position or 'after'} {payload.get('target_xmlid') or '?'}"
+                )
             else:
                 rec.name = f"{rec.type} on {anchor}"
 
@@ -339,6 +352,7 @@ class CustomizationOperation(models.Model):
                 modifiers.get("column_invisible") or False
             )
             rec.payload_action_xmlid = payload.get("action_xmlid") or False
+            rec.payload_target_xmlid = payload.get("target_xmlid") or False
 
     def _inverse_payload_ui(self):
         for rec in self:
@@ -440,6 +454,11 @@ class CustomizationOperation(models.Model):
             if op_type == "add_menu" and "payload_action_xmlid" in ui:
                 self._set_payload_key(
                     payload, "action_xmlid", ui["payload_action_xmlid"]
+                )
+        elif op_type == "move_menu":
+            if "payload_target_xmlid" in ui:
+                self._set_payload_key(
+                    payload, "target_xmlid", ui["payload_target_xmlid"]
                 )
         elif op_type == "set_widget":
             if "payload_widget" in ui:

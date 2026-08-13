@@ -267,6 +267,14 @@ def _menu_modules(operations):
                 parent_xmlid = parent.get_external_id().get(parent.id)
                 _add_xmlid_module(modules, parent_xmlid)
             continue
+        if operation.type == "move_menu":
+            payload = operation.payload or {}
+            xmlid = payload.get("xmlid")
+            if not xmlid and operation.menu_id:
+                xmlid = operation.menu_id.get_external_id().get(operation.menu_id.id)
+            _add_xmlid_module(modules, xmlid)
+            _add_xmlid_module(modules, payload.get("parent_xmlid"))
+            continue
         xmlid = (operation.payload or {}).get("xmlid")
         if not xmlid and operation.menu_id:
             xmlid = operation.menu_id.get_external_id().get(operation.menu_id.id)
@@ -305,6 +313,16 @@ def _menu_record(operation):
                 _("Menu groups operation '%s' has no group XML IDs.") % operation.name
             )
         lines.append(f'        <field name="groups_id" eval="[(6, 0, [{refs}])]"/>')
+    elif operation.type == "move_menu":
+        parent_xmlid = (payload.get("parent_xmlid") or "").strip()
+        if parent_xmlid:
+            lines.append(
+                f'        <field name="parent_id" ref="{escape(parent_xmlid)}"/>'
+            )
+        else:
+            lines.append('        <field name="parent_id" eval="False"/>')
+        sequence = int(menu.sequence or 10)
+        lines.append(f'        <field name="sequence" eval="{sequence}"/>')
     lines.append("    </record>")
     return "\n".join(lines)
 

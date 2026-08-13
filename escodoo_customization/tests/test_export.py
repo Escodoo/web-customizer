@@ -262,3 +262,64 @@ class TestCustomizationExport(CustomizationCase):
         )
         self.assertIn("base", manifest["depends"])
         self.assertNotIn("escodoo_customization", manifest["depends"])
+
+    def test_export_includes_moved_menu(self):
+        menu = self.env["ir.ui.menu"].create(
+            {
+                "name": "Export Move Menu",
+                "parent_id": self.env.ref("base.menu_administration").id,
+                "sequence": 20,
+            }
+        )
+        dest = self.env["ir.ui.menu"].create(
+            {
+                "name": "Export Move Dest",
+                "parent_id": self.env.ref("base.menu_administration").id,
+                "sequence": 80,
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "name": "tester_export_move_menu",
+                "module": "escodoo_customization",
+                "model": "ir.ui.menu",
+                "res_id": menu.id,
+                "noupdate": True,
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "name": "tester_export_move_dest",
+                "module": "escodoo_customization",
+                "model": "ir.ui.menu",
+                "res_id": dest.id,
+                "noupdate": True,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_export_move_menu",
+            operations=[
+                Command.create(
+                    {
+                        "type": "move_menu",
+                        "sequence": 10,
+                        "menu_id": menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": "escodoo_customization.tester_export_move_menu",
+                        "position": "inside",
+                        "payload": {
+                            "target_xmlid": (
+                                "escodoo_customization.tester_export_move_dest"
+                            ),
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        files = export_bundle_files(bundle)
+        menus_xml = files["data/ir_ui_menu.xml"]
+        self.assertIn("escodoo_customization.tester_export_move_menu", menus_xml)
+        self.assertIn("escodoo_customization.tester_export_move_dest", menus_xml)
+        self.assertIn('name="parent_id"', menus_xml)
+        self.assertIn('name="sequence"', menus_xml)

@@ -80,6 +80,7 @@ export class CustomizationFieldDialog extends Component {
             existingFieldId: false,
             existingFieldName: "",
             actionId: false,
+            targetMenuId: false,
             widget: "",
             groupIds: [],
             modInvisible: "",
@@ -180,6 +181,8 @@ export class CustomizationFieldDialog extends Component {
                 {value: "set_groups", label: _t("Restrict to groups")},
                 {value: "add_menu", label: _t("Add menu after this one")},
                 {value: "add_submenu", label: _t("Add submenu")},
+                {value: "move_menu", label: _t("Move after another menu")},
+                {value: "move_as_submenu", label: _t("Move as submenu of another menu")},
             ];
         }
         const fieldActions = [
@@ -209,6 +212,14 @@ export class CustomizationFieldDialog extends Component {
             ["model", "=", this.props.model],
             ["name", "!=", this.props.fieldName],
         ];
+    }
+
+    get destinationMenuDomain() {
+        const domain = [];
+        if (this.props.menuId) {
+            domain.push(["id", "!=", this.props.menuId]);
+        }
+        return domain;
     }
 
     notifyError(message) {
@@ -249,6 +260,10 @@ export class CustomizationFieldDialog extends Component {
 
     onWindowActionUpdate(resId) {
         this.state.actionId = resId || false;
+    }
+
+    onTargetMenuUpdate(resId) {
+        this.state.targetMenuId = resId || false;
     }
 
     onGroupsUpdate(resIds) {
@@ -351,6 +366,13 @@ export class CustomizationFieldDialog extends Component {
                 payload.name = this.state.name;
             }
             return payload;
+        }
+        if (action === "move_menu" || action === "move_as_submenu") {
+            if (!this.state.targetMenuId) {
+                this.notifyError(_t("Select a destination menu with an XML ID."));
+                return false;
+            }
+            return {target_menu_id: this.state.targetMenuId};
         }
         if (action === "add_menu" || action === "add_submenu") {
             const string = this.state.string.trim();

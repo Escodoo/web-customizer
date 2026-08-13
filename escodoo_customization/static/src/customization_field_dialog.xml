@@ -217,6 +217,24 @@
                         />
                     </div>
                 </t>
+                <t
+                    t-if="state.action === 'move_menu' || state.action === 'move_as_submenu'"
+                >
+                    <div class="mb-3">
+                        <label class="form-label">Destination menu</label>
+                        <RecordSelector
+                            resId="state.targetMenuId"
+                            resModel="'ir.ui.menu'"
+                            domain="destinationMenuDomain"
+                            update.bind="onTargetMenuUpdate"
+                            fieldString.translate="Destination menu"
+                            placeholder.translate="Search a menu..."
+                        />
+                        <div class="form-text">
+                            The destination menu must have an XML ID.
+                        </div>
+                    </div>
+                </t>
                 <t t-if="state.action === 'place_after'">
                     <div class="mb-3">
                         <label class="form-label">Existing field</label>

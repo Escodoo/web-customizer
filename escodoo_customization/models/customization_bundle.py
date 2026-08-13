@@ -31,6 +31,8 @@ UI_ACTIONS = (
     "add_group",
     "add_menu",
     "add_submenu",
+    "move_menu",
+    "move_as_submenu",
 )
 
 
@@ -183,6 +185,7 @@ class CustomizationBundle(models.Model):
         Pages without a technical name are anchored with ``anchor_string``.
         Menus pass ``anchor_kind='menu'`` and ``menu_id`` instead of a view.
         ``add_menu`` / ``add_submenu`` create a sibling or child menu.
+        ``move_menu`` / ``move_as_submenu`` reparent an existing menu.
         """
         self._check_ui_access()
         params = params or {}
@@ -327,10 +330,21 @@ class CustomizationBundle(models.Model):
         }
 
     def _create_menu_from_ui(self, bundle, action, params):
-        """Create a hide/rename/groups/add operation for a navbar menu."""
-        if action not in ("hide", "rename", "set_groups", "add_menu", "add_submenu"):
+        """Create a hide/rename/groups/add/move operation for a navbar menu."""
+        menu_actions = (
+            "hide",
+            "rename",
+            "set_groups",
+            "add_menu",
+            "add_submenu",
+            "move_menu",
+            "move_as_submenu",
+        )
+        if action not in menu_actions:
             raise UserError(
-                self.env._("Menus can only be hidden, renamed, restricted or added.")
+                self.env._(
+                    "Menus can only be hidden, renamed, restricted, added or moved."
+                )
             )
         menu = self.env["ir.ui.menu"].browse(params.get("menu_id"))
         if not menu.exists():
@@ -353,6 +367,10 @@ class CustomizationBundle(models.Model):
         }
         if action in ("add_menu", "add_submenu"):
             return self._ui_action_add_menu(bundle, vals, action, payload, apply, xmlid)
+        if action in ("move_menu", "move_as_submenu"):
+            return self._ui_action_move_menu(
+                bundle, vals, action, payload, apply, xmlid
+            )
         if action == "hide":
             vals.update({"type": "hide_menu", "payload": {"xmlid": xmlid}})
         elif action == "rename":
@@ -406,6 +424,59 @@ class CustomizationBundle(models.Model):
         if apply:
             operation.action_apply()
         return self._ui_result(bundle, operation, apply)
+
+    def _ui_action_move_menu(self, bundle, vals, action, payload, apply, xmlid):
+        """Move the clicked menu after or inside another menu."""
+        target_xmlid = self._ui_menu_xmlid(payload, exclude_id=vals["menu_id"])
+        position = "inside" if action == "move_as_submenu" else "after"
+        vals.update(
+            {
+                "type": "move_menu",
+                "position": position,
+                "payload": {"target_xmlid": target_xmlid, "xmlid": xmlid},
+            }
+        )
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return self._ui_result(bundle, operation, apply)
+
+    def _ui_menu_xmlid(self, payload, exclude_id=False):
+        """Return a menu XML ID from xmlid or record id."""
+        target_xmlid = (payload.get("target_xmlid") or "").strip()
+        if target_xmlid:
+            try:
+                menu = self.env.ref(target_xmlid)
+            except ValueError as err:
+                raise UserError(
+                    self.env._("Menu '%s' is missing.") % target_xmlid
+                ) from err
+            if menu._name != "ir.ui.menu":
+                raise UserError(
+                    self.env._("Destination '%s' is not a menu.") % target_xmlid
+                )
+            if exclude_id and menu.id == exclude_id:
+                raise UserError(
+                    self.env._("Choose a different menu as the destination.")
+                )
+            return target_xmlid
+        target_id = payload.get("target_menu_id")
+        if not target_id:
+            raise UserError(self.env._("Select a destination menu with an XML ID."))
+        menu = self.env["ir.ui.menu"].browse(int(target_id))
+        if not menu.exists():
+            raise UserError(self.env._("The destination menu is missing."))
+        if exclude_id and menu.id == exclude_id:
+            raise UserError(
+                self.env._("Choose a different menu as the destination.")
+            )
+        xmlid = menu.get_external_id().get(menu.id)
+        if not xmlid:
+            raise UserError(
+                self.env._("Menu '%s' has no XML ID and cannot be used.")
+                % menu.display_name
+            )
+        return xmlid
 
     def _ui_action_xmlid(self, payload):
         """Return a window-action XML ID from xmlid or record id."""

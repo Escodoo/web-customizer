@@ -35,8 +35,19 @@ ANCHOR_TAGS = {
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
 STRUCTURE_TYPES = ("add_page", "add_group")
-MENU_TYPES = ("hide_menu", "set_menu_string", "set_menu_groups", "add_menu")
-MENU_WRITE_TYPES = ("hide_menu", "set_menu_string", "set_menu_groups")
+MENU_TYPES = (
+    "hide_menu",
+    "set_menu_string",
+    "set_menu_groups",
+    "add_menu",
+    "move_menu",
+)
+MENU_WRITE_TYPES = (
+    "hide_menu",
+    "set_menu_string",
+    "set_menu_groups",
+    "move_menu",
+)
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -490,6 +501,16 @@ def _health_check_menu(operation):
             operation.env.ref(action_xmlid)
         except ValueError:
             return False, _("Action '%s' is missing.") % action_xmlid
+    if operation.type == "move_menu":
+        target_xmlid = (_payload(operation).get("target_xmlid") or "").strip()
+        if not target_xmlid:
+            return False, _("move_menu requires a destination menu with an XML ID.")
+        try:
+            target = operation.env.ref(target_xmlid)
+        except ValueError:
+            return False, _("Menu '%s' is missing.") % target_xmlid
+        if target._name != "ir.ui.menu":
+            return False, _("Destination '%s' is not a menu.") % target_xmlid
     return True, ""
 
 
@@ -519,6 +540,9 @@ def _apply_menu(operation):
         raise AnchorError(reason)
     if operation.type == "add_menu":
         _apply_add_menu(operation)
+        return
+    if operation.type == "move_menu":
+        _apply_move_menu(operation)
         return
     menu = operation.menu_id
     xmlid = menu.get_external_id().get(menu.id)
@@ -599,6 +623,67 @@ def _apply_add_menu(operation):
     operation.payload = payload
 
 
+def _assert_safe_menu_move(menu, target):
+    """Refuse moving a menu onto itself or into its own subtree."""
+    if menu == target:
+        raise UserError(_("Choose a different menu as the destination."))
+    current = target
+    while current:
+        if current == menu:
+            raise UserError(_("A menu cannot be moved under itself."))
+        current = current.parent_id
+
+
+def _apply_move_menu(operation):
+    """Reparent the clicked menu after or inside another menu."""
+    menu = operation.menu_id
+    payload = dict(_payload(operation))
+    target_xmlid = (payload.get("target_xmlid") or "").strip()
+    if not target_xmlid:
+        raise UserError(_("move_menu requires a destination menu with an XML ID."))
+    target = operation.env.ref(target_xmlid)
+    if target._name != "ir.ui.menu":
+        raise UserError(_("Destination '%s' is not a menu.") % target_xmlid)
+    _assert_safe_menu_move(menu, target)
+    position = operation.position or "after"
+    if position == "inside":
+        parent = target
+        siblings = parent.child_id.filtered(lambda child: child != menu)
+        sequence = max(siblings.mapped("sequence") or [0]) + 10
+    else:
+        parent = target.parent_id
+        sequence = (target.sequence or 10) + 1
+    if parent:
+        parent_xmlid = parent.get_external_id().get(parent.id)
+        if not parent_xmlid:
+            raise UserError(
+                _("Parent menu '%s' has no XML ID.") % parent.display_name
+            )
+    else:
+        parent_xmlid = False
+    previous = dict(payload.get("previous") or {})
+    previous.setdefault("parent_id", menu.parent_id.id if menu.parent_id else False)
+    if menu.parent_id:
+        previous.setdefault(
+            "parent_xmlid",
+            menu.parent_id.get_external_id().get(menu.parent_id.id) or False,
+        )
+    else:
+        previous.setdefault("parent_xmlid", False)
+    previous.setdefault("sequence", menu.sequence)
+    menu.write(
+        {
+            "parent_id": parent.id if parent else False,
+            "sequence": sequence,
+        }
+    )
+    payload["xmlid"] = menu.get_external_id().get(menu.id)
+    payload["target_xmlid"] = target_xmlid
+    payload["parent_xmlid"] = parent_xmlid
+    payload["previous"] = previous
+    operation.payload = payload
+
+
 def restore_menu_operation(operation):
     """Undo a menu write using the snapshot stored on first apply."""
     menu = operation.menu_id.exists()
@@ -613,6 +698,11 @@ def restore_menu_operation(operation):
     elif operation.type == "set_menu_groups" and "groups" in previous:
         groups = groups_from_xmlids(operation.env, previous["groups"])
         vals["groups_id"] = [Command.set(groups.ids)]
+    elif operation.type == "move_menu" and "sequence" in previous:
+        parent_id = previous.get("parent_id") or 0
+        parent = operation.env["ir.ui.menu"].browse(parent_id).exists()
+        vals["parent_id"] = parent.id if parent else False
+        vals["sequence"] = previous["sequence"]
     if vals:
         menu.write(vals)
 

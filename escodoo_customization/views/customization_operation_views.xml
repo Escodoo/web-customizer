@@ -53,19 +53,19 @@
                             <field name="type" />
                             <field
                                 name="model_id"
-                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu', 'move_menu')"
                             />
                             <field
                                 name="view_id"
-                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu', 'move_menu')"
                             />
                             <field
                                 name="view_type"
-                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu', 'move_menu')"
                             />
                             <field
                                 name="menu_id"
-                                invisible="type not in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu')"
+                                invisible="type not in ('hide_menu', 'set_menu_string', 'set_menu_groups', 'add_menu', 'move_menu')"
                             />
                         </group>
                         <group>
@@ -108,6 +108,12 @@
                                     required="type == 'add_menu'"
                                 />
                                 <field name="payload_name" />
+                            </group>
+                            <group string="Move Menu" invisible="type != 'move_menu'">
+                                <field
+                                    name="payload_target_xmlid"
+                                    required="type == 'move_menu'"
+                                />
                             </group>
                             <group string="Add Field" invisible="type != 'add_field'">
                                 <group>

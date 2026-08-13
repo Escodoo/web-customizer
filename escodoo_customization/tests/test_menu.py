@@ -31,6 +31,23 @@ class TestCustomizationMenu(CustomizationCase):
             }
         )
         cls.menu_xmlid = "escodoo_customization.tester_menu"
+        cls.dest_menu = cls.env["ir.ui.menu"].create(
+            {
+                "name": "Customization Dest Menu",
+                "parent_id": cls.env.ref("base.menu_administration").id,
+                "sequence": 90,
+            }
+        )
+        cls.env["ir.model.data"].create(
+            {
+                "name": "tester_dest_menu",
+                "module": "escodoo_customization",
+                "model": "ir.ui.menu",
+                "res_id": cls.dest_menu.id,
+                "noupdate": True,
+            }
+        )
+        cls.dest_xmlid = "escodoo_customization.tester_dest_menu"
 
     def test_hide_menu_deactivates_and_restores(self):
         bundle = self._create_bundle(
@@ -300,3 +317,161 @@ class TestCustomizationMenu(CustomizationCase):
         menu_id = bundle.operation_ids.generated_menu_id.id
         uninstall_hook(self.env)
         self.assertFalse(self.env["ir.ui.menu"].browse(menu_id).exists())
+
+    def test_move_menu_after_and_restore(self):
+        original_parent = self.test_menu.parent_id
+        original_sequence = self.test_menu.sequence
+        bundle = self._create_bundle(
+            code="client_move_menu",
+            operations=[
+                Command.create(
+                    {
+                        "type": "move_menu",
+                        "sequence": 10,
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "position": "after",
+                        "payload": {"target_xmlid": self.dest_xmlid},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        self.assertEqual(self.test_menu.parent_id, self.dest_menu.parent_id)
+        self.assertGreater(self.test_menu.sequence, self.dest_menu.sequence)
+        bundle.operation_ids.unlink()
+        self.assertEqual(self.test_menu.parent_id, original_parent)
+        self.assertEqual(self.test_menu.sequence, original_sequence)
+
+    def test_move_menu_as_submenu(self):
+        bundle = self._create_bundle(
+            code="client_move_submenu",
+            operations=[
+                Command.create(
+                    {
+                        "type": "move_menu",
+                        "sequence": 10,
+                        "menu_id": self.dest_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.dest_xmlid,
+                        "position": "inside",
+                        "payload": {"target_xmlid": self.menu_xmlid},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(self.dest_menu.parent_id, self.test_menu)
+
+    def test_move_menu_into_own_child_is_broken(self):
+        child = self.env["ir.ui.menu"].create(
+            {
+                "name": "Child Menu",
+                "parent_id": self.test_menu.id,
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "name": "tester_child_menu",
+                "module": "escodoo_customization",
+                "model": "ir.ui.menu",
+                "res_id": child.id,
+                "noupdate": True,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_move_cycle",
+            operations=[
+                Command.create(
+                    {
+                        "type": "move_menu",
+                        "sequence": 10,
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "position": "inside",
+                        "payload": {
+                            "target_xmlid": "escodoo_customization.tester_child_menu",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.operation_ids.state, "broken")
+        self.assertEqual(
+            self.test_menu.parent_id, self.env.ref("base.menu_administration")
+        )
+
+    def test_create_from_ui_move_menu(self):
+        bundle = self._create_bundle(code="client_ui_move_menu")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "move_menu",
+                "anchor_kind": "menu",
+                "menu_id": self.test_menu.id,
+                "payload": {"target_menu_id": self.dest_menu.id},
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        operation = bundle.operation_ids
+        self.assertEqual(operation.type, "move_menu")
+        self.assertEqual(operation.position, "after")
+        self.assertEqual(self.test_menu.parent_id, self.dest_menu.parent_id)
+
+    def test_create_from_ui_move_as_submenu(self):
+        bundle = self._create_bundle(code="client_ui_move_submenu")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "move_as_submenu",
+                "anchor_kind": "menu",
+                "menu_id": self.dest_menu.id,
+                "payload": {"target_xmlid": self.menu_xmlid},
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        self.assertEqual(bundle.operation_ids.position, "inside")
+        self.assertEqual(self.dest_menu.parent_id, self.test_menu)
+
+    def test_create_from_ui_move_without_target_raises(self):
+        bundle = self._create_bundle(code="client_ui_move_notarget")
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "move_menu",
+                    "anchor_kind": "menu",
+                    "menu_id": self.test_menu.id,
+                    "payload": {},
+                    "apply": True,
+                }
+            )
+
+    def test_uninstall_hook_restores_moved_menu(self):
+        original_parent = self.test_menu.parent_id
+        bundle = self._create_bundle(
+            code="client_move_uninstall",
+            operations=[
+                Command.create(
+                    {
+                        "type": "move_menu",
+                        "sequence": 10,
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "position": "inside",
+                        "payload": {"target_xmlid": self.dest_xmlid},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(self.test_menu.parent_id, self.dest_menu)
+        uninstall_hook(self.env)
+        self.assertEqual(self.test_menu.parent_id, original_parent)
