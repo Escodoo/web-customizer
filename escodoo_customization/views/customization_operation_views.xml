@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_customization_operation_tree" model="ir.ui.view">
+        <field name="name">customization.operation.list</field>
+        <field name="model">customization.operation</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="type" />
+                <field name="model_id" />
+                <field name="view_id" />
+                <field name="anchor_name" />
+                <field name="state" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_customization_operation_form" model="ir.ui.view">
+        <field name="name">customization.operation.form</field>
+        <field name="model">customization.operation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_apply"
+                        type="object"
+                        string="Apply"
+                        class="btn-primary"
+                        groups="escodoo_customization.group_customization_manager"
+                        invisible="state == 'archived'"
+                    />
+                    <button
+                        name="action_health_check"
+                        type="object"
+                        string="Health Check"
+                        groups="escodoo_customization.group_customization_manager"
+                        invisible="state in ('draft', 'archived')"
+                    />
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,applied,broken"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bundle_id" />
+                            <field name="sequence" />
+                            <field name="type" />
+                            <field name="model_id" />
+                            <field name="view_id" />
+                            <field name="view_type" />
+                        </group>
+                        <group>
+                            <field name="anchor_kind" />
+                            <field
+                                name="anchor_name"
+                                invisible="type == 'add_field'"
+                            />
+                            <field
+                                name="position"
+                                invisible="type == 'add_field'"
+                            />
+                            <field name="generated_field_id" readonly="1" />
+                            <field name="generated_view_id" readonly="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payload" name="payload">
+                            <group
+                                invisible="type not in ('add_field', 'set_string')"
+                            >
+                                <field
+                                    name="payload_string"
+                                    required="type == 'set_string'"
+                                />
+                            </group>
+                            <group
+                                string="Add Field"
+                                invisible="type != 'add_field'"
+                            >
+                                <group>
+                                    <field
+                                        name="payload_ttype"
+                                        required="type == 'add_field'"
+                                    />
+                                    <field name="payload_name" />
+                                </group>
+                                <group>
+                                    <field
+                                        name="payload_relation"
+                                        invisible="payload_ttype not in ('many2one', 'many2many')"
+                                        required="payload_ttype in ('many2one', 'many2many')"
+                                    />
+                                    <field name="payload_required" />
+                                    <field name="payload_help" />
+                                </group>
+                            </group>
+                            <group
+                                string="Place Field"
+                                invisible="type != 'place_field'"
+                            >
+                                <field
+                                    name="payload_field_name"
+                                    required="type == 'place_field'"
+                                />
+                            </group>
+                            <group
+                                string="Set Widget"
+                                invisible="type != 'set_widget'"
+                            >
+                                <field
+                                    name="payload_widget"
+                                    required="type == 'set_widget'"
+                                />
+                            </group>
+                            <group
+                                string="Set Groups"
+                                invisible="type != 'set_groups'"
+                            >
+                                <field
+                                    name="payload_groups"
+                                    required="type == 'set_groups'"
+                                />
+                            </group>
+                            <group
+                                string="Modifiers"
+                                invisible="type != 'set_modifier'"
+                            >
+                                <field name="payload_mod_invisible" />
+                                <field name="payload_mod_readonly" />
+                                <field name="payload_mod_required" />
+                                <field name="payload_mod_column_invisible" />
+                            </group>
+                            <div
+                                class="text-muted"
+                                invisible="type != 'hide_field'"
+                            >
+                                Hide Field has no extra payload. The compiler
+                                uses the anchor and the view type.
+                            </div>
+                        </page>
+                        <page string="Raw JSON" name="raw_json">
+                            <field
+                                name="payload_json"
+                                nolabel="1"
+                                colspan="2"
+                                readonly="1"
+                                widget="text"
+                            />
+                        </page>
+                    </notebook>
+                    <group
+                        string="Broken reason"
+                        invisible="not broken_reason"
+                    >
+                        <field name="broken_reason" colspan="2" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customization_operation" model="ir.actions.act_window">
+        <field name="name">Operations</field>
+        <field name="res_model">customization.operation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

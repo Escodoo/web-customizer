@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_customization_bundle_user,customization.bundle.user,model_customization_bundle,group_customization_user,1,1,1,1
+access_customization_operation_user,customization.operation.user,model_customization_operation,group_customization_user,1,1,1,1

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_customization_bundle_tree" model="ir.ui.view">
+        <field name="name">customization.bundle.list</field>
+        <field name="model">customization.bundle</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="code" />
+                <field name="state" />
+                <field name="broken_count" />
+                <field name="company_id" groups="base.group_multi_company" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_customization_bundle_form" model="ir.ui.view">
+        <field name="name">customization.bundle.form</field>
+        <field name="model">customization.bundle</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_apply"
+                        type="object"
+                        string="Apply"
+                        class="btn-primary"
+                        groups="escodoo_customization.group_customization_manager"
+                    />
+                    <button
+                        name="action_reapply"
+                        type="object"
+                        string="Re-apply"
+                        groups="escodoo_customization.group_customization_manager"
+                    />
+                    <button
+                        name="action_health_check"
+                        type="object"
+                        string="Health Check"
+                        groups="escodoo_customization.group_customization_manager"
+                    />
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,applied,needs_reapply"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            class="oe_stat_button"
+                            icon="fa-exclamation-triangle"
+                            invisible="not broken_count"
+                        >
+                            <field
+                                name="broken_count"
+                                widget="statinfo"
+                                string="Broken"
+                            />
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="code" />
+                        </group>
+                        <group>
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                            <field name="operation_count" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Operations" name="operations">
+                            <field name="operation_ids">
+                                <list>
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="type" />
+                                    <field name="model_id" />
+                                    <field name="view_id" />
+                                    <field name="anchor_name" />
+                                    <field name="state" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customization_bundle" model="ir.actions.act_window">
+        <field name="name">Bundles</field>
+        <field name="res_model">customization.bundle</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a customization bundle
+            </p>
+            <p>
+                Group field and view operations for a client or project, then apply
+                them as upgrade-safe inherited views.
+            </p>
+        </field>
+    </record>
+</odoo>

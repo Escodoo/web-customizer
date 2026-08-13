@@ -1,0 +1,415 @@
+# Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
+import json
+
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
+
+from .compiler import (
+    ATTRIBUTE_TYPES,
+    AnchorError,
+    _deactivate_generated_view,
+    apply_operation,
+    ensure_field_name,
+    health_check_operation,
+)
+
+TTYPE_SELECTION = [
+    ("char", "Char"),
+    ("text", "Text"),
+    ("integer", "Integer"),
+    ("float", "Float"),
+    ("boolean", "Boolean"),
+    ("date", "Date"),
+    ("datetime", "Datetime"),
+    ("selection", "Selection"),
+    ("many2one", "Many2one"),
+    ("many2many", "Many2many"),
+    ("binary", "Binary"),
+    ("monetary", "Monetary"),
+]
+PAYLOAD_UI_FIELDS = (
+    "payload_ttype",
+    "payload_string",
+    "payload_name",
+    "payload_help",
+    "payload_required",
+    "payload_relation",
+    "payload_field_name",
+    "payload_widget",
+    "payload_groups",
+    "payload_mod_invisible",
+    "payload_mod_readonly",
+    "payload_mod_required",
+    "payload_mod_column_invisible",
+)
+
+
+class CustomizationOperation(models.Model):
+    _name = "customization.operation"
+    _description = "Customization Operation"
+    _order = "bundle_id, sequence, id"
+
+    bundle_id = fields.Many2one(
+        "customization.bundle",
+        required=True,
+        ondelete="cascade",
+        index=True,
+    )
+    sequence = fields.Integer(default=10)
+    name = fields.Char(compute="_compute_name", store=True)
+    type = fields.Selection(
+        selection=[
+            ("add_field", "Add Field"),
+            ("place_field", "Place Field"),
+            ("set_string", "Set Label"),
+            ("set_widget", "Set Widget"),
+            ("set_groups", "Set Groups"),
+            ("set_modifier", "Set Modifier"),
+            ("hide_field", "Hide Field"),
+        ],
+        required=True,
+        default="place_field",
+    )
+    model_id = fields.Many2one(
+        "ir.model",
+        string="Model",
+        ondelete="cascade",
+        index=True,
+    )
+    model = fields.Char(
+        related="model_id.model",
+        store=True,
+        index=True,
+        string="Model Name",
+    )
+    view_id = fields.Many2one("ir.ui.view", ondelete="set null", index=True)
+    view_type = fields.Selection(
+        selection=[
+            ("form", "Form"),
+            ("list", "List"),
+            ("search", "Search"),
+        ],
+        default="form",
+    )
+    anchor_kind = fields.Selection(
+        selection=[
+            ("field", "Field"),
+            ("page", "Page"),
+            ("button", "Button"),
+            ("xpath", "XPath"),
+        ],
+        default="field",
+        required=True,
+    )
+    anchor_name = fields.Char(
+        help="Semantic anchor, for example the field name partner_id."
+    )
+    position = fields.Selection(
+        selection=[
+            ("before", "Before"),
+            ("after", "After"),
+            ("inside", "Inside"),
+            ("replace", "Replace"),
+            ("attributes", "Attributes"),
+        ],
+        default="after",
+    )
+    payload = fields.Json()
+    payload_json = fields.Text(
+        compute="_compute_payload_json",
+        string="Raw JSON",
+    )
+    payload_ttype = fields.Selection(
+        selection=TTYPE_SELECTION,
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Field Type",
+    )
+    payload_string = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Label",
+    )
+    payload_name = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Technical Name",
+        help="Must start with x_esc_. Leave empty to slugify from the label.",
+    )
+    payload_help = fields.Text(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Help",
+    )
+    payload_required = fields.Boolean(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Required",
+    )
+    payload_relation = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Relation Model",
+        help="Technical model name, for example res.partner.",
+    )
+    payload_field_name = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Field To Place",
+    )
+    payload_widget = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Widget",
+    )
+    payload_groups = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Groups",
+        help="Comma-separated XML IDs, for example base.group_user.",
+    )
+    payload_mod_invisible = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Invisible",
+    )
+    payload_mod_readonly = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Readonly",
+    )
+    payload_mod_required = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Required Expr",
+    )
+    payload_mod_column_invisible = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Column Invisible",
+    )
+    state = fields.Selection(
+        selection=[
+            ("draft", "Draft"),
+            ("applied", "Applied"),
+            ("broken", "Broken"),
+            ("archived", "Archived"),
+        ],
+        default="draft",
+        required=True,
+    )
+    broken_reason = fields.Text()
+    generated_view_id = fields.Many2one("ir.ui.view", ondelete="set null", copy=False)
+    generated_field_id = fields.Many2one(
+        "ir.model.fields", ondelete="set null", copy=False
+    )
+
+    @api.depends("type", "anchor_name", "payload", "model_id")
+    def _compute_name(self):
+        for rec in self:
+            payload = rec.payload or {}
+            if rec.type == "add_field":
+                label = payload.get("string") or payload.get("name") or rec.model
+                rec.name = f"Add field {label}"
+            elif rec.type == "place_field":
+                rec.name = (
+                    f"Place {payload.get('field_name') or '?'} "
+                    f"{rec.position or 'after'} {rec.anchor_name or '?'}"
+                )
+            elif rec.type == "hide_field":
+                rec.name = f"Hide {rec.anchor_name or '?'}"
+            else:
+                rec.name = f"{rec.type} on {rec.anchor_name or '?'}"
+
+    @api.depends("payload")
+    def _compute_payload_json(self):
+        for rec in self:
+            rec.payload_json = (
+                json.dumps(rec.payload, indent=2, sort_keys=True) if rec.payload else ""
+            )
+
+    @api.depends("payload")
+    def _compute_payload_ui(self):
+        for rec in self:
+            payload = rec.payload or {}
+            modifiers = payload.get("modifiers") or {}
+            rec.payload_ttype = payload.get("ttype") or False
+            rec.payload_string = payload.get("string") or False
+            rec.payload_name = payload.get("name") or False
+            rec.payload_help = payload.get("help") or False
+            rec.payload_required = bool(payload.get("required"))
+            rec.payload_relation = payload.get("relation") or False
+            rec.payload_field_name = payload.get("field_name") or False
+            rec.payload_widget = payload.get("widget") or False
+            rec.payload_groups = payload.get("groups") or False
+            rec.payload_mod_invisible = modifiers.get("invisible") or False
+            rec.payload_mod_readonly = modifiers.get("readonly") or False
+            rec.payload_mod_required = modifiers.get("required") or False
+            rec.payload_mod_column_invisible = modifiers.get("column_invisible") or False
+
+    def _inverse_payload_ui(self):
+        for rec in self:
+            rec.payload = rec._payload_from_ui()
+
+    def _payload_from_ui(self):
+        self.ensure_one()
+        ui = {name: self[name] for name in PAYLOAD_UI_FIELDS}
+        return self._apply_ui_to_payload(self.payload, self.type, ui) or False
+
+    @api.model
+    def _apply_ui_to_payload(self, payload, op_type, ui):
+        payload = dict(payload or {})
+        if op_type == "add_field":
+            if "payload_ttype" in ui:
+                self._set_payload_key(payload, "ttype", ui["payload_ttype"])
+            if "payload_string" in ui:
+                self._set_payload_key(payload, "string", ui["payload_string"])
+            if "payload_name" in ui:
+                self._set_payload_key(payload, "name", ui["payload_name"])
+            if "payload_help" in ui:
+                self._set_payload_key(payload, "help", ui["payload_help"])
+            if "payload_required" in ui:
+                if ui["payload_required"]:
+                    payload["required"] = True
+                else:
+                    payload.pop("required", None)
+            ttype = payload.get("ttype")
+            if ttype in ("many2one", "many2many"):
+                if "payload_relation" in ui:
+                    self._set_payload_key(payload, "relation", ui["payload_relation"])
+            elif "payload_ttype" in ui:
+                payload.pop("relation", None)
+        elif op_type == "place_field":
+            if "payload_field_name" in ui:
+                self._set_payload_key(payload, "field_name", ui["payload_field_name"])
+        elif op_type == "set_string":
+            if "payload_string" in ui:
+                self._set_payload_key(payload, "string", ui["payload_string"])
+        elif op_type == "set_widget":
+            if "payload_widget" in ui:
+                self._set_payload_key(payload, "widget", ui["payload_widget"])
+        elif op_type == "set_groups":
+            if "payload_groups" in ui:
+                self._set_payload_key(payload, "groups", ui["payload_groups"])
+        elif op_type == "set_modifier":
+            modifiers = dict(payload.get("modifiers") or {})
+            mapping = (
+                ("payload_mod_invisible", "invisible"),
+                ("payload_mod_readonly", "readonly"),
+                ("payload_mod_required", "required"),
+                ("payload_mod_column_invisible", "column_invisible"),
+            )
+            for ui_name, key in mapping:
+                if ui_name in ui:
+                    self._set_payload_key(modifiers, key, ui[ui_name])
+            if modifiers:
+                payload["modifiers"] = modifiers
+            else:
+                payload.pop("modifiers", None)
+        return payload
+
+    @api.model
+    def _vals_with_payload_ui(self, vals, current_payload=None, op_type=None):
+        ui = {name: vals[name] for name in PAYLOAD_UI_FIELDS if name in vals}
+        if not ui:
+            return vals
+        vals = dict(vals)
+        payload = self._apply_ui_to_payload(
+            vals.get("payload") or current_payload,
+            vals.get("type") or op_type,
+            ui,
+        )
+        vals["payload"] = payload or False
+        return vals
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        vals_list = [self._vals_with_payload_ui(vals) for vals in vals_list]
+        return super().create(vals_list)
+
+    @staticmethod
+    def _set_payload_key(payload, key, value):
+        if value:
+            payload[key] = value
+        else:
+            payload.pop(key, None)
+
+    @api.constrains("type", "view_id", "anchor_name", "payload", "model_id")
+    def _check_operation(self):
+        for rec in self:
+            if rec.type == "add_field":
+                payload = rec.payload or {}
+                if not rec.model_id:
+                    raise ValidationError(
+                        self.env._("A model is required to add a field.")
+                    )
+                if not payload.get("ttype"):
+                    raise ValidationError(
+                        self.env._("add_field requires payload.ttype.")
+                    )
+                if payload.get("name"):
+                    ensure_field_name(payload["name"])
+            elif rec.type in ("place_field",) + ATTRIBUTE_TYPES:
+                if not rec.view_id:
+                    raise ValidationError(
+                        self.env._("A target view is required for this operation.")
+                    )
+                if not rec.anchor_name:
+                    raise ValidationError(
+                        self.env._("An anchor field name is required.")
+                    )
+
+    def _mark_broken(self, reason):
+        self.ensure_one()
+        _deactivate_generated_view(self)
+        self.write({"state": "broken", "broken_reason": reason})
+
+    def _mark_applied(self):
+        self.ensure_one()
+        self.write({"state": "applied", "broken_reason": False})
+
+    def action_apply(self):
+        """Compile this operation. Anchor failures become broken, not silent."""
+        for operation in self:
+            if operation.state == "archived":
+                continue
+            try:
+                apply_operation(operation)
+            except (AnchorError, UserError, ValidationError, ValueError) as err:
+                reason = getattr(err, "reason", None) or str(err)
+                operation._mark_broken(reason)
+            else:
+                operation._mark_applied()
+        return True
+
+    def action_health_check(self):
+        """Re-resolve anchors; missing ones are marked broken and kept."""
+        for operation in self:
+            if operation.state in ("archived", "draft"):
+                continue
+            if operation.type == "add_field":
+                if operation.generated_field_id:
+                    operation._mark_applied()
+                continue
+            ok, reason = health_check_operation(operation)
+            if ok:
+                if operation.state == "broken":
+                    # Keep broken until re-apply actually rewrites the inherit.
+                    continue
+                operation._mark_applied()
+            else:
+                operation._mark_broken(reason)
+        return True
+
+    def unlink(self):
+        views = self.mapped("generated_view_id").exists()
+        fields_to_drop = self.mapped("generated_field_id").exists()
+        # Unlink views first so inherit specs do not reference dropped fields.
+        if views:
+            views.unlink()
+        res = super().unlink()
+        if fields_to_drop:
+            fields_to_drop.unlink()
+        return res

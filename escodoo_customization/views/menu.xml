@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <menuitem
+        id="menu_customization_root"
+        name="Customization"
+        parent="base.menu_custom"
+        groups="escodoo_customization.group_customization_user"
+        sequence="65"
+    />
+    <menuitem
+        id="menu_customization_bundle"
+        name="Bundles"
+        parent="menu_customization_root"
+        action="action_customization_bundle"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_customization_operation"
+        name="Operations"
+        parent="menu_customization_root"
+        action="action_customization_operation"
+        sequence="20"
+    />
+</odoo>
