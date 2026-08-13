@@ -8,12 +8,14 @@ from odoo.exceptions import UserError, ValidationError
 
 from .compiler import (
     ATTRIBUTE_TYPES,
+    MENU_TYPES,
     STRUCTURE_TYPES,
     AnchorError,
     _deactivate_generated_view,
     apply_operation,
     ensure_field_name,
     health_check_operation,
+    restore_menu_operation,
 )
 
 TTYPE_SELECTION = [
@@ -75,6 +77,9 @@ class CustomizationOperation(models.Model):
             ("set_groups", "Set Groups"),
             ("set_modifier", "Set Modifier"),
             ("hide_field", "Hide Field"),
+            ("hide_menu", "Hide Menu"),
+            ("set_menu_string", "Set Menu Label"),
+            ("set_menu_groups", "Set Menu Groups"),
         ],
         required=True,
         default="place_field",
@@ -92,6 +97,7 @@ class CustomizationOperation(models.Model):
         string="Model Name",
     )
     view_id = fields.Many2one("ir.ui.view", ondelete="set null", index=True)
+    menu_id = fields.Many2one("ir.ui.menu", ondelete="set null", index=True)
     view_type = fields.Selection(
         selection=[
             ("form", "Form"),
@@ -107,6 +113,7 @@ class CustomizationOperation(models.Model):
             ("page", "Page"),
             ("button", "Button"),
             ("group", "Group"),
+            ("menu", "Menu"),
             ("xpath", "XPath"),
         ],
         default="field",
@@ -250,7 +257,9 @@ class CustomizationOperation(models.Model):
         "ir.model.fields", ondelete="set null", copy=False
     )
 
-    @api.depends("type", "anchor_name", "anchor_string", "payload", "model_id")
+    @api.depends(
+        "type", "anchor_name", "anchor_string", "payload", "model_id", "menu_id"
+    )
     def _compute_name(self):
         for rec in self:
             payload = rec.payload or {}
@@ -273,6 +282,12 @@ class CustomizationOperation(models.Model):
                 )
             elif rec.type == "hide_field":
                 rec.name = f"Hide {anchor}"
+            elif rec.type == "hide_menu":
+                rec.name = f"Hide menu {rec.menu_id.display_name or anchor}"
+            elif rec.type == "set_menu_string":
+                rec.name = f"Rename menu {rec.menu_id.display_name or anchor}"
+            elif rec.type == "set_menu_groups":
+                rec.name = f"Restrict menu {rec.menu_id.display_name or anchor}"
             else:
                 rec.name = f"{rec.type} on {anchor}"
 
@@ -400,7 +415,7 @@ class CustomizationOperation(models.Model):
         elif op_type == "place_field":
             if "payload_field_name" in ui:
                 self._set_payload_key(payload, "field_name", ui["payload_field_name"])
-        elif op_type in STRUCTURE_TYPES + ("set_string",):
+        elif op_type in STRUCTURE_TYPES + ("set_string", "set_menu_string"):
             if "payload_string" in ui:
                 self._set_payload_key(payload, "string", ui["payload_string"])
             if op_type in STRUCTURE_TYPES and "payload_name" in ui:
@@ -408,7 +423,7 @@ class CustomizationOperation(models.Model):
         elif op_type == "set_widget":
             if "payload_widget" in ui:
                 self._set_payload_key(payload, "widget", ui["payload_widget"])
-        elif op_type == "set_groups":
+        elif op_type in ("set_groups", "set_menu_groups"):
             if "payload_groups" in ui:
                 self._set_payload_key(payload, "groups", ui["payload_groups"])
         elif op_type == "set_modifier":
@@ -455,7 +470,13 @@ class CustomizationOperation(models.Model):
             payload.pop(key, None)
 
     @api.constrains(
-        "type", "view_id", "anchor_name", "anchor_string", "payload", "model_id"
+        "type",
+        "view_id",
+        "menu_id",
+        "anchor_name",
+        "anchor_string",
+        "payload",
+        "model_id",
     )
     def _check_operation(self):
         for rec in self:
@@ -471,6 +492,9 @@ class CustomizationOperation(models.Model):
                     )
                 if payload.get("name"):
                     ensure_field_name(payload["name"])
+            elif rec.type in MENU_TYPES:
+                if not rec.menu_id:
+                    raise ValidationError(self.env._("A menu is required."))
             elif rec.type in ("place_field",) + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
                 if not rec.view_id:
                     raise ValidationError(
@@ -517,6 +541,14 @@ class CustomizationOperation(models.Model):
                 if operation.generated_field_id:
                     operation._mark_applied()
                 continue
+            if operation.type in MENU_TYPES:
+                ok, reason = health_check_operation(operation)
+                if ok:
+                    if operation.state != "broken":
+                        operation._mark_applied()
+                else:
+                    operation._mark_broken(reason)
+                continue
             ok, reason = health_check_operation(operation)
             if ok:
                 if operation.state == "broken":
@@ -528,6 +560,11 @@ class CustomizationOperation(models.Model):
         return True
 
     def unlink(self):
+        menu_ops = self.filtered(lambda rec: rec.type in MENU_TYPES).sorted(
+            "sequence", reverse=True
+        )
+        for operation in menu_ops:
+            restore_menu_operation(operation)
         views = self.mapped("generated_view_id").exists()
         fields_to_drop = self.mapped("generated_field_id").exists()
         # Unlink views first so inherit specs do not reference dropped fields.

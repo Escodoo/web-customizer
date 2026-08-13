@@ -33,3 +33,13 @@ th.o_esc_customization_target,
 .o_esc_customization_dialog .o_record_selector {
     width: 100%;
 }
+
+body.o_esc_customization_mode .o_menu_brand,
+body.o_esc_customization_mode .o_nav_entry,
+body.o_esc_customization_mode .o_menu_sections [data-menu-xmlid],
+body.o_esc_customization_mode .dropdown-item[data-menu-xmlid],
+body.o_esc_customization_mode .o_app[data-menu-xmlid] {
+    outline: 1px dashed #714b67 !important;
+    outline-offset: -1px;
+    cursor: pointer !important;
+}

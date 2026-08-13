@@ -178,6 +178,7 @@ class CustomizationBundle(models.Model):
         anchor_name, anchor_kind, anchor_string, anchor_index, anchor_page,
         payload, apply. ``view_type`` may be form, list, search or kanban.
         Pages without a technical name are anchored with ``anchor_string``.
+        Menus pass ``anchor_kind='menu'`` and ``menu_id`` instead of a view.
         """
         self._check_ui_access()
         params = params or {}
@@ -187,6 +188,11 @@ class CustomizationBundle(models.Model):
         action = params.get("action")
         if action not in UI_ACTIONS:
             raise UserError(self.env._("Unknown customization action '%s'.") % action)
+        if (params.get("anchor_kind") or "") == "menu":
+            return self._create_menu_from_ui(bundle, action, params)
+        return self._create_view_from_ui(bundle, action, params)
+
+    def _create_view_from_ui(self, bundle, action, params):
         model_name = params.get("model")
         model = self.env["ir.model"]._get(model_name) if model_name else False
         if not model:
@@ -302,6 +308,9 @@ class CustomizationBundle(models.Model):
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
             )
+        return self._ui_result(bundle, operations, apply)
+
+    def _ui_result(self, bundle, operations, apply):
         broken = operations.filtered(lambda o: o.state == "broken")
         return {
             "operation_ids": operations.ids,
@@ -312,6 +321,56 @@ class CustomizationBundle(models.Model):
             ],
             "reload": bool(operations.ids) and not broken.ids and apply,
         }
+
+    def _create_menu_from_ui(self, bundle, action, params):
+        """Create a hide/rename/groups operation for a navbar menu."""
+        if action not in ("hide", "rename", "set_groups"):
+            raise UserError(
+                self.env._("Menus can only be hidden, renamed or restricted.")
+            )
+        menu = self.env["ir.ui.menu"].browse(params.get("menu_id"))
+        if not menu.exists():
+            raise UserError(self.env._("The target menu is missing."))
+        xmlid = menu.get_external_id().get(menu.id)
+        if not xmlid:
+            raise UserError(
+                self.env._("Menu '%s' has no XML ID and cannot be customized.")
+                % menu.display_name
+            )
+        payload = dict(params.get("payload") or {})
+        apply = params.get("apply", True)
+        sequence = max(bundle.operation_ids.mapped("sequence") or [0]) + 10
+        vals = {
+            "bundle_id": bundle.id,
+            "sequence": sequence,
+            "menu_id": menu.id,
+            "anchor_kind": "menu",
+            "anchor_name": xmlid,
+        }
+        if action == "hide":
+            vals.update({"type": "hide_menu", "payload": {"xmlid": xmlid}})
+        elif action == "rename":
+            string = (payload.get("string") or "").strip()
+            if not string:
+                raise UserError(self.env._("A new label is required."))
+            vals.update(
+                {
+                    "type": "set_menu_string",
+                    "payload": {"string": string, "xmlid": xmlid},
+                }
+            )
+        else:
+            groups = self._ui_groups_xmlids(payload)
+            vals.update(
+                {
+                    "type": "set_menu_groups",
+                    "payload": {"groups": groups, "xmlid": xmlid},
+                }
+            )
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return self._ui_result(bundle, operation, apply)
 
     def _ui_action_add_after(
         self,

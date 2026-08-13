@@ -50,10 +50,11 @@ export class CustomizationFieldDialog extends Component {
         fieldName: String,
         fieldLabel: {type: String, optional: true},
         model: {type: String, optional: true},
-        viewId: Number,
+        viewId: {type: [Number, Boolean], optional: true},
         viewType: {type: String, optional: true},
         anchorKind: {type: String, optional: true},
         anchorString: {type: String, optional: true},
+        menuId: {type: Number, optional: true},
     };
 
     setup() {
@@ -65,7 +66,10 @@ export class CustomizationFieldDialog extends Component {
         this.state = useState({
             bundles: [],
             bundleId: false,
-            action: this.anchorKind === "button" ? "hide" : "add_after",
+            action:
+                this.anchorKind === "button" || this.anchorKind === "menu"
+                    ? "hide"
+                    : "add_after",
             ttype: "char",
             string: "",
             name: "",
@@ -92,7 +96,7 @@ export class CustomizationFieldDialog extends Component {
         });
         onWillStart(async () => {
             const info = await this.orm.call("customization.bundle", "get_ui_context", [
-                this.props.viewId,
+                this.props.viewId || false,
                 this.props.anchorString ? false : this.props.fieldName,
                 this.anchorKind,
                 this.props.anchorString || false,
@@ -121,6 +125,9 @@ export class CustomizationFieldDialog extends Component {
         }
         if (this.anchorKind === "button") {
             return _t("Customize button %s", label);
+        }
+        if (this.anchorKind === "menu") {
+            return _t("Customize menu %s", label);
         }
         if (this.props.viewType === "list") {
             return _t("Customize list field %s", label);
@@ -163,6 +170,13 @@ export class CustomizationFieldDialog extends Component {
                 {value: "rename", label: _t("Change label")},
                 {value: "set_groups", label: _t("Restrict to groups")},
                 {value: "set_modifier", label: _t("Set modifiers")},
+            ];
+        }
+        if (this.anchorKind === "menu") {
+            return [
+                {value: "hide", label: _t("Hide this menu")},
+                {value: "rename", label: _t("Change label")},
+                {value: "set_groups", label: _t("Restrict to groups")},
             ];
         }
         const fieldActions = [
@@ -366,26 +380,24 @@ export class CustomizationFieldDialog extends Component {
         }
         this.state.busy = true;
         try {
+            const params = {
+                bundle_id: this.state.bundleId,
+                action: this.state.action,
+                model: this.props.model,
+                view_id: this.props.viewId || false,
+                view_type: this.props.viewType || "form",
+                anchor_name: this.props.anchorString ? false : this.props.fieldName,
+                anchor_kind: this.anchorKind,
+                anchor_string: this.props.anchorString || false,
+                menu_id: this.props.menuId || false,
+                ...this.anchorQualifier(),
+                payload,
+                apply: this.state.apply,
+            };
             const result = await this.orm.call(
                 "customization.bundle",
                 "create_from_ui",
-                [
-                    {
-                        bundle_id: this.state.bundleId,
-                        action: this.state.action,
-                        model: this.props.model,
-                        view_id: this.props.viewId,
-                        view_type: this.props.viewType || "form",
-                        anchor_name: this.props.anchorString
-                            ? false
-                            : this.props.fieldName,
-                        anchor_kind: this.anchorKind,
-                        anchor_string: this.props.anchorString || false,
-                        ...this.anchorQualifier(),
-                        payload,
-                        apply: this.state.apply,
-                    },
-                ]
+                [params]
             );
             if (result.broken && result.broken.length) {
                 this.notification.add(

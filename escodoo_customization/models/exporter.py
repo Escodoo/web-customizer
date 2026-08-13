@@ -11,6 +11,8 @@ from lxml import etree
 from odoo import _
 from odoo.exceptions import UserError
 
+from .compiler import MENU_TYPES
+
 XML_HEADER = """<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2026 Escodoo
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
@@ -45,9 +47,13 @@ def export_bundle_files(bundle):
 
     fields = operations.mapped("generated_field_id").exists()
     views = operations.mapped("generated_view_id").filtered("active").exists()
-    if not fields and not views:
+    menu_ops = operations.filtered(lambda o: o.type in MENU_TYPES and o.menu_id)
+    if not fields and not views and not menu_ops:
         raise UserError(
-            _("Applied operations in bundle '%s' did not generate fields or views.")
+            _(
+                "Applied operations in bundle '%s' did not generate "
+                "fields, views or menus."
+            )
             % bundle.code
         )
 
@@ -66,6 +72,11 @@ def export_bundle_files(bundle):
         files["views/inherited_views.xml"] = _views_xml(views, operations)
         data_files.append("views/inherited_views.xml")
         depends.update(_view_modules(views))
+
+    if menu_ops:
+        files["data/ir_ui_menu.xml"] = _menus_xml(menu_ops)
+        data_files.append("data/ir_ui_menu.xml")
+        depends.update(_menu_modules(menu_ops))
 
     files["__manifest__.py"] = _manifest(bundle, sorted(depends), data_files)
     return files
@@ -234,3 +245,47 @@ def _view_modules(views):
         if xmlid and "." in xmlid:
             modules.add(xmlid.split(".", 1)[0])
     return modules
+
+
+def _menu_modules(operations):
+    modules = set()
+    for operation in operations:
+        xmlid = (operation.payload or {}).get("xmlid")
+        if not xmlid and operation.menu_id:
+            xmlid = operation.menu_id.get_external_id().get(operation.menu_id.id)
+        if xmlid and "." in xmlid:
+            modules.add(xmlid.split(".", 1)[0])
+    return modules
+
+
+def _menus_xml(operations):
+    records = "\n".join(_menu_record(operation) for operation in operations)
+    return f"{XML_HEADER}<odoo>\n{records}\n</odoo>\n"
+
+
+def _menu_record(operation):
+    menu = operation.menu_id
+    xmlid = _record_xmlid(
+        menu,
+        _("Menu '%s' has no XML ID and cannot be exported.") % menu.display_name,
+    )
+    payload = operation.payload or {}
+    lines = [f'    <record id="{escape(xmlid)}" model="ir.ui.menu">']
+    if operation.type == "hide_menu":
+        lines.append('        <field name="active" eval="False"/>')
+    elif operation.type == "set_menu_string":
+        name = payload.get("string") or menu.name or ""
+        lines.append(f'        <field name="name">{escape(name)}</field>')
+    elif operation.type == "set_menu_groups":
+        refs = ", ".join(
+            f"ref('{group_xmlid.strip()}')"
+            for group_xmlid in (payload.get("groups") or "").split(",")
+            if group_xmlid.strip()
+        )
+        if not refs:
+            raise UserError(
+                _("Menu groups operation '%s' has no group XML IDs.") % operation.name
+            )
+        lines.append(f'        <field name="groups_id" eval="[(6, 0, [{refs}])]"/>')
+    lines.append("    </record>")
+    return "\n".join(lines)

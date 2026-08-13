@@ -3,12 +3,19 @@
 
 import logging
 
+from .models.compiler import MENU_TYPES, restore_menu_operation
+
 _logger = logging.getLogger(__name__)
 
 
 def uninstall_hook(env):
     """Remove compiler-generated fields and views that live only in the database."""
     operations = env["customization.operation"].sudo().search([])
+    menu_ops = operations.filtered(lambda rec: rec.type in MENU_TYPES).sorted(
+        "sequence", reverse=True
+    )
+    for operation in menu_ops:
+        restore_menu_operation(operation)
     views = operations.mapped("generated_view_id").exists()
     fields = operations.mapped("generated_field_id").exists()
     if views:

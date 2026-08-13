@@ -161,3 +161,50 @@ class TestCustomizationExport(CustomizationCase):
         self.assertIn("parent_id.email", fields_xml)
         self.assertIn('name="related"', fields_xml)
         self.assertIn('name="readonly"', fields_xml)
+
+    def test_export_includes_menu_records(self):
+        menu = self.env["ir.ui.menu"].create(
+            {
+                "name": "Export Menu",
+                "parent_id": self.env.ref("base.menu_administration").id,
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "name": "tester_export_menu",
+                "module": "escodoo_customization",
+                "model": "ir.ui.menu",
+                "res_id": menu.id,
+                "noupdate": True,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_export_menu",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "sequence": 10,
+                        "menu_id": menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": "escodoo_customization.tester_export_menu",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        files = export_bundle_files(bundle)
+        self.assertIn("data/ir_ui_menu.xml", files)
+        menus_xml = files["data/ir_ui_menu.xml"]
+        self.assertIn("escodoo_customization.tester_export_menu", menus_xml)
+        self.assertIn('name="active"', menus_xml)
+        manifest = ast.literal_eval(
+            "\n".join(
+                line
+                for line in files["__manifest__.py"].splitlines()
+                if line and not line.startswith("#")
+            )
+        )
+        self.assertIn("escodoo_customization", manifest["depends"])
+        self.assertIn("data/ir_ui_menu.xml", manifest["data"])

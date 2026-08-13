@@ -51,9 +51,22 @@
                             <field name="bundle_id" />
                             <field name="sequence" />
                             <field name="type" />
-                            <field name="model_id" />
-                            <field name="view_id" />
-                            <field name="view_type" />
+                            <field
+                                name="model_id"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                            />
+                            <field
+                                name="view_id"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                            />
+                            <field
+                                name="view_type"
+                                invisible="type in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                            />
+                            <field
+                                name="menu_id"
+                                invisible="type not in ('hide_menu', 'set_menu_string', 'set_menu_groups')"
+                            />
                         </group>
                         <group>
                             <field name="anchor_kind" />
@@ -75,11 +88,11 @@
                     <notebook>
                         <page string="Payload" name="payload">
                             <group
-                                invisible="type not in ('add_field', 'set_string', 'add_page', 'add_group')"
+                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group')"
                             >
                                 <field
                                     name="payload_string"
-                                    required="type in ('set_string', 'add_page', 'add_group')"
+                                    required="type in ('set_string', 'set_menu_string', 'add_page', 'add_group')"
                                 />
                             </group>
                             <group
@@ -140,10 +153,13 @@
                                     required="type == 'set_widget'"
                                 />
                             </group>
-                            <group string="Set Groups" invisible="type != 'set_groups'">
+                            <group
+                                string="Set Groups"
+                                invisible="type not in ('set_groups', 'set_menu_groups')"
+                            >
                                 <field
                                     name="payload_groups"
-                                    required="type == 'set_groups'"
+                                    required="type in ('set_groups', 'set_menu_groups')"
                                 />
                             </group>
                             <group
@@ -155,9 +171,12 @@
                                 <field name="payload_mod_required" />
                                 <field name="payload_mod_column_invisible" />
                             </group>
-                            <div class="text-muted" invisible="type != 'hide_field'">
-                                Hide Field has no extra payload. The compiler
-                                uses the anchor and the view type.
+                            <div
+                                class="text-muted"
+                                invisible="type not in ('hide_field', 'hide_menu')"
+                            >
+                                Hide has no extra payload. The compiler uses the
+                                anchor, the view type, or the menu.
                             </div>
                         </page>
                         <page string="Raw JSON" name="raw_json">

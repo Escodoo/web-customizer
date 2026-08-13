@@ -35,6 +35,7 @@ ANCHOR_TAGS = {
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
 STRUCTURE_TYPES = ("add_page", "add_group")
+MENU_TYPES = ("hide_menu", "set_menu_string", "set_menu_groups")
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -162,7 +163,7 @@ def source_unnamed_page_string(view, title, tag="page"):
     if not lang or not nodes_en:
         return title
     nodes_loc = unnamed_nodes(arch_tree(view.with_context(lang=lang)))
-    for source, localized in zip(nodes_en, nodes_loc):
+    for source, localized in zip(nodes_en, nodes_loc, strict=False):
         if (localized.get("string") or "").strip() == title:
             return (source.get("string") or "").strip() or title
     return title
@@ -398,6 +399,8 @@ def health_check_operation(operation):
     """
     if operation.type == "add_field":
         return True, ""
+    if operation.type in MENU_TYPES:
+        return _health_check_menu(operation)
     if operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
         return False, _("Anchor kind '%s' is not supported yet.") % (
             operation.anchor_kind
@@ -426,6 +429,9 @@ def apply_operation(operation):
     if operation.type == "add_field":
         _apply_add_field(operation)
         return
+    if operation.type in MENU_TYPES:
+        _apply_menu(operation)
+        return
     if operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
         raise AnchorError(
             _("Anchor kind '%s' is not supported yet.") % operation.anchor_kind
@@ -443,6 +449,87 @@ def apply_operation(operation):
         _apply_attributes(operation)
         return
     raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+
+
+def _health_check_menu(operation):
+    menu = operation.menu_id
+    if not menu:
+        return False, _("A menu is required.")
+    if not menu.exists():
+        return False, _("The target menu is missing.")
+    xmlid = menu.get_external_id().get(menu.id)
+    if not xmlid:
+        return False, _("Menu '%s' has no XML ID.") % menu.display_name
+    return True, ""
+
+
+def _menu_groups_xmlids(menu):
+    mapping = menu.groups_id.get_external_id()
+    xmlids = []
+    for group in menu.groups_id:
+        xmlid = mapping.get(group.id)
+        if xmlid:
+            xmlids.append(xmlid)
+    return ",".join(xmlids)
+
+
+def groups_from_xmlids(env, xmlids):
+    groups = env["res.groups"]
+    for xmlid in (xmlids or "").split(","):
+        xmlid = xmlid.strip()
+        if not xmlid:
+            continue
+        groups |= env.ref(xmlid)
+    return groups
+
+
+def _apply_menu(operation):
+    ok, reason = _health_check_menu(operation)
+    if not ok:
+        raise AnchorError(reason)
+    menu = operation.menu_id
+    xmlid = menu.get_external_id().get(menu.id)
+    payload = dict(_payload(operation))
+    previous = dict(payload.get("previous") or {})
+    if operation.type == "hide_menu":
+        previous.setdefault("active", menu.active)
+        menu.write({"active": False})
+    elif operation.type == "set_menu_string":
+        string = (payload.get("string") or "").strip()
+        if not string:
+            raise UserError(_("set_menu_string requires payload.string."))
+        previous.setdefault("name", menu.name)
+        menu.write({"name": string})
+    elif operation.type == "set_menu_groups":
+        groups = payload.get("groups")
+        if not groups:
+            raise UserError(_("set_menu_groups requires payload.groups."))
+        previous.setdefault("groups", _menu_groups_xmlids(menu))
+        group_recs = groups_from_xmlids(operation.env, groups)
+        menu.write({"groups_id": [Command.set(group_recs.ids)]})
+    else:
+        raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+    payload["xmlid"] = xmlid
+    payload["previous"] = previous
+    operation.payload = payload
+
+
+def restore_menu_operation(operation):
+    """Undo a menu write using the snapshot stored on first apply."""
+    menu = operation.menu_id.exists()
+    if not menu:
+        return
+    previous = (_payload(operation).get("previous")) or {}
+    vals = {}
+    if operation.type == "hide_menu" and "active" in previous:
+        vals["active"] = previous["active"]
+    elif operation.type == "set_menu_string" and "name" in previous:
+        vals["name"] = previous["name"]
+    elif operation.type == "set_menu_groups" and "groups" in previous:
+        groups = groups_from_xmlids(operation.env, previous["groups"])
+        vals["groups_id"] = [Command.set(groups.ids)]
+    if vals:
+        menu.write(vals)
 
 
 def _apply_add_field(operation):

@@ -11,10 +11,16 @@ export const customizationService = {
             state,
             toggle() {
                 state.enabled = !state.enabled;
+                if (typeof document !== "undefined") {
+                    document.body.classList.toggle(
+                        "o_esc_customization_mode",
+                        state.enabled
+                    );
+                }
                 if (state.enabled) {
                     notification.add(
                         _t(
-                            "Customization mode is on. Click a field, page, group, button, list column, kanban card field or search field."
+                            "Customization mode is on. Click a field, page, group, button, list column, kanban card field, search field or menu."
                         ),
                         {type: "info"}
                     );
