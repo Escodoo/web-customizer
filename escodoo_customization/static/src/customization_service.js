@@ -14,7 +14,7 @@ export const customizationService = {
                 if (state.enabled) {
                     notification.add(
                         _t(
-                            "Customization mode is on. Click a field, page, button, list column or search field."
+                            "Customization mode is on. Click a field, page, group, button, list column or search field."
                         ),
                         {type: "info"}
                     );
@@ -76,7 +76,8 @@ function customizationTarget(component, extra) {
 
 export function openCustomizationFor(component, fieldName, ev, extra = {}) {
     const customization = component.customization;
-    if (!customization?.state.enabled || !fieldName) {
+    const anchorString = extra.anchorString || "";
+    if (!customization?.state.enabled || !(fieldName || anchorString)) {
         return false;
     }
     const target = customizationTarget(component, extra);
@@ -88,13 +89,15 @@ export function openCustomizationFor(component, fieldName, ev, extra = {}) {
         ev.stopPropagation();
     }
     const record = formRecord(component);
+    const name = fieldName || anchorString;
     customization.openFieldDialog({
-        fieldName,
-        fieldLabel: fieldLabelOf(component, fieldName, extra),
+        fieldName: name,
+        fieldLabel: fieldLabelOf(component, name, extra),
         model: extra.model || record?.resModel,
         viewId: target.viewId,
         viewType: target.viewType,
         anchorKind: extra.anchorKind || "field",
+        anchorString,
     });
     return true;
 }

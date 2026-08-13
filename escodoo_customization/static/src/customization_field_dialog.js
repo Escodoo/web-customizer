@@ -52,6 +52,7 @@ export class CustomizationFieldDialog extends Component {
         viewId: Number,
         viewType: {type: String, optional: true},
         anchorKind: {type: String, optional: true},
+        anchorString: {type: String, optional: true},
     };
 
     setup() {
@@ -91,8 +92,9 @@ export class CustomizationFieldDialog extends Component {
         onWillStart(async () => {
             const info = await this.orm.call("customization.bundle", "get_ui_context", [
                 this.props.viewId,
-                this.props.fieldName,
+                this.props.anchorString ? false : this.props.fieldName,
                 this.anchorKind,
+                this.props.anchorString || false,
             ]);
             this.state.bundles = info.bundles || [];
             this.state.anchorCount = info.anchor_count || 0;
@@ -112,6 +114,9 @@ export class CustomizationFieldDialog extends Component {
         const label = this.props.fieldLabel || this.props.fieldName;
         if (this.anchorKind === "page") {
             return _t("Customize page %s", label);
+        }
+        if (this.anchorKind === "group") {
+            return _t("Customize group %s", label);
         }
         if (this.anchorKind === "button") {
             return _t("Customize button %s", label);
@@ -134,6 +139,18 @@ export class CustomizationFieldDialog extends Component {
                 {value: "add_group", label: _t("Add group in this page")},
                 {value: "hide", label: _t("Hide this page")},
                 {value: "rename", label: _t("Change page title")},
+            ];
+        }
+        if (this.anchorKind === "group") {
+            return [
+                {value: "add_after", label: _t("Add field in this group")},
+                {
+                    value: "place_after",
+                    label: _t("Place existing field in this group"),
+                },
+                {value: "add_group", label: _t("Add group after this one")},
+                {value: "hide", label: _t("Hide this group")},
+                {value: "rename", label: _t("Change group title")},
             ];
         }
         if (this.anchorKind === "button") {
@@ -352,8 +369,11 @@ export class CustomizationFieldDialog extends Component {
                         model: this.props.model,
                         view_id: this.props.viewId,
                         view_type: this.props.viewType || "form",
-                        anchor_name: this.props.fieldName,
+                        anchor_name: this.props.anchorString
+                            ? false
+                            : this.props.fieldName,
                         anchor_kind: this.anchorKind,
+                        anchor_string: this.props.anchorString || false,
                         ...this.anchorQualifier(),
                         payload,
                         apply: this.state.apply,

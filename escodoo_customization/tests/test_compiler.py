@@ -723,3 +723,117 @@ class TestCustomizationCompiler(CustomizationCase):
         arch = view.get_combined_arch()
         self.assertIn("x_esc_site_group", arch)
         self.assertIn("x_esc_page_group", arch)
+
+    def test_add_group_inside_unnamed_page(self):
+        view = self._form_with_unnamed_page()
+        bundle = self._create_bundle(
+            code="client_unnamed_page",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_group",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "page",
+                        "anchor_string": "Field Service",
+                        "position": "inside",
+                        "payload": {
+                            "string": "Site Notes",
+                            "name": "x_esc_fsm_group",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        op = bundle.operation_ids
+        self.assertIn(
+            "//page[not(@name)][.//field[@name='phone']]",
+            op.generated_view_id.arch,
+        )
+        self.assertIn("x_esc_fsm_group", view.get_combined_arch())
+
+    def test_place_field_inside_named_group(self):
+        view = self._form_with_group()
+        bundle = self._create_bundle(
+            code="client_inside_group",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "char",
+                            "string": "Site Note",
+                            "name": "x_esc_site_note",
+                        },
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "sequence": 20,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "group",
+                        "anchor_name": "site_block",
+                        "position": "inside",
+                        "payload": {"field_name": "x_esc_site_note"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        self.assertIn(
+            '<group name="site_block" position="inside">',
+            place.generated_view_id.arch,
+        )
+        self.assertIn("x_esc_site_note", view.get_combined_arch())
+
+    def test_place_field_inside_unnamed_group(self):
+        view = self._form_with_group()
+        bundle = self._create_bundle(
+            code="client_unnamed_group",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "char",
+                            "string": "Extra Note",
+                            "name": "x_esc_extra_note",
+                        },
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "sequence": 20,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "group",
+                        "anchor_string": "Notes",
+                        "position": "inside",
+                        "payload": {"field_name": "x_esc_extra_note"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        self.assertIn(
+            "//group[not(@name)][.//field[@name='email']]",
+            place.generated_view_id.arch,
+        )
+        self.assertIn("x_esc_extra_note", view.get_combined_arch())

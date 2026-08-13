@@ -105,6 +105,7 @@ class CustomizationOperation(models.Model):
             ("field", "Field"),
             ("page", "Page"),
             ("button", "Button"),
+            ("group", "Group"),
             ("xpath", "XPath"),
         ],
         default="field",
@@ -112,6 +113,9 @@ class CustomizationOperation(models.Model):
     )
     anchor_name = fields.Char(
         help="Semantic anchor, for example the field name partner_id."
+    )
+    anchor_string = fields.Char(
+        help="Untranslated page or group title when the node has no name.",
     )
     anchor_occurrence = fields.Integer(
         default=0,
@@ -245,17 +249,18 @@ class CustomizationOperation(models.Model):
         "ir.model.fields", ondelete="set null", copy=False
     )
 
-    @api.depends("type", "anchor_name", "payload", "model_id")
+    @api.depends("type", "anchor_name", "anchor_string", "payload", "model_id")
     def _compute_name(self):
         for rec in self:
             payload = rec.payload or {}
+            anchor = rec.anchor_name or rec.anchor_string or "?"
             if rec.type == "add_field":
                 label = payload.get("string") or payload.get("name") or rec.model
                 rec.name = f"Add field {label}"
             elif rec.type == "place_field":
                 rec.name = (
                     f"Place {payload.get('field_name') or '?'} "
-                    f"{rec.position or 'after'} {rec.anchor_name or '?'}"
+                    f"{rec.position or 'after'} {anchor}"
                 )
             elif rec.type == "add_page":
                 rec.name = (
@@ -266,9 +271,9 @@ class CustomizationOperation(models.Model):
                     f"Add group {payload.get('string') or payload.get('name') or '?'}"
                 )
             elif rec.type == "hide_field":
-                rec.name = f"Hide {rec.anchor_name or '?'}"
+                rec.name = f"Hide {anchor}"
             else:
-                rec.name = f"{rec.type} on {rec.anchor_name or '?'}"
+                rec.name = f"{rec.type} on {anchor}"
 
     @api.depends("payload")
     def _compute_payload_json(self):
@@ -448,7 +453,9 @@ class CustomizationOperation(models.Model):
         else:
             payload.pop(key, None)
 
-    @api.constrains("type", "view_id", "anchor_name", "payload", "model_id")
+    @api.constrains(
+        "type", "view_id", "anchor_name", "anchor_string", "payload", "model_id"
+    )
     def _check_operation(self):
         for rec in self:
             if rec.type == "add_field":
@@ -468,9 +475,11 @@ class CustomizationOperation(models.Model):
                     raise ValidationError(
                         self.env._("A target view is required for this operation.")
                     )
-                if not rec.anchor_name:
+                if not rec.anchor_name and not (
+                    rec.anchor_kind in ("page", "group") and rec.anchor_string
+                ):
                     raise ValidationError(
-                        self.env._("An anchor field name is required.")
+                        self.env._("An anchor name or title is required.")
                     )
                 if rec.type in STRUCTURE_TYPES and (rec.payload or {}).get("name"):
                     ensure_field_name(rec.payload["name"])

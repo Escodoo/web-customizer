@@ -83,6 +83,51 @@ class CustomizationCase(TransactionCase):
             }
         )
 
+    def _form_with_unnamed_page(self):
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.unnamed.page",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                                <field name="email"/>
+                            </group>
+                            <notebook>
+                                <page string="Field Service">
+                                    <field name="phone"/>
+                                </page>
+                            </notebook>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
+    def _form_with_group(self):
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.group",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <group name="site_block" string="Site">
+                                <field name="phone"/>
+                            </group>
+                            <group string="Notes">
+                                <field name="email"/>
+                            </group>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
     def _create_bundle(self, code="client_test", operations=None):
         vals = {
             "name": "Test bundle",

@@ -283,6 +283,12 @@ class TestCustomizationUiApi(CustomizationCase):
             view.id, "toggle_active", "button"
         )
         self.assertTrue(button["anchor_unique"])
+        grouped = self._form_with_group()
+        group = self.env["customization.bundle"].get_ui_context(
+            grouped.id, "site_block", "group"
+        )
+        self.assertTrue(group["anchor_unique"])
+        self.assertEqual(group["anchor_kind"], "group")
 
     def test_get_ui_context_lists_ambiguous_candidates(self):
         view = self.env["ir.ui.view"].create(
@@ -527,6 +533,43 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertEqual(group.position, "inside")
         self.assertIn("x_esc_ui_group", view.get_combined_arch())
 
+    def test_get_ui_context_unnamed_page(self):
+        view = self._form_with_unnamed_page()
+        info = self.env["customization.bundle"].get_ui_context(
+            view.id, False, "page", "Field Service"
+        )
+        self.assertTrue(info["anchor_unique"])
+        self.assertEqual(info["anchor_count"], 1)
+        self.assertEqual(info["anchor_kind"], "page")
+
+    def test_create_from_ui_add_group_inside_unnamed_page(self):
+        bundle = self._create_bundle(code="client_ui_unnamed_page")
+        view = self._form_with_unnamed_page()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_group",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": False,
+                "anchor_kind": "page",
+                "anchor_string": "Field Service",
+                "payload": {"string": "UI FSM Group", "name": "x_esc_ui_fsm_group"},
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        group = bundle.operation_ids
+        self.assertFalse(group.anchor_name)
+        self.assertEqual(group.anchor_string, "Field Service")
+        self.assertEqual(group.position, "inside")
+        self.assertIn(
+            "//page[not(@name)][.//field[@name='phone']]",
+            group.generated_view_id.arch,
+        )
+        self.assertIn("x_esc_ui_fsm_group", view.get_combined_arch())
+
     def test_create_from_ui_add_selection_field(self):
         bundle = self._create_bundle(code="client_ui_selection")
         result = self.env["customization.bundle"].create_from_ui(
@@ -550,3 +593,61 @@ class TestCustomizationUiApi(CustomizationCase):
         field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_status")
         self.assertEqual(field.ttype, "selection")
         self.assertIn("x_esc_ui_status", self.form_view.get_combined_arch())
+
+    def test_create_from_ui_add_field_inside_named_group(self):
+        bundle = self._create_bundle(code="client_ui_inside_group")
+        view = self._form_with_group()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": "site_block",
+                "anchor_kind": "group",
+                "payload": {
+                    "ttype": "char",
+                    "string": "UI Group Note",
+                    "name": "x_esc_ui_group_note",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        self.assertEqual(place.anchor_kind, "group")
+        self.assertEqual(place.position, "inside")
+        self.assertIn(
+            '<group name="site_block" position="inside">',
+            place.generated_view_id.arch,
+        )
+        self.assertIn("x_esc_ui_group_note", view.get_combined_arch())
+
+    def test_create_from_ui_add_field_inside_unnamed_group(self):
+        bundle = self._create_bundle(code="client_ui_unnamed_group")
+        view = self._form_with_group()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": False,
+                "anchor_kind": "group",
+                "anchor_string": "Notes",
+                "payload": {
+                    "ttype": "char",
+                    "string": "UI Notes Extra",
+                    "name": "x_esc_ui_notes_extra",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        self.assertFalse(place.anchor_name)
+        self.assertEqual(place.anchor_string, "Notes")
+        self.assertEqual(place.position, "inside")
+        self.assertIn("x_esc_ui_notes_extra", view.get_combined_arch())

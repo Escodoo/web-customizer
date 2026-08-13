@@ -26,11 +26,12 @@ SUPPORTED_TTYPES = (
     "binary",
     "monetary",
 )
-SUPPORTED_ANCHOR_KINDS = ("field", "page", "button")
+SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group")
 ANCHOR_TAGS = {
     "field": "field",
     "page": "page",
     "button": "button",
+    "group": "group",
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
 STRUCTURE_TYPES = ("add_page", "add_group")
@@ -119,6 +120,54 @@ def _xml_attr(value):
     return xml_escape(value or "", {'"': "&quot;"})
 
 
+def xpath_quote(value):
+    """Return an XPath 1.0 string literal."""
+    value = value or ""
+    if "'" not in value:
+        return f"'{value}'"
+    if '"' not in value:
+        return f'"{value}"'
+    parts = "', \"'\", '".join(value.split("'"))
+    return f"concat('{parts}')"
+
+
+def arch_tree(view):
+    """Return the combined architecture of ``view`` as an etree."""
+    arch = view.get_combined_arch()
+    if isinstance(arch, str):
+        return etree.fromstring(arch.encode())
+    return arch
+
+
+def source_unnamed_page_string(view, title, tag="page"):
+    """Return the untranslated ``@string`` of an unnamed page or group.
+
+    The in-place UI sends the label in the user language. Inherit xpaths
+    must target the source architecture, so map the displayed title back.
+    """
+    title = (title or "").strip()
+    tag = tag or "page"
+    if not title:
+        return ""
+
+    def unnamed_nodes(tree):
+        return [node for node in tree.xpath(f"//{tag}") if not node.get("name")]
+
+    tree_en = arch_tree(view.with_context(lang=None))
+    nodes_en = unnamed_nodes(tree_en)
+    for node in nodes_en:
+        if (node.get("string") or "").strip() == title:
+            return title
+    lang = view.env.lang
+    if not lang or not nodes_en:
+        return title
+    nodes_loc = unnamed_nodes(arch_tree(view.with_context(lang=lang)))
+    for source, localized in zip(nodes_en, nodes_loc):
+        if (localized.get("string") or "").strip() == title:
+            return (source.get("string") or "").strip() or title
+    return title
+
+
 def resolve_related_field(env, model_name, related):
     """Return the destination ``ir.model.fields`` for a dotted related path."""
     related = (related or "").strip()
@@ -189,20 +238,25 @@ def combined_arch_for_operation(view, operation):
     if was_active:
         was_active.write({"active": False})
     try:
-        return view._get_combined_arch()
+        # Inherit xpaths use source (untranslated) @string values.
+        return view.with_context(lang=None)._get_combined_arch()
     finally:
         if was_active:
             was_active.write({"active": True})
 
 
-def list_anchor_candidates(arch_tree, anchor_name, anchor_kind="field"):
-    """Describe every node that matches the semantic anchor name."""
+def list_anchor_candidates(
+    arch_tree, anchor_name, anchor_kind="field", anchor_string=None
+):
+    """Describe every node that matches the semantic anchor name or title."""
     kind = anchor_kind or "field"
     tag = ANCHOR_TAGS.get(kind, "field")
-    if not anchor_name or not re.match(r"^[\w.]+$", anchor_name):
+    nodes = _anchor_nodes(arch_tree, tag, anchor_name, anchor_string)
+    label_base = (anchor_name or anchor_string or "").strip()
+    if not nodes or not label_base:
         return []
     candidates = []
-    for index, node in enumerate(arch_tree.xpath(f"//{tag}[@name='{anchor_name}']")):
+    for index, node in enumerate(nodes):
         page_names = node.xpath("ancestor::page[@name][1]/@name")
         page = page_names[0] if page_names else ""
         previous = node.getprevious()
@@ -220,10 +274,28 @@ def list_anchor_candidates(arch_tree, anchor_name, anchor_kind="field"):
                 "index": index,
                 "page": page,
                 "after": after,
-                "label": f"{index + 1}. {anchor_name}{suffix}",
+                "label": f"{index + 1}. {label_base}{suffix}",
             }
         )
     return candidates
+
+
+def _anchor_nodes(arch_tree, tag, anchor_name, anchor_string=None):
+    """Return matching view nodes by technical name or unnamed page title."""
+    name = (anchor_name or "").strip()
+    if name:
+        if not re.match(r"^[\w.]+$", name):
+            return []
+        return arch_tree.xpath(f"//{tag}[@name='{name}']")
+    title = (anchor_string or "").strip()
+    if tag not in ("page", "group") or not title:
+        return []
+    quoted = xpath_quote(title)
+    return [
+        node
+        for node in arch_tree.xpath(f"//{tag}[@string={quoted}]")
+        if not node.get("name")
+    ]
 
 
 def resolve_anchor(
@@ -232,27 +304,32 @@ def resolve_anchor(
     anchor_kind="field",
     occurrence=0,
     anchor_page=None,
+    anchor_string=None,
 ):
     """Return the unique semantic anchor node or raise AnchorError.
 
     ``occurrence`` is 1-based. 0 means the remaining matches must be unique.
+    Pages and groups without a technical name are matched by ``anchor_string``.
     """
     kind = anchor_kind or "field"
     tag = ANCHOR_TAGS.get(kind)
     if not tag:
         raise AnchorError(_("Anchor kind '%s' is not supported yet.") % kind)
-    if not anchor_name:
+    name = (anchor_name or "").strip()
+    title = (anchor_string or "").strip()
+    if name and not re.match(r"^[\w.]+$", name):
+        raise AnchorError(_("Anchor name '%s' is invalid.") % name)
+    if not name and not title:
         raise AnchorError(_("Anchor name is missing."))
-    if not re.match(r"^[\w.]+$", anchor_name):
-        raise AnchorError(_("Anchor name '%s' is invalid.") % anchor_name)
-    nodes = arch_tree.xpath(f"//{tag}[@name='{anchor_name}']")
+    nodes = _anchor_nodes(arch_tree, tag, name, title)
+    label = name or title
     page = (anchor_page or "").strip()
     if not nodes:
         raise AnchorError(
             _(
                 "Anchor %(kind)s '%(name)s' was not found in the target view.",
                 kind=kind,
-                name=anchor_name,
+                name=label,
             )
         )
     if occurrence:
@@ -262,7 +339,7 @@ def resolve_anchor(
                 _(
                     "Anchor %(kind)s '%(name)s' has no occurrence %(index)s.",
                     kind=kind,
-                    name=anchor_name,
+                    name=label,
                     index=int(occurrence),
                 )
             )
@@ -275,7 +352,7 @@ def resolve_anchor(
                         "Anchor %(kind)s '%(name)s' occurrence %(index)s "
                         "is not on page '%(page)s'.",
                         kind=kind,
-                        name=anchor_name,
+                        name=label,
                         index=int(occurrence),
                         page=page,
                     )
@@ -292,7 +369,7 @@ def resolve_anchor(
                 _(
                     "Anchor %(kind)s '%(name)s' was not found on page '%(page)s'.",
                     kind=kind,
-                    name=anchor_name,
+                    name=label,
                     page=page,
                 )
             )
@@ -303,7 +380,7 @@ def resolve_anchor(
             "Anchor %(kind)s '%(name)s' is ambiguous "
             "(%(count)s matches in the target view).",
             kind=kind,
-            name=anchor_name,
+            name=label,
             count=len(nodes),
         )
     )
@@ -335,6 +412,7 @@ def health_check_operation(operation):
             operation.anchor_kind,
             operation.anchor_occurrence,
             operation.anchor_page,
+            operation.anchor_string,
         )
     except AnchorError as err:
         return False, err.reason
@@ -464,12 +542,52 @@ def _apply_add_field(operation):
     operation.payload = payload
 
 
-def _inherit_arch(operation, inner_xml, position):
+def _unnamed_node_expr(arch_tree, node):
+    """Inherit xpath for a page or group without ``@name``.
+
+    Odoo rejects ``@string`` in inherit specs because it is translated.
+    Prefer a unique named descendant, then fall back to document order.
+    """
+    tag = node.tag
+    for child_tag in ("field", "button"):
+        for name in node.xpath(f".//{child_tag}[@name]/@name"):
+            if not re.match(r"^[\w.]+$", name):
+                continue
+            expr = f"//{tag}[not(@name)][.//{child_tag}[@name='{name}']]"
+            matches = arch_tree.xpath(expr)
+            if len(matches) == 1 and matches[0] is node:
+                return expr
+    unnamed = [item for item in arch_tree.xpath(f"//{tag}") if not item.get("name")]
+    try:
+        index = unnamed.index(node) + 1
+    except ValueError as err:
+        raise AnchorError(_("Unnamed %s anchor was not found.") % tag) from err
+    return f"(//{tag}[not(@name)])[{index}]"
+
+
+def _inherit_arch(operation, inner_xml, position, arch_tree=None):
     kind = operation.anchor_kind or "field"
     tag = ANCHOR_TAGS.get(kind, "field")
-    anchor = operation.anchor_name
+    anchor = (operation.anchor_name or "").strip()
+    title = (operation.anchor_string or "").strip()
     page = (operation.anchor_page or "").strip()
     occurrence = operation.anchor_occurrence or 0
+    if not anchor and tag in ("page", "group") and title:
+        if arch_tree is None:
+            arch_tree = combined_arch_for_operation(operation.view_id, operation)
+        node = resolve_anchor(
+            arch_tree,
+            operation.anchor_name,
+            operation.anchor_kind,
+            operation.anchor_occurrence,
+            operation.anchor_page,
+            operation.anchor_string,
+        )
+        expr = _unnamed_node_expr(arch_tree, node)
+        return (
+            f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
+            f"{inner_xml}</xpath>"
+        )
     if occurrence:
         expr = f"(//{tag}[@name='{anchor}'])[{int(occurrence)}]"
         return f'<xpath expr="{expr}" position="{position}">{inner_xml}</xpath>'
@@ -543,7 +661,7 @@ def _apply_add_structure(operation):
                 tag=tag,
             )
         )
-    arch = _inherit_arch(operation, node_xml, position)
+    arch = _inherit_arch(operation, node_xml, position, arch_tree)
     _upsert_generated_view(operation, arch, active=True)
     payload["name"] = name
     if string:

@@ -29,4 +29,34 @@
             >(ev) => this.onCustomizationNavClick(ev, navItem)</attribute>
         </xpath>
     </t>
+    <t
+        t-name="escodoo_customization.InnerGroup"
+        t-inherit="web.Form.InnerGroup"
+        t-inherit-mode="extension"
+    >
+        <xpath
+            expr="//div[hasclass('o_inner_group')]/div[not(hasclass('o_wrap_field'))]"
+            position="attributes"
+        >
+            <attribute name="t-on-click">onCustomizationClick</attribute>
+            <attribute
+                name="t-attf-class"
+            >g-col-sm-{{ props.maxCols }} {{ customizationTargetClass }}</attribute>
+        </xpath>
+    </t>
+    <t
+        t-name="escodoo_customization.OuterGroup"
+        t-inherit="web.Form.OuterGroup"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//t[@t-slot='title']" position="replace">
+            <div
+                t-if="props.slots and props.slots.title"
+                t-att-class="customizationTargetClass"
+                t-on-click="onCustomizationClick"
+            >
+                <t t-slot="title" />
+            </div>
+        </xpath>
+    </t>
 </templates>

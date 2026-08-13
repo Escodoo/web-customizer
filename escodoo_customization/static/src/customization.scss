@@ -8,9 +8,17 @@
 }
 
 .nav-link.o_esc_customization_target,
+.nav-link.active.o_esc_customization_target,
 .btn.o_esc_customization_target,
 th.o_esc_customization_target {
+    outline: 1px dashed #714b67 !important;
+    outline-offset: -1px;
+}
+
+.o_horizontal_separator.o_esc_customization_target,
+.o_esc_customization_target:has(> .o_horizontal_separator) {
     outline: 1px dashed #714b67;
+    outline-offset: 2px;
 }
 
 .o_esc_customization_target:hover {

@@ -59,6 +59,10 @@
                             <field name="anchor_kind" />
                             <field name="anchor_name" invisible="type == 'add_field'" />
                             <field
+                                name="anchor_string"
+                                invisible="type == 'add_field' or anchor_kind not in ('page', 'group')"
+                            />
+                            <field
                                 name="anchor_occurrence"
                                 invisible="type == 'add_field'"
                             />
