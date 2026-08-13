@@ -57,44 +57,41 @@
                         </group>
                         <group>
                             <field name="anchor_kind" />
-                            <field
-                                name="anchor_name"
-                                invisible="type == 'add_field'"
-                            />
-                            <field
-                                name="position"
-                                invisible="type == 'add_field'"
-                            />
+                            <field name="anchor_name" invisible="type == 'add_field'" />
+                            <field name="position" invisible="type == 'add_field'" />
                             <field name="generated_field_id" readonly="1" />
                             <field name="generated_view_id" readonly="1" />
                         </group>
                     </group>
                     <notebook>
                         <page string="Payload" name="payload">
-                            <group
-                                invisible="type not in ('add_field', 'set_string')"
-                            >
+                            <group invisible="type not in ('add_field', 'set_string')">
                                 <field
                                     name="payload_string"
                                     required="type == 'set_string'"
                                 />
                             </group>
-                            <group
-                                string="Add Field"
-                                invisible="type != 'add_field'"
-                            >
+                            <group string="Add Field" invisible="type != 'add_field'">
                                 <group>
                                     <field
                                         name="payload_ttype"
-                                        required="type == 'add_field'"
+                                        required="type == 'add_field' and not payload_related"
                                     />
                                     <field name="payload_name" />
+                                    <field
+                                        name="payload_related"
+                                        placeholder="parent_id.email"
+                                    />
+                                    <field
+                                        name="payload_store"
+                                        invisible="not payload_related"
+                                    />
                                 </group>
                                 <group>
                                     <field
                                         name="payload_relation"
-                                        invisible="payload_ttype not in ('many2one', 'many2many')"
-                                        required="payload_ttype in ('many2one', 'many2many')"
+                                        invisible="payload_ttype not in ('many2one', 'many2many') or payload_related"
+                                        required="payload_ttype in ('many2one', 'many2many') and not payload_related"
                                     />
                                     <field name="payload_required" />
                                     <field name="payload_help" />
@@ -109,19 +106,13 @@
                                     required="type == 'place_field'"
                                 />
                             </group>
-                            <group
-                                string="Set Widget"
-                                invisible="type != 'set_widget'"
-                            >
+                            <group string="Set Widget" invisible="type != 'set_widget'">
                                 <field
                                     name="payload_widget"
                                     required="type == 'set_widget'"
                                 />
                             </group>
-                            <group
-                                string="Set Groups"
-                                invisible="type != 'set_groups'"
-                            >
+                            <group string="Set Groups" invisible="type != 'set_groups'">
                                 <field
                                     name="payload_groups"
                                     required="type == 'set_groups'"
@@ -136,10 +127,7 @@
                                 <field name="payload_mod_required" />
                                 <field name="payload_mod_column_invisible" />
                             </group>
-                            <div
-                                class="text-muted"
-                                invisible="type != 'hide_field'"
-                            >
+                            <div class="text-muted" invisible="type != 'hide_field'">
                                 Hide Field has no extra payload. The compiler
                                 uses the anchor and the view type.
                             </div>
@@ -154,10 +142,7 @@
                             />
                         </page>
                     </notebook>
-                    <group
-                        string="Broken reason"
-                        invisible="not broken_reason"
-                    >
+                    <group string="Broken reason" invisible="not broken_reason">
                         <field name="broken_reason" colspan="2" />
                     </group>
                 </sheet>

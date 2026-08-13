@@ -60,7 +60,9 @@ Usage
 3. On any form, click the magic-wand icon in the systray (customization
    managers). Fields are outlined; click one to add a **new** field
    after it, **place an existing field** after it, hide it, or change
-   its label. The clicked field is the semantic anchor.
+   its label. The clicked field is the semantic anchor. To mirror
+   another field, fill **Related path** (for example
+   ``parent_id.email``) instead of a field type.
 4. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.

@@ -108,11 +108,11 @@ def _field_record(field):
     )
     lines = [
         f'    <record id="{xmlid}" model="ir.model.fields">',
-        f"        <field name=\"name\">{escape(field.name)}</field>",
-        f"        <field name=\"model_id\" ref=\"{model_xmlid}\"/>",
-        f"        <field name=\"ttype\">{escape(field.ttype)}</field>",
+        f'        <field name="name">{escape(field.name)}</field>',
+        f'        <field name="model_id" ref="{model_xmlid}"/>',
+        f'        <field name="ttype">{escape(field.ttype)}</field>',
         '        <field name="state">manual</field>',
-        "        <field name=\"field_description\">"
+        '        <field name="field_description">'
         f"{escape(field.field_description or field.name)}</field>",
     ]
     if field.help:
@@ -120,12 +120,16 @@ def _field_record(field):
     if field.required:
         lines.append('        <field name="required" eval="True"/>')
     if field.relation:
-        lines.append(
-            f'        <field name="relation">{escape(field.relation)}</field>'
-        )
+        lines.append(f'        <field name="relation">{escape(field.relation)}</field>')
+    if field.related:
+        lines.append(f'        <field name="related">{escape(field.related)}</field>')
+        lines.append('        <field name="readonly" eval="True"/>')
+        if field.store:
+            lines.append('        <field name="store" eval="True"/>')
     if field.ttype == "monetary" and field.currency_field:
         lines.append(
-            f'        <field name="currency_field">{escape(field.currency_field)}</field>'
+            '        <field name="currency_field">'
+            f"{escape(field.currency_field)}</field>"
         )
     lines.append("    </record>")
     if field.ttype == "selection":
@@ -137,9 +141,7 @@ def _selection_records(field, field_xmlid):
     lines = []
     for index, option in enumerate(field.selection_ids.sorted("sequence")):
         sel_id = f"{field_xmlid}_sel_{re.sub('[^a-zA-Z0-9_]', '_', option.value)}"
-        lines.append(
-            f'    <record id="{sel_id}" model="ir.model.fields.selection">'
-        )
+        lines.append(f'    <record id="{sel_id}" model="ir.model.fields.selection">')
         lines.append(f'        <field name="field_id" ref="{field_xmlid}"/>')
         lines.append(f'        <field name="value">{escape(option.value)}</field>')
         lines.append(f'        <field name="name">{escape(option.name)}</field>')
@@ -164,9 +166,7 @@ def _view_record(view, operation):
     xmlid = f"view_operation_{operation.id}"
     inherit_xmlid = _record_xmlid(
         view.inherit_id,
-        _(
-            "Target view '%s' has no XML ID. Export needs a stable inherit_id."
-        )
+        _("Target view '%s' has no XML ID. Export needs a stable inherit_id.")
         % (view.inherit_id.display_name if view.inherit_id else view.display_name),
     )
     arch = _pretty_arch(view)

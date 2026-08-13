@@ -96,6 +96,46 @@ def unique_field_name(env, model_name, base_name):
     return name
 
 
+def resolve_related_field(env, model_name, related):
+    """Return the destination ``ir.model.fields`` for a dotted related path."""
+    related = (related or "").strip()
+    if not related or not re.match(r"^[\w]+(?:\.[\w]+)*$", related):
+        raise UserError(
+            _(
+                "Related path '%s' is invalid. Use dotted field names, "
+                "for example parent_id.email."
+            )
+            % (related or "")
+        )
+    names = related.split(".")
+    current_model = model_name
+    dest = None
+    for index, name in enumerate(names):
+        dest = env["ir.model.fields"]._get(current_model, name)
+        if not dest:
+            raise UserError(
+                _(
+                    "Related field '%(name)s' was not found on %(model)s.",
+                    name=name,
+                    model=current_model,
+                )
+            )
+        if index == len(names) - 1:
+            break
+        if dest.ttype != "many2one" or not dest.relation:
+            raise UserError(
+                _(
+                    "Intermediate field '%(name)s' on %(model)s must be a many2one.",
+                    name=name,
+                    model=current_model,
+                )
+            )
+        current_model = dest.relation
+    if dest.ttype not in SUPPORTED_TTYPES:
+        raise UserError(_("Related field type '%s' is not supported.") % dest.ttype)
+    return dest
+
+
 def _payload(operation):
     return operation.payload or {}
 
@@ -148,8 +188,12 @@ def resolve_field_anchor(arch_tree, anchor_name):
         )
     if len(nodes) > 1:
         raise AnchorError(
-            _("Anchor field '%s' is ambiguous (%s matches in the target view).")
-            % (anchor_name, len(nodes))
+            _(
+                "Anchor field '%(name)s' is ambiguous "
+                "(%(count)s matches in the target view).",
+                name=anchor_name,
+                count=len(nodes),
+            )
         )
     return nodes[0]
 
@@ -199,12 +243,7 @@ def apply_operation(operation):
 
 
 def _apply_add_field(operation):
-    payload = _payload(operation)
-    ttype = payload.get("ttype")
-    if ttype not in SUPPORTED_TTYPES:
-        raise UserError(
-            _("Field type '%s' is not supported.") % (ttype or _("(missing)"))
-        )
+    payload = dict(_payload(operation))
     model_name = operation.model
     if not model_name:
         raise UserError(_("A model is required to create a field."))
@@ -213,7 +252,25 @@ def _apply_add_field(operation):
     if table_kind != sql.TableKind.Regular:
         raise UserError(_("The model %s does not support adding fields.") % model_name)
 
-    requested = payload.get("name") or slugify_field_suffix(payload.get("string") or "")
+    related = (payload.get("related") or "").strip() or False
+    if related:
+        dest = resolve_related_field(operation.env, model_name, related)
+        payload["related"] = related
+        payload["ttype"] = dest.ttype
+        if dest.relation:
+            payload["relation"] = dest.relation
+        if dest.ttype == "monetary" and dest.currency_field:
+            payload.setdefault("currency_field", dest.currency_field)
+
+    ttype = payload.get("ttype")
+    if ttype not in SUPPORTED_TTYPES:
+        raise UserError(
+            _("Field type '%s' is not supported.") % (ttype or _("(missing)"))
+        )
+
+    requested = payload.get("name") or slugify_field_suffix(
+        payload.get("string") or (related and related.split(".")[-1]) or ""
+    )
     name = ensure_field_name(requested)
     if operation.generated_field_id:
         field = operation.generated_field_id
@@ -236,12 +293,17 @@ def _apply_add_field(operation):
         "help": payload.get("help") or False,
         "required": bool(payload.get("required")),
     }
+    if related:
+        vals["related"] = related
+        vals["store"] = bool(payload.get("store"))
+        vals["readonly"] = True
+        vals["copied"] = False
     if ttype in ("many2one", "many2many"):
         relation = payload.get("relation")
         if not relation:
             raise UserError(_("A relation model is required for %s fields.") % ttype)
         vals["relation"] = relation
-    if ttype == "selection":
+    if ttype == "selection" and not related:
         selection = payload.get("selection") or []
         if not selection:
             raise UserError(_("Selection fields need at least one option."))
@@ -272,8 +334,8 @@ def _apply_add_field(operation):
 
     field = operation.env["ir.model.fields"].create(vals)
     operation.generated_field_id = field
-    payload = dict(payload)
     payload["name"] = field.name
+    payload["ttype"] = ttype
     operation.payload = payload
 
 
@@ -285,9 +347,7 @@ def _inherit_arch(operation, inner_xml, position):
 def _upsert_generated_view(operation, arch, active=True):
     view = operation.generated_view_id
     values = {
-        "name": (
-            f"Customization {operation.bundle_id.code} operation {operation.id}"
-        ),
+        "name": (f"Customization {operation.bundle_id.code} operation {operation.id}"),
         "type": operation.view_type or operation.view_id.type,
         "model": operation.model,
         "inherit_id": operation.view_id.id,

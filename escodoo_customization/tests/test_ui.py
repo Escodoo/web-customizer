@@ -73,6 +73,30 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertIn("x_esc_vip_ui", arch)
         self.assertIn("x_esc_juvenal_ui", arch)
 
+    def test_create_from_ui_add_related_field(self):
+        bundle = self._create_bundle(code="client_ui_related")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "payload": {
+                    "string": "Parent Email",
+                    "name": "x_esc_ui_parent_email",
+                    "related": "parent_id.email",
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_parent_email")
+        self.assertEqual(field.related, "parent_id.email")
+        self.assertEqual(field.ttype, "char")
+        self.assertIn("x_esc_ui_parent_email", self.form_view.get_combined_arch())
+
     def test_create_from_ui_place_after_existing_field(self):
         bundle = self._create_bundle(code="client_ui_place")
         Field = self.env["ir.model.fields"]

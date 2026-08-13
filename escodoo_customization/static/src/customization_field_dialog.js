@@ -42,6 +42,8 @@ export class CustomizationFieldDialog extends Component {
             name: "",
             relation: "",
             newLabel: "",
+            related: "",
+            storeRelated: false,
             existingFieldId: false,
             existingFieldName: "",
             apply: true,
@@ -100,13 +102,18 @@ export class CustomizationFieldDialog extends Component {
         }
         const payload = {};
         if (this.state.action === "add_after") {
-            payload.ttype = this.state.ttype;
             payload.string = this.state.string;
             if (this.state.name) {
                 payload.name = this.state.name;
             }
-            if (["many2one", "many2many"].includes(this.state.ttype)) {
-                payload.relation = this.state.relation;
+            if (this.state.related) {
+                payload.related = this.state.related;
+                payload.store = this.state.storeRelated;
+            } else {
+                payload.ttype = this.state.ttype;
+                if (["many2one", "many2many"].includes(this.state.ttype)) {
+                    payload.relation = this.state.relation;
+                }
             }
         } else if (this.state.action === "place_after") {
             if (!this.state.existingFieldName) {

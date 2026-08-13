@@ -136,3 +136,28 @@ class TestCustomizationExport(CustomizationCase):
         self.assertEqual(download["type"], "ir.actions.act_url")
         self.assertIn("download=true", download["url"])
         self.assertIn("client_export_wizard.zip", download["url"])
+
+    def test_export_includes_related_attributes(self):
+        bundle = self._create_bundle(
+            code="client_export_related",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "string": "Parent Email",
+                            "name": "x_esc_export_parent_email",
+                            "related": "parent_id.email",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        files = export_bundle_files(bundle)
+        fields_xml = files["data/ir_model_fields.xml"]
+        self.assertIn("parent_id.email", fields_xml)
+        self.assertIn('name="related"', fields_xml)
+        self.assertIn('name="readonly"', fields_xml)

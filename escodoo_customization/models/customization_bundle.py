@@ -8,7 +8,7 @@ from lxml import etree
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
-from .compiler import ensure_field_name, slugify_field_suffix
+from .compiler import ensure_field_name, resolve_related_field, slugify_field_suffix
 
 
 class CustomizationBundle(models.Model):
@@ -173,10 +173,17 @@ class CustomizationBundle(models.Model):
         sequence = max(bundle.operation_ids.mapped("sequence") or [0]) + 10
         Operation = self.env["customization.operation"]
         if action == "add_after":
-            if not payload.get("ttype"):
-                raise UserError(self.env._("A field type is required."))
+            if not payload.get("ttype") and not payload.get("related"):
+                raise UserError(
+                    self.env._("A field type or a related path is required.")
+                )
+            if payload.get("related") and not payload.get("ttype"):
+                dest = resolve_related_field(self.env, model_name, payload["related"])
+                payload["ttype"] = dest.ttype
+                if dest.relation:
+                    payload["relation"] = dest.relation
             requested = payload.get("name") or slugify_field_suffix(
-                payload.get("string") or ""
+                payload.get("string") or (payload.get("related") or "").split(".")[-1]
             )
             field_name = ensure_field_name(requested)
             payload["name"] = field_name

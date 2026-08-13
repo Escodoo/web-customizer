@@ -36,6 +36,8 @@ PAYLOAD_UI_FIELDS = (
     "payload_help",
     "payload_required",
     "payload_relation",
+    "payload_related",
+    "payload_store",
     "payload_field_name",
     "payload_widget",
     "payload_groups",
@@ -154,6 +156,19 @@ class CustomizationOperation(models.Model):
         string="Relation Model",
         help="Technical model name, for example res.partner.",
     )
+    payload_related = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Related Path",
+        help="Dotted path to an existing field, for example parent_id.email.",
+    )
+    payload_store = fields.Boolean(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Store Related",
+        help="Store the related value in the database. Leave off for a "
+        "computed-only related field.",
+    )
     payload_field_name = fields.Char(
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
@@ -241,13 +256,17 @@ class CustomizationOperation(models.Model):
             rec.payload_help = payload.get("help") or False
             rec.payload_required = bool(payload.get("required"))
             rec.payload_relation = payload.get("relation") or False
+            rec.payload_related = payload.get("related") or False
+            rec.payload_store = bool(payload.get("store"))
             rec.payload_field_name = payload.get("field_name") or False
             rec.payload_widget = payload.get("widget") or False
             rec.payload_groups = payload.get("groups") or False
             rec.payload_mod_invisible = modifiers.get("invisible") or False
             rec.payload_mod_readonly = modifiers.get("readonly") or False
             rec.payload_mod_required = modifiers.get("required") or False
-            rec.payload_mod_column_invisible = modifiers.get("column_invisible") or False
+            rec.payload_mod_column_invisible = (
+                modifiers.get("column_invisible") or False
+            )
 
     def _inverse_payload_ui(self):
         for rec in self:
@@ -259,28 +278,39 @@ class CustomizationOperation(models.Model):
         return self._apply_ui_to_payload(self.payload, self.type, ui) or False
 
     @api.model
+    def _apply_add_field_payload_ui(self, payload, ui):
+        if "payload_ttype" in ui:
+            self._set_payload_key(payload, "ttype", ui["payload_ttype"])
+        if "payload_string" in ui:
+            self._set_payload_key(payload, "string", ui["payload_string"])
+        if "payload_name" in ui:
+            self._set_payload_key(payload, "name", ui["payload_name"])
+        if "payload_help" in ui:
+            self._set_payload_key(payload, "help", ui["payload_help"])
+        if "payload_required" in ui:
+            if ui["payload_required"]:
+                payload["required"] = True
+            else:
+                payload.pop("required", None)
+        ttype = payload.get("ttype")
+        if ttype in ("many2one", "many2many"):
+            if "payload_relation" in ui:
+                self._set_payload_key(payload, "relation", ui["payload_relation"])
+        elif "payload_ttype" in ui:
+            payload.pop("relation", None)
+        if "payload_related" in ui:
+            self._set_payload_key(payload, "related", ui["payload_related"])
+        if "payload_store" in ui:
+            if ui["payload_store"]:
+                payload["store"] = True
+            else:
+                payload.pop("store", None)
+
+    @api.model
     def _apply_ui_to_payload(self, payload, op_type, ui):
         payload = dict(payload or {})
         if op_type == "add_field":
-            if "payload_ttype" in ui:
-                self._set_payload_key(payload, "ttype", ui["payload_ttype"])
-            if "payload_string" in ui:
-                self._set_payload_key(payload, "string", ui["payload_string"])
-            if "payload_name" in ui:
-                self._set_payload_key(payload, "name", ui["payload_name"])
-            if "payload_help" in ui:
-                self._set_payload_key(payload, "help", ui["payload_help"])
-            if "payload_required" in ui:
-                if ui["payload_required"]:
-                    payload["required"] = True
-                else:
-                    payload.pop("required", None)
-            ttype = payload.get("ttype")
-            if ttype in ("many2one", "many2many"):
-                if "payload_relation" in ui:
-                    self._set_payload_key(payload, "relation", ui["payload_relation"])
-            elif "payload_ttype" in ui:
-                payload.pop("relation", None)
+            self._apply_add_field_payload_ui(payload, ui)
         elif op_type == "place_field":
             if "payload_field_name" in ui:
                 self._set_payload_key(payload, "field_name", ui["payload_field_name"])
@@ -345,9 +375,9 @@ class CustomizationOperation(models.Model):
                     raise ValidationError(
                         self.env._("A model is required to add a field.")
                     )
-                if not payload.get("ttype"):
+                if not payload.get("ttype") and not payload.get("related"):
                     raise ValidationError(
-                        self.env._("add_field requires payload.ttype.")
+                        self.env._("add_field requires a field type or a related path.")
                     )
                 if payload.get("name"):
                     ensure_field_name(payload["name"])

@@ -53,6 +53,80 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertIn('name="x_esc_site_ref"', arch)
         self.assertIn('name="email"', arch)
 
+    def test_add_related_field_infers_type(self):
+        bundle = self._create_bundle(
+            code="client_related",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "string": "Parent Email",
+                            "name": "x_esc_parent_email",
+                            "related": "parent_id.email",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_parent_email")
+        self.assertTrue(field)
+        self.assertEqual(field.ttype, "char")
+        self.assertEqual(field.related, "parent_id.email")
+        self.assertFalse(field.store)
+        self.assertTrue(field.readonly)
+
+    def test_add_related_stored_many2one(self):
+        bundle = self._create_bundle(
+            code="client_related_m2o",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "string": "Parent Country",
+                            "name": "x_esc_parent_country",
+                            "related": "parent_id.country_id",
+                            "store": True,
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_parent_country")
+        self.assertEqual(field.ttype, "many2one")
+        self.assertEqual(field.relation, "res.country")
+        self.assertTrue(field.store)
+
+    def test_add_related_invalid_path_is_broken(self):
+        bundle = self._create_bundle(
+            code="client_related_bad",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "string": "Broken Related",
+                            "name": "x_esc_bad_related",
+                            "related": "parent_id.no_such_field",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        operation = bundle.operation_ids
+        self.assertEqual(operation.state, "broken")
+        self.assertIn("no_such_field", operation.broken_reason)
+
     def test_place_field_after_custom_field_same_bundle(self):
         bundle = self._create_bundle(
             code="client_chain",

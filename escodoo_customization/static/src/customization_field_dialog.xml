@@ -54,7 +54,7 @@
                     </select>
                 </div>
                 <t t-if="state.action === 'add_after'">
-                    <div class="mb-3">
+                    <div class="mb-3" t-if="!state.related">
                         <label class="form-label">Field type</label>
                         <select
                             class="form-select"
@@ -88,9 +88,31 @@
                             t-on-input="(ev) => state.name = ev.target.value"
                         />
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Related path (optional)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="parent_id.email"
+                            t-att-value="state.related"
+                            t-on-input="(ev) => state.related = ev.target.value"
+                        />
+                    </div>
+                    <div class="form-check mb-3" t-if="state.related">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="esc_cust_store"
+                            t-att-checked="state.storeRelated"
+                            t-on-change="(ev) => state.storeRelated = ev.target.checked"
+                        />
+                        <label class="form-check-label" for="esc_cust_store">
+                            Store related value
+                        </label>
+                    </div>
                     <div
                         class="mb-3"
-                        t-if="state.ttype === 'many2one' || state.ttype === 'many2many'"
+                        t-if="!state.related &amp;&amp; (state.ttype === 'many2one' || state.ttype === 'many2many')"
                     >
                         <label class="form-label">Relation model</label>
                         <input
