@@ -153,6 +153,85 @@ class TestCustomizationUiApi(CustomizationCase):
                 }
             )
 
+    def test_create_from_ui_set_widget_groups_and_modifiers(self):
+        bundle = self._create_bundle(code="client_ui_attrs_extra")
+        widget = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "set_widget",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "payload": {"widget": "email"},
+                "apply": True,
+            }
+        )
+        self.assertFalse(widget["broken"])
+        arch = self.form_view.get_combined_arch()
+        self.assertIn('widget="email"', arch)
+        groups = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "set_groups",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "phone",
+                "payload": {"groups": "base.group_system"},
+                "apply": True,
+            }
+        )
+        self.assertFalse(groups["broken"])
+        self.assertIn("base.group_system", self.form_view.get_combined_arch())
+        modifiers = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "set_modifier",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "name",
+                "payload": {"modifiers": {"readonly": "True", "required": True}},
+                "apply": True,
+            }
+        )
+        self.assertFalse(modifiers["broken"])
+        arch = self.form_view.get_combined_arch()
+        self.assertIn('readonly="True"', arch)
+        self.assertIn('required="True"', arch)
+        self.assertEqual(
+            bundle.operation_ids.filtered(lambda o: o.type == "set_modifier").payload[
+                "modifiers"
+            ],
+            {"readonly": "True", "required": "True"},
+        )
+
+    def test_create_from_ui_set_modifier_requires_value(self):
+        bundle = self._create_bundle(code="client_ui_mod_empty")
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "set_modifier",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "anchor_name": "email",
+                    "payload": {"modifiers": {"invisible": "  "}},
+                }
+            )
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "set_widget",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "anchor_name": "email",
+                    "payload": {"widget": ""},
+                }
+            )
+
     def test_create_from_ui_hide_and_rename(self):
         bundle = self._create_bundle(code="client_ui_attrs")
         hide = self.env["customization.bundle"].create_from_ui(

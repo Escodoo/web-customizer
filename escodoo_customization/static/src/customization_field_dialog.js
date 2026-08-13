@@ -17,6 +17,27 @@ const FIELD_TYPES = [
     ["many2many", "Many2many"],
 ];
 
+const FIELD_WIDGETS = [
+    "badge",
+    "boolean_toggle",
+    "CopyClipboardChar",
+    "email",
+    "handle",
+    "html",
+    "image",
+    "many2many_checkboxes",
+    "many2many_tags",
+    "many2one_avatar",
+    "percentage",
+    "phone",
+    "priority",
+    "progressbar",
+    "radio",
+    "remaining_days",
+    "statusbar",
+    "url",
+];
+
 export class CustomizationFieldDialog extends Component {
     static template = "escodoo_customization.FieldDialog";
     static components = {Dialog, RecordSelector};
@@ -33,6 +54,7 @@ export class CustomizationFieldDialog extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.fieldTypes = FIELD_TYPES;
+        this.fieldWidgets = FIELD_WIDGETS;
         this.state = useState({
             bundles: [],
             bundleId: false,
@@ -46,6 +68,11 @@ export class CustomizationFieldDialog extends Component {
             storeRelated: false,
             existingFieldId: false,
             existingFieldName: "",
+            widget: "",
+            groups: "",
+            modInvisible: "",
+            modReadonly: "",
+            modRequired: "",
             apply: true,
             busy: false,
             anchorCount: 0,
@@ -76,6 +103,10 @@ export class CustomizationFieldDialog extends Component {
         ];
     }
 
+    notifyError(message) {
+        this.notification.add(message, {type: "danger"});
+    }
+
     onBundleChange(ev) {
         this.state.bundleId = parseInt(ev.target.value, 10) || false;
     }
@@ -90,41 +121,90 @@ export class CustomizationFieldDialog extends Component {
         this.state.existingFieldName = data?.name || "";
     }
 
+    payloadForAddAfter() {
+        const payload = {string: this.state.string};
+        if (this.state.name) {
+            payload.name = this.state.name;
+        }
+        if (this.state.related) {
+            payload.related = this.state.related;
+            payload.store = this.state.storeRelated;
+            return payload;
+        }
+        payload.ttype = this.state.ttype;
+        if (["many2one", "many2many"].includes(this.state.ttype)) {
+            payload.relation = this.state.relation;
+        }
+        return payload;
+    }
+
+    payloadForModifiers() {
+        const modifiers = {};
+        for (const [stateKey, attr] of [
+            ["modInvisible", "invisible"],
+            ["modReadonly", "readonly"],
+            ["modRequired", "required"],
+        ]) {
+            const value = this.state[stateKey].trim();
+            if (value) {
+                modifiers[attr] = value;
+            }
+        }
+        if (!Object.keys(modifiers).length) {
+            this.notifyError(_t("Set at least one modifier."));
+            return false;
+        }
+        return {modifiers};
+    }
+
+    payloadForAction() {
+        const action = this.state.action;
+        if (action === "add_after") {
+            return this.payloadForAddAfter();
+        }
+        if (action === "place_after") {
+            if (!this.state.existingFieldName) {
+                this.notifyError(_t("Select an existing field to place."));
+                return false;
+            }
+            return {field_name: this.state.existingFieldName};
+        }
+        if (action === "rename") {
+            return {string: this.state.newLabel};
+        }
+        if (action === "set_widget") {
+            const widget = this.state.widget.trim();
+            if (!widget) {
+                this.notifyError(_t("Enter a widget name."));
+                return false;
+            }
+            return {widget};
+        }
+        if (action === "set_groups") {
+            const groups = this.state.groups.trim();
+            if (!groups) {
+                this.notifyError(_t("Enter at least one group XML ID."));
+                return false;
+            }
+            return {groups};
+        }
+        if (action === "set_modifier") {
+            return this.payloadForModifiers();
+        }
+        return {};
+    }
+
     async onApply() {
         if (this.state.busy) {
             return;
         }
         if (!this.state.bundleId) {
-            this.notification.add(_t("Create a customization bundle first."), {
-                type: "danger",
-            });
+            this.notifyError(_t("Create a customization bundle first."));
             return;
         }
-        const payload = {};
-        if (this.state.action === "add_after") {
-            payload.string = this.state.string;
-            if (this.state.name) {
-                payload.name = this.state.name;
-            }
-            if (this.state.related) {
-                payload.related = this.state.related;
-                payload.store = this.state.storeRelated;
-            } else {
-                payload.ttype = this.state.ttype;
-                if (["many2one", "many2many"].includes(this.state.ttype)) {
-                    payload.relation = this.state.relation;
-                }
-            }
-        } else if (this.state.action === "place_after") {
-            if (!this.state.existingFieldName) {
-                this.notification.add(_t("Select an existing field to place."), {
-                    type: "danger",
-                });
-                return;
-            }
-            payload.field_name = this.state.existingFieldName;
-        } else if (this.state.action === "rename") {
-            payload.string = this.state.newLabel;
+        const payload = this.payloadForAction();
+        if (payload === false) {
+            return;
         }
         this.state.busy = true;
         try {

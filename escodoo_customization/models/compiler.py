@@ -34,6 +34,7 @@ ATTRIBUTE_TYPES = (
     "set_modifier",
     "hide_field",
 )
+MODIFIER_KEYS = ("invisible", "readonly", "required", "column_invisible")
 XMLID_MODULE = "escodoo_customization"
 
 
@@ -418,7 +419,7 @@ def _apply_attributes(operation):
         modifiers = payload.get("modifiers") or {}
         if not modifiers:
             raise UserError(_("set_modifier requires payload.modifiers."))
-        for key in ("invisible", "readonly", "required", "column_invisible"):
+        for key in MODIFIER_KEYS:
             if key in modifiers:
                 parts.append(_attribute_xml(key, modifiers[key]))
     elif operation.type == "hide_field":

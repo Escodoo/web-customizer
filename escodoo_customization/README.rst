@@ -34,8 +34,10 @@ views. Applied bundles can be **exported** as a plain Odoo addon to
 version in git.
 
 Customization managers can turn on customization mode from the systray
-and click a field on a form to add a field after it, hide it, or change
-its label. That writes the same ledger operations as the backend form.
+and click a field on a form to add a field after it, place an existing
+field, hide it, change its label, set a widget, restrict it to groups,
+or set modifiers. That writes the same ledger operations as the backend
+form.
 
 On upgrade, a health check re-resolves anchors. Missing anchors are
 marked ``broken`` with a reason; other operations are left intact.
@@ -59,9 +61,10 @@ Usage
    example ``client_acme``).
 3. On any form, click the magic-wand icon in the systray (customization
    managers). Fields are outlined; click one to add a **new** field
-   after it, **place an existing field** after it, hide it, or change
-   its label. The clicked field is the semantic anchor. To mirror
-   another field, fill **Related path** (for example
+   after it, **place an existing field** after it, hide it, change its
+   label, set a widget, restrict it to groups, or set modifiers
+   (invisible / readonly / required). The clicked field is the semantic
+   anchor. To mirror another field, fill **Related path** (for example
    ``parent_id.email``) instead of a field type.
 4. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.

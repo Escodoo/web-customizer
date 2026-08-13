@@ -380,8 +380,10 @@ operations into regular <tt class="docutils literal">ir.model.fields</tt> (<tt c
 views. Applied bundles can be <strong>exported</strong> as a plain Odoo addon to
 version in git.</p>
 <p>Customization managers can turn on customization mode from the systray
-and click a field on a form to add a field after it, hide it, or change
-its label. That writes the same ledger operations as the backend form.</p>
+and click a field on a form to add a field after it, place an existing
+field, hide it, change its label, set a widget, restrict it to groups,
+or set modifiers. That writes the same ledger operations as the backend
+form.</p>
 <p>On upgrade, a health check re-resolves anchors. Missing anchors are
 marked <tt class="docutils literal">broken</tt> with a reason; other operations are left intact.
 Customizations never disappear silently.</p>
@@ -410,9 +412,10 @@ mode).</li>
 example <tt class="docutils literal">client_acme</tt>).</li>
 <li>On any form, click the magic-wand icon in the systray (customization
 managers). Fields are outlined; click one to add a <strong>new</strong> field
-after it, <strong>place an existing field</strong> after it, hide it, or change
-its label. The clicked field is the semantic anchor. To mirror
-another field, fill <strong>Related path</strong> (for example
+after it, <strong>place an existing field</strong> after it, hide it, change its
+label, set a widget, restrict it to groups, or set modifiers
+(invisible / readonly / required). The clicked field is the semantic
+anchor. To mirror another field, fill <strong>Related path</strong> (for example
 <tt class="docutils literal">parent_id.email</tt>) instead of a field type.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
 the selected type. The <strong>Raw JSON</strong> tab shows the stored intent.</li>

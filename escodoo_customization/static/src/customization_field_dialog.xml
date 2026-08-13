@@ -51,6 +51,24 @@
                         >
                             Change label
                         </option>
+                        <option
+                            value="set_widget"
+                            t-att-selected="state.action === 'set_widget'"
+                        >
+                            Set widget
+                        </option>
+                        <option
+                            value="set_groups"
+                            t-att-selected="state.action === 'set_groups'"
+                        >
+                            Restrict to groups
+                        </option>
+                        <option
+                            value="set_modifier"
+                            t-att-selected="state.action === 'set_modifier'"
+                        >
+                            Set modifiers
+                        </option>
                     </select>
                 </div>
                 <t t-if="state.action === 'add_after'">
@@ -145,6 +163,76 @@
                             class="form-control"
                             t-att-value="state.newLabel"
                             t-on-input="(ev) => state.newLabel = ev.target.value"
+                        />
+                    </div>
+                </t>
+                <t t-if="state.action === 'set_widget'">
+                    <div class="mb-3">
+                        <label class="form-label">Widget</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            list="esc_cust_widgets"
+                            placeholder="many2many_tags"
+                            t-att-value="state.widget"
+                            t-on-input="(ev) => state.widget = ev.target.value"
+                        />
+                        <datalist id="esc_cust_widgets">
+                            <t t-foreach="fieldWidgets" t-as="widget" t-key="widget">
+                                <option t-att-value="widget" />
+                            </t>
+                        </datalist>
+                    </div>
+                </t>
+                <t t-if="state.action === 'set_groups'">
+                    <div class="mb-3">
+                        <label class="form-label">Groups</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="base.group_system"
+                            t-att-value="state.groups"
+                            t-on-input="(ev) => state.groups = ev.target.value"
+                        />
+                        <div class="form-text">
+                            Comma-separated XML IDs. The field is shown only to
+                            users in those groups.
+                        </div>
+                    </div>
+                </t>
+                <t t-if="state.action === 'set_modifier'">
+                    <p class="text-muted">
+                        Use True to always apply, or an expression such as
+                        not is_company.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label">Invisible</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="True"
+                            t-att-value="state.modInvisible"
+                            t-on-input="(ev) => state.modInvisible = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Readonly</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="True"
+                            t-att-value="state.modReadonly"
+                            t-on-input="(ev) => state.modReadonly = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Required</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="True"
+                            t-att-value="state.modRequired"
+                            t-on-input="(ev) => state.modRequired = ev.target.value"
                         />
                     </div>
                 </t>
