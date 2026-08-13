@@ -228,16 +228,15 @@
                 <t t-if="state.action === 'set_groups'">
                     <div class="mb-3">
                         <label class="form-label">Groups</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="base.group_system"
-                            t-att-value="state.groups"
-                            t-on-input="(ev) => state.groups = ev.target.value"
+                        <MultiRecordSelector
+                            resIds="state.groupIds"
+                            resModel="'res.groups'"
+                            update.bind="onGroupsUpdate"
+                            fieldString.translate="Groups"
+                            placeholder.translate="Search a group..."
                         />
                         <div class="form-text">
-                            Comma-separated XML IDs. The field is shown only to
-                            users in those groups.
+                            The node is shown only to users in those groups.
                         </div>
                     </div>
                 </t>

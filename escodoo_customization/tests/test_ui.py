@@ -184,6 +184,26 @@ class TestCustomizationUiApi(CustomizationCase):
         )
         self.assertFalse(groups["broken"])
         self.assertIn("base.group_system", self.form_view.get_combined_arch())
+        group_ids = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "set_groups",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "payload": {
+                    "group_ids": [self.env.ref("base.group_user").id],
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(group_ids["broken"])
+        email_groups = bundle.operation_ids.filtered(
+            lambda o: o.anchor_name == "email" and o.type == "set_groups"
+        )
+        self.assertEqual(email_groups.payload.get("groups"), "base.group_user")
+        self.assertIn("base.group_user", self.form_view.get_combined_arch())
         modifiers = self.env["customization.bundle"].create_from_ui(
             {
                 "bundle_id": bundle.id,
@@ -229,6 +249,29 @@ class TestCustomizationUiApi(CustomizationCase):
                     "view_id": self.form_view.id,
                     "anchor_name": "email",
                     "payload": {"widget": ""},
+                }
+            )
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "set_groups",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "anchor_name": "email",
+                    "payload": {"group_ids": []},
+                }
+            )
+        orphan = self.env["res.groups"].create({"name": "No XML ID Group"})
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "set_groups",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "anchor_name": "email",
+                    "payload": {"group_ids": [orphan.id]},
                 }
             )
 

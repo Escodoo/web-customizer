@@ -3,6 +3,7 @@ import {browser} from "@web/core/browser/browser";
 import {Dialog} from "@web/core/dialog/dialog";
 import {_t} from "@web/core/l10n/translation";
 import {RecordSelector} from "@web/core/record_selectors/record_selector";
+import {MultiRecordSelector} from "@web/core/record_selectors/multi_record_selector";
 import {useService} from "@web/core/utils/hooks";
 
 const FIELD_TYPES = [
@@ -43,7 +44,7 @@ const FIELD_WIDGETS = [
 
 export class CustomizationFieldDialog extends Component {
     static template = "escodoo_customization.FieldDialog";
-    static components = {Dialog, RecordSelector};
+    static components = {Dialog, RecordSelector, MultiRecordSelector};
     static props = {
         close: Function,
         fieldName: String,
@@ -75,7 +76,7 @@ export class CustomizationFieldDialog extends Component {
             existingFieldId: false,
             existingFieldName: "",
             widget: "",
-            groups: "",
+            groupIds: [],
             modInvisible: "",
             modReadonly: "",
             modRequired: "",
@@ -226,6 +227,10 @@ export class CustomizationFieldDialog extends Component {
         this.state.existingFieldName = data?.name || "";
     }
 
+    onGroupsUpdate(resIds) {
+        this.state.groupIds = resIds || [];
+    }
+
     parseSelectionOptions(text) {
         const options = [];
         for (const rawLine of (text || "").split("\n")) {
@@ -332,12 +337,11 @@ export class CustomizationFieldDialog extends Component {
             return {widget};
         }
         if (action === "set_groups") {
-            const groups = this.state.groups.trim();
-            if (!groups) {
-                this.notifyError(_t("Enter at least one group XML ID."));
+            if (!this.state.groupIds.length) {
+                this.notifyError(_t("Select at least one group."));
                 return false;
             }
-            return {groups};
+            return {group_ids: this.state.groupIds};
         }
         if (action === "set_modifier") {
             return this.payloadForModifiers();

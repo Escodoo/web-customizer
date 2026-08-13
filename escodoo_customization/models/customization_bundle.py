@@ -465,9 +465,7 @@ class CustomizationBundle(models.Model):
                 }
             )
         elif action == "set_groups":
-            groups = (payload.get("groups") or "").strip()
-            if not groups:
-                raise UserError(self.env._("At least one group XML ID is required."))
+            groups = self._ui_groups_xmlids(payload)
             vals.update(
                 {
                     "type": "set_groups",
@@ -490,6 +488,37 @@ class CustomizationBundle(models.Model):
         if apply:
             operation.action_apply()
         return operation
+
+    def _ui_groups_xmlids(self, payload):
+        """Return comma-separated group XML IDs from names or record ids."""
+        xmlids = (payload.get("groups") or "").strip()
+        raw_ids = payload.get("group_ids") or []
+        if xmlids and not raw_ids:
+            return xmlids
+        ids = []
+        for value in raw_ids:
+            try:
+                ids.append(int(value))
+            except (TypeError, ValueError) as err:
+                raise UserError(self.env._("Invalid group id '%s'.") % value) from err
+        if not ids:
+            raise UserError(self.env._("Select at least one group."))
+        groups = self.env["res.groups"].browse(ids).exists()
+        if len(groups) != len(set(ids)):
+            raise UserError(self.env._("One of the selected groups does not exist."))
+        xmlid_map = groups.get_external_id()
+        resolved = []
+        for group in groups:
+            xmlid = xmlid_map.get(group.id)
+            if not xmlid:
+                raise UserError(
+                    self.env._(
+                        "Group '%s' has no XML ID and cannot be used in a view."
+                    )
+                    % group.display_name
+                )
+            resolved.append(xmlid)
+        return ",".join(resolved)
 
     def _ui_modifiers_payload(self, modifiers):
         """Keep only known modifier keys with a non-empty expression."""
