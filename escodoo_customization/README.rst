@@ -36,10 +36,10 @@ version in git.
 Customization managers can turn on customization mode from the systray
 and click a field, named page tab, or named button on a form, a list
 column header, or a search field to add a field, place an existing
-field, hide it, change its label, set a widget, restrict it to groups,
-or set modifiers. Duplicate names (for example two ``email`` fields) are
-chosen in the dialog. That writes the same ledger operations as the
-backend form.
+field, add a notebook page or group, hide it, change its label, set a
+widget, restrict it to groups, or set modifiers. Duplicate names (for
+example two ``email`` fields) are chosen in the dialog. That writes the
+same ledger operations as the backend form.
 
 On upgrade, a health check re-resolves anchors. Missing anchors are
 marked ``broken`` with a reason; other operations are left intact.
@@ -65,13 +65,15 @@ Usage
    systray (customization managers). Fields, named page tabs and named
    buttons are outlined on forms; list column headers and search fields
    are outlined on those views. Click one to add a **new** field after
-   it (or **inside** a page), **place an existing field**, hide it,
-   change its label, set a widget, restrict it to groups, or set
-   modifiers (invisible / readonly / required). The clicked node is the
-   semantic anchor. To mirror another field, fill **Related path** (for
-   example ``parent_id.email``) instead of a field type. Pages and
-   buttons need a technical ``name`` in the view. If the same name
-   appears more than once, choose the node in the dialog.
+   it (or **inside** a page), **place an existing field**, add a
+   **page** or **group**, hide it, change its label, set a widget,
+   restrict it to groups, or set modifiers (invisible / readonly /
+   required). The clicked node is the semantic anchor. To mirror another
+   field, fill **Related path** (for example ``parent_id.email``)
+   instead of a field type. Pages and buttons need a technical ``name``
+   in the view. If the same name appears more than once, choose the node
+   in the dialog. A new page after a field is wrapped in a notebook; a
+   new page after an existing tab is a sibling.
 4. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.

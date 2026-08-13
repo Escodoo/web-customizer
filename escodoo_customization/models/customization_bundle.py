@@ -10,6 +10,7 @@ from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .compiler import (
     MODIFIER_KEYS,
+    STRUCTURE_TYPES,
     SUPPORTED_ANCHOR_KINDS,
     ensure_field_name,
     list_anchor_candidates,
@@ -25,6 +26,8 @@ UI_ACTIONS = (
     "set_widget",
     "set_groups",
     "set_modifier",
+    "add_page",
+    "add_group",
 )
 
 
@@ -201,6 +204,15 @@ class CustomizationBundle(models.Model):
             raise UserError(
                 self.env._("Place a field on a page or after another field.")
             )
+        if action in STRUCTURE_TYPES:
+            if (params.get("view_type") or "form") != "form":
+                raise UserError(
+                    self.env._("Pages and groups can only be added on forms.")
+                )
+            if anchor_kind == "button":
+                raise UserError(
+                    self.env._("Place a page or group on a field or a page.")
+                )
         view_type = params.get("view_type") or "form"
         payload = dict(params.get("payload") or {})
         apply = params.get("apply", True)
@@ -238,6 +250,21 @@ class CustomizationBundle(models.Model):
                 apply,
                 anchor_kind=anchor_kind,
                 position=place_position,
+                occurrence=occurrence,
+                anchor_page=anchor_page,
+            )
+        elif action in STRUCTURE_TYPES:
+            operations = self._ui_action_add_structure(
+                bundle,
+                sequence,
+                action,
+                model,
+                view,
+                view_type,
+                anchor_name,
+                payload,
+                apply,
+                anchor_kind=anchor_kind,
                 occurrence=occurrence,
                 anchor_page=anchor_page,
             )
@@ -323,6 +350,48 @@ class CustomizationBundle(models.Model):
             anchor_page=anchor_page,
         )
         return add_op | place_op
+
+    def _ui_action_add_structure(
+        self,
+        bundle,
+        sequence,
+        action,
+        model,
+        view,
+        view_type,
+        anchor_name,
+        payload,
+        apply,
+        anchor_kind="field",
+        occurrence=0,
+        anchor_page=False,
+    ):
+        """Create an add_page or add_group operation on the clicked anchor."""
+        string = (payload.get("string") or "").strip()
+        if not string:
+            raise UserError(self.env._("A label is required."))
+        requested = payload.get("name") or slugify_field_suffix(string)
+        name = ensure_field_name(requested)
+        position = (
+            "inside" if action == "add_group" and anchor_kind == "page" else "after"
+        )
+        vals = {
+            "bundle_id": bundle.id,
+            "sequence": sequence,
+            "type": action,
+            "model_id": model.id,
+            "view_id": view.id,
+            "view_type": view_type,
+            "anchor_kind": anchor_kind,
+            "anchor_name": anchor_name,
+            "position": position,
+            "payload": {"string": string, "name": name},
+        }
+        vals.update(self._ui_anchor_extra(occurrence, anchor_page))
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return operation
 
     def _ui_action_on_anchor(
         self,

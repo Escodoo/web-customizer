@@ -8,6 +8,7 @@ from odoo.exceptions import UserError, ValidationError
 
 from .compiler import (
     ATTRIBUTE_TYPES,
+    STRUCTURE_TYPES,
     AnchorError,
     _deactivate_generated_view,
     apply_operation,
@@ -65,6 +66,8 @@ class CustomizationOperation(models.Model):
         selection=[
             ("add_field", "Add Field"),
             ("place_field", "Place Field"),
+            ("add_page", "Add Page"),
+            ("add_group", "Add Group"),
             ("set_string", "Set Label"),
             ("set_widget", "Set Widget"),
             ("set_groups", "Set Groups"),
@@ -241,6 +244,14 @@ class CustomizationOperation(models.Model):
                     f"Place {payload.get('field_name') or '?'} "
                     f"{rec.position or 'after'} {rec.anchor_name or '?'}"
                 )
+            elif rec.type == "add_page":
+                rec.name = (
+                    f"Add page {payload.get('string') or payload.get('name') or '?'}"
+                )
+            elif rec.type == "add_group":
+                rec.name = (
+                    f"Add group {payload.get('string') or payload.get('name') or '?'}"
+                )
             elif rec.type == "hide_field":
                 rec.name = f"Hide {rec.anchor_name or '?'}"
             else:
@@ -322,9 +333,11 @@ class CustomizationOperation(models.Model):
         elif op_type == "place_field":
             if "payload_field_name" in ui:
                 self._set_payload_key(payload, "field_name", ui["payload_field_name"])
-        elif op_type == "set_string":
+        elif op_type in STRUCTURE_TYPES + ("set_string",):
             if "payload_string" in ui:
                 self._set_payload_key(payload, "string", ui["payload_string"])
+            if op_type in STRUCTURE_TYPES and "payload_name" in ui:
+                self._set_payload_key(payload, "name", ui["payload_name"])
         elif op_type == "set_widget":
             if "payload_widget" in ui:
                 self._set_payload_key(payload, "widget", ui["payload_widget"])
@@ -389,7 +402,7 @@ class CustomizationOperation(models.Model):
                     )
                 if payload.get("name"):
                     ensure_field_name(payload["name"])
-            elif rec.type in ("place_field",) + ATTRIBUTE_TYPES:
+            elif rec.type in ("place_field",) + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
                 if not rec.view_id:
                     raise ValidationError(
                         self.env._("A target view is required for this operation.")
@@ -398,6 +411,8 @@ class CustomizationOperation(models.Model):
                     raise ValidationError(
                         self.env._("An anchor field name is required.")
                     )
+                if rec.type in STRUCTURE_TYPES and (rec.payload or {}).get("name"):
+                    ensure_field_name(rec.payload["name"])
 
     def _mark_broken(self, reason):
         self.ensure_one()

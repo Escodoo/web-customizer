@@ -550,3 +550,112 @@ class TestCustomizationCompiler(CustomizationCase):
             '<button name="toggle_active" position="attributes">',
             button_op.generated_view_id.arch,
         )
+
+    def test_add_page_after_named_page(self):
+        view = self._form_with_page()
+        bundle = self._create_bundle(
+            code="client_add_page",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_page",
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "page",
+                        "anchor_name": "extra_info",
+                        "position": "after",
+                        "payload": {
+                            "string": "Site Notes",
+                            "name": "x_esc_site_notes",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn('<page name="extra_info" position="after">', generated)
+        self.assertIn('name="x_esc_site_notes"', generated)
+        self.assertNotIn("<notebook>", generated)
+        arch = view.get_combined_arch()
+        self.assertIn("x_esc_site_notes", arch)
+        self.assertIn("Site Notes", arch)
+
+    def test_add_page_after_field_wraps_notebook(self):
+        bundle = self._create_bundle(
+            code="client_add_page_field",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_page",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "email",
+                        "position": "after",
+                        "payload": {"string": "Extra Tab", "name": "x_esc_extra_tab"},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn("<notebook>", generated)
+        self.assertIn('name="x_esc_extra_tab"', generated)
+        self.assertIn("x_esc_extra_tab", self.form_view.get_combined_arch())
+
+    def test_add_group_after_field_and_inside_page(self):
+        view = self._form_with_page()
+        bundle = self._create_bundle(
+            code="client_add_group",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_group",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_name": "email",
+                        "position": "after",
+                        "payload": {
+                            "string": "Site Group",
+                            "name": "x_esc_site_group",
+                        },
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "add_group",
+                        "sequence": 20,
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "page",
+                        "anchor_name": "extra_info",
+                        "position": "inside",
+                        "payload": {
+                            "string": "Page Group",
+                            "name": "x_esc_page_group",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        ops = bundle.operation_ids.sorted("sequence")
+        self.assertIn(
+            '<field name="email" position="after">',
+            ops[0].generated_view_id.arch,
+        )
+        self.assertIn(
+            '<page name="extra_info" position="inside">',
+            ops[1].generated_view_id.arch,
+        )
+        arch = view.get_combined_arch()
+        self.assertIn("x_esc_site_group", arch)
+        self.assertIn("x_esc_page_group", arch)

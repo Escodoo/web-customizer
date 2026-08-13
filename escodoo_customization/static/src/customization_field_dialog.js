@@ -125,6 +125,8 @@ export class CustomizationFieldDialog extends Component {
             return [
                 {value: "add_after", label: _t("Add field in this page")},
                 {value: "place_after", label: _t("Place existing field in this page")},
+                {value: "add_page", label: _t("Add page after this one")},
+                {value: "add_group", label: _t("Add group in this page")},
                 {value: "hide", label: _t("Hide this page")},
                 {value: "rename", label: _t("Change page title")},
             ];
@@ -137,7 +139,7 @@ export class CustomizationFieldDialog extends Component {
                 {value: "set_modifier", label: _t("Set modifiers")},
             ];
         }
-        return [
+        const fieldActions = [
             {value: "add_after", label: _t("Add field after this one")},
             {value: "place_after", label: _t("Place existing field after this one")},
             {value: "hide", label: _t("Hide this field")},
@@ -146,6 +148,17 @@ export class CustomizationFieldDialog extends Component {
             {value: "set_groups", label: _t("Restrict to groups")},
             {value: "set_modifier", label: _t("Set modifiers")},
         ];
+        if ((this.props.viewType || "form") === "form") {
+            fieldActions.splice(2, 0, {
+                value: "add_group",
+                label: _t("Add group after this one"),
+            });
+            fieldActions.splice(3, 0, {
+                value: "add_page",
+                label: _t("Add page after this one"),
+            });
+        }
+        return fieldActions;
     }
 
     get existingFieldDomain() {
@@ -241,6 +254,18 @@ export class CustomizationFieldDialog extends Component {
         }
         if (action === "rename") {
             return {string: this.state.newLabel};
+        }
+        if (action === "add_page" || action === "add_group") {
+            const string = this.state.string.trim();
+            if (!string) {
+                this.notifyError(_t("A label is required."));
+                return false;
+            }
+            const payload = {string};
+            if (this.state.name) {
+                payload.name = this.state.name;
+            }
+            return payload;
         }
         if (action === "set_widget") {
             const widget = this.state.widget.trim();

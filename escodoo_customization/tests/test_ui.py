@@ -482,3 +482,47 @@ class TestCustomizationUiApi(CustomizationCase):
                     "anchor_name": "email",
                 }
             )
+
+    def test_create_from_ui_add_page_after_page(self):
+        bundle = self._create_bundle(code="client_ui_add_page")
+        view = self._form_with_page()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_page",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": "extra_info",
+                "anchor_kind": "page",
+                "payload": {"string": "UI Page", "name": "x_esc_ui_page"},
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        page = bundle.operation_ids
+        self.assertEqual(page.type, "add_page")
+        self.assertEqual(page.position, "after")
+        self.assertIn("x_esc_ui_page", view.get_combined_arch())
+
+    def test_create_from_ui_add_group_inside_page(self):
+        bundle = self._create_bundle(code="client_ui_add_group")
+        view = self._form_with_page()
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_group",
+                "model": "res.partner",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_name": "extra_info",
+                "anchor_kind": "page",
+                "payload": {"string": "UI Group", "name": "x_esc_ui_group"},
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        group = bundle.operation_ids
+        self.assertEqual(group.type, "add_group")
+        self.assertEqual(group.position, "inside")
+        self.assertIn("x_esc_ui_group", view.get_combined_arch())

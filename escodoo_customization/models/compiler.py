@@ -3,6 +3,7 @@
 
 import re
 import unicodedata
+from xml.sax.saxutils import escape as xml_escape
 
 from lxml import etree
 
@@ -32,6 +33,7 @@ ANCHOR_TAGS = {
     "button": "button",
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
+STRUCTURE_TYPES = ("add_page", "add_group")
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -100,6 +102,21 @@ def unique_field_name(env, model_name, base_name):
         name = f"{base_name}_{attempt}"
         attempt += 1
     return name
+
+
+def unique_node_name(arch_tree, base_name):
+    """Append a numeric suffix when the view already has that node name."""
+    name = base_name
+    attempt = 1
+    while arch_tree.xpath(f"//*[@name='{name}']"):
+        name = f"{base_name}_{attempt}"
+        attempt += 1
+    return name
+
+
+def _xml_attr(value):
+    """Escape a value for use inside a double-quoted XML attribute."""
+    return xml_escape(value or "", {'"': "&quot;"})
 
 
 def resolve_related_field(env, model_name, related):
@@ -341,6 +358,9 @@ def apply_operation(operation):
     if operation.type == "place_field":
         _apply_place_field(operation)
         return
+    if operation.type in STRUCTURE_TYPES:
+        _apply_add_structure(operation)
+        return
     if operation.type in ATTRIBUTE_TYPES:
         _apply_attributes(operation)
         return
@@ -491,6 +511,44 @@ def _upsert_generated_view(operation, arch, active=True):
 def _deactivate_generated_view(operation):
     if operation.generated_view_id:
         operation.generated_view_id.active = False
+
+
+def _apply_add_structure(operation):
+    """Compile add_page / add_group into an inherited view node."""
+    tag = "page" if operation.type == "add_page" else "group"
+    payload = dict(_payload(operation))
+    string = (payload.get("string") or "").strip()
+    if tag == "page" and not string:
+        raise UserError(_("A page title is required."))
+    requested = payload.get("name") or slugify_field_suffix(string or tag)
+    name = ensure_field_name(requested)
+    arch_tree = combined_arch_for_operation(operation.view_id, operation)
+    name = unique_node_name(arch_tree, name)
+    attrs = f'name="{name}"'
+    if string:
+        attrs += f' string="{_xml_attr(string)}"'
+    node_xml = f"<{tag} {attrs}/>"
+    if tag == "page" and (operation.anchor_kind or "field") != "page":
+        node_xml = f"<notebook>{node_xml}</notebook>"
+    position = operation.position or (
+        "inside" if tag == "group" and operation.anchor_kind == "page" else "after"
+    )
+    if tag == "page" and position == "inside":
+        raise UserError(_("A page cannot be placed inside another page."))
+    if position not in FIELD_POSITIONS:
+        raise AnchorError(
+            _(
+                "Position '%(position)s' is not valid for placing a %(tag)s.",
+                position=position,
+                tag=tag,
+            )
+        )
+    arch = _inherit_arch(operation, node_xml, position)
+    _upsert_generated_view(operation, arch, active=True)
+    payload["name"] = name
+    if string:
+        payload["string"] = string
+    operation.payload = payload
 
 
 def _apply_place_field(operation):

@@ -126,6 +126,30 @@
                         />
                     </div>
                 </t>
+                <t t-if="state.action === 'add_page' || state.action === 'add_group'">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <t t-if="state.action === 'add_page'">Page title</t>
+                            <t t-else="">Group label</t>
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            t-att-value="state.string"
+                            t-on-input="(ev) => state.string = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Technical name (optional)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="x_esc_..."
+                            t-att-value="state.name"
+                            t-on-input="(ev) => state.name = ev.target.value"
+                        />
+                    </div>
+                </t>
                 <t t-if="state.action === 'place_after'">
                     <div class="mb-3">
                         <label class="form-label">Existing field</label>

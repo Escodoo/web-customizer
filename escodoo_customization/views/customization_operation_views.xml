@@ -70,11 +70,19 @@
                     </group>
                     <notebook>
                         <page string="Payload" name="payload">
-                            <group invisible="type not in ('add_field', 'set_string')">
+                            <group
+                                invisible="type not in ('add_field', 'set_string', 'add_page', 'add_group')"
+                            >
                                 <field
                                     name="payload_string"
-                                    required="type == 'set_string'"
+                                    required="type in ('set_string', 'add_page', 'add_group')"
                                 />
+                            </group>
+                            <group
+                                string="Add Page or Group"
+                                invisible="type not in ('add_page', 'add_group')"
+                            >
+                                <field name="payload_name" />
                             </group>
                             <group string="Add Field" invisible="type != 'add_field'">
                                 <group>
