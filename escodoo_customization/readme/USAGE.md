@@ -24,3 +24,6 @@
    ledger at runtime.
 
 Generated field names always start with `x_esc_` and cannot contain `__`.
+Selection fields take one option per line as `value:Label`. Monetary
+fields need `currency_id` or `x_currency_id` on the model, or a
+currency field name in the payload.

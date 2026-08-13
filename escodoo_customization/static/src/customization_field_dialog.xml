@@ -125,6 +125,39 @@
                             t-on-input="(ev) => state.relation = ev.target.value"
                         />
                     </div>
+                    <div
+                        class="mb-3"
+                        t-if="!state.related &amp;&amp; state.ttype === 'selection'"
+                    >
+                        <label class="form-label">Selection options</label>
+                        <textarea
+                            class="form-control"
+                            rows="4"
+                            placeholder="draft:Draft"
+                            t-att-value="state.selectionOptions"
+                            t-on-input="(ev) => state.selectionOptions = ev.target.value"
+                        />
+                        <div class="form-text">
+                            One option per line as value:Label.
+                        </div>
+                    </div>
+                    <div
+                        class="mb-3"
+                        t-if="!state.related &amp;&amp; state.ttype === 'monetary'"
+                    >
+                        <label class="form-label">Currency field (optional)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="currency_id"
+                            t-att-value="state.currencyField"
+                            t-on-input="(ev) => state.currencyField = ev.target.value"
+                        />
+                        <div class="form-text">
+                            Required unless the model already has currency_id
+                            or x_currency_id.
+                        </div>
+                    </div>
                 </t>
                 <t t-if="state.action === 'add_page' || state.action === 'add_group'">
                     <div class="mb-3">

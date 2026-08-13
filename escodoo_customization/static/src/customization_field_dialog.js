@@ -13,8 +13,11 @@ const FIELD_TYPES = [
     ["float", "Float"],
     ["date", "Date"],
     ["datetime", "Datetime"],
+    ["selection", "Selection"],
     ["many2one", "Many2one"],
     ["many2many", "Many2many"],
+    ["monetary", "Monetary"],
+    ["binary", "Binary"],
 ];
 
 const FIELD_WIDGETS = [
@@ -77,6 +80,8 @@ export class CustomizationFieldDialog extends Component {
             modRequired: "",
             apply: true,
             busy: false,
+            selectionOptions: "",
+            currencyField: "",
             anchorCount: 0,
             anchorUnique: true,
             candidates: [],
@@ -204,6 +209,29 @@ export class CustomizationFieldDialog extends Component {
         this.state.existingFieldName = data?.name || "";
     }
 
+    parseSelectionOptions(text) {
+        const options = [];
+        for (const rawLine of (text || "").split("\n")) {
+            const line = rawLine.trim();
+            if (!line) {
+                continue;
+            }
+            const colon = line.indexOf(":");
+            const comma = line.indexOf(",");
+            const sepIndex = colon >= 0 ? colon : comma;
+            if (sepIndex < 0) {
+                options.push([line, line]);
+                continue;
+            }
+            const value = line.slice(0, sepIndex).trim();
+            const label = line.slice(sepIndex + 1).trim() || value;
+            if (value) {
+                options.push([value, label]);
+            }
+        }
+        return options;
+    }
+
     payloadForAddAfter() {
         const payload = {string: this.state.string};
         if (this.state.name) {
@@ -217,6 +245,17 @@ export class CustomizationFieldDialog extends Component {
         payload.ttype = this.state.ttype;
         if (["many2one", "many2many"].includes(this.state.ttype)) {
             payload.relation = this.state.relation;
+        }
+        if (this.state.ttype === "selection") {
+            const selection = this.parseSelectionOptions(this.state.selectionOptions);
+            if (!selection.length) {
+                this.notifyError(_t("Add at least one selection option."));
+                return false;
+            }
+            payload.selection = selection;
+        }
+        if (this.state.ttype === "monetary" && this.state.currencyField) {
+            payload.currency_field = this.state.currencyField;
         }
         return payload;
     }

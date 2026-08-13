@@ -39,6 +39,8 @@ PAYLOAD_UI_FIELDS = (
     "payload_relation",
     "payload_related",
     "payload_store",
+    "payload_selection",
+    "payload_currency_field",
     "payload_field_name",
     "payload_widget",
     "payload_groups",
@@ -180,6 +182,17 @@ class CustomizationOperation(models.Model):
         help="Store the related value in the database. Leave off for a "
         "computed-only related field.",
     )
+    payload_selection = fields.Text(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Selection Options",
+        help="One option per line as value:Label.",
+    )
+    payload_currency_field = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Currency Field",
+    )
     payload_field_name = fields.Char(
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
@@ -277,6 +290,8 @@ class CustomizationOperation(models.Model):
             rec.payload_relation = payload.get("relation") or False
             rec.payload_related = payload.get("related") or False
             rec.payload_store = bool(payload.get("store"))
+            rec.payload_selection = self._selection_to_text(payload.get("selection"))
+            rec.payload_currency_field = payload.get("currency_field") or False
             rec.payload_field_name = payload.get("field_name") or False
             rec.payload_widget = payload.get("widget") or False
             rec.payload_groups = payload.get("groups") or False
@@ -324,6 +339,52 @@ class CustomizationOperation(models.Model):
                 payload["store"] = True
             else:
                 payload.pop("store", None)
+        self._apply_add_field_type_extras(payload, ui)
+
+    @api.model
+    def _apply_add_field_type_extras(self, payload, ui):
+        """Selection options and currency field for add_field payloads."""
+        if "payload_selection" in ui:
+            selection = self._selection_from_text(ui["payload_selection"])
+            if selection:
+                payload["selection"] = selection
+            else:
+                payload.pop("selection", None)
+        if "payload_currency_field" in ui:
+            self._set_payload_key(
+                payload, "currency_field", ui["payload_currency_field"]
+            )
+
+    @staticmethod
+    def _selection_to_text(selection):
+        if not selection:
+            return False
+        lines = []
+        for item in selection:
+            if isinstance(item, list | tuple) and len(item) >= 2:
+                lines.append(f"{item[0]}:{item[1]}")
+            elif isinstance(item, list | tuple) and item:
+                lines.append(str(item[0]))
+        return "\n".join(lines) or False
+
+    @staticmethod
+    def _selection_from_text(text):
+        options = []
+        for raw_line in (text or "").splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            if ":" in line:
+                value, label = line.split(":", 1)
+            elif "," in line:
+                value, label = line.split(",", 1)
+            else:
+                value, label = line, line
+            value = value.strip()
+            label = label.strip() or value
+            if value:
+                options.append([value, label])
+        return options
 
     @api.model
     def _apply_ui_to_payload(self, payload, op_type, ui):

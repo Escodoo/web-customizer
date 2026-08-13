@@ -436,7 +436,9 @@ click <strong>Download ZIP</strong> and put that module in git; it does not depe
 on this ledger at runtime.</li>
 </ol>
 <p>Generated field names always start with <tt class="docutils literal">x_esc_</tt> and cannot contain
-<tt class="docutils literal">__</tt>.</p>
+<tt class="docutils literal">__</tt>. Selection fields take one option per line as <tt class="docutils literal">value:Label</tt>.
+Monetary fields need <tt class="docutils literal">currency_id</tt> or <tt class="docutils literal">x_currency_id</tt> on the model,
+or a currency field name in the payload.</p>
 </div>
 <div class="section" id="bug-tracker">
 <h1><a class="toc-backref" href="#toc-entry-2">Bug Tracker</a></h1>

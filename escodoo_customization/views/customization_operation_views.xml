@@ -106,6 +106,17 @@
                                         invisible="payload_ttype not in ('many2one', 'many2many') or payload_related"
                                         required="payload_ttype in ('many2one', 'many2many') and not payload_related"
                                     />
+                                    <field
+                                        name="payload_selection"
+                                        invisible="payload_ttype != 'selection' or payload_related"
+                                        required="payload_ttype == 'selection' and not payload_related"
+                                        placeholder="draft:Draft"
+                                    />
+                                    <field
+                                        name="payload_currency_field"
+                                        invisible="payload_ttype != 'monetary' or payload_related"
+                                        placeholder="currency_id"
+                                    />
                                     <field name="payload_required" />
                                     <field name="payload_help" />
                                 </group>

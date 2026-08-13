@@ -526,3 +526,27 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertEqual(group.type, "add_group")
         self.assertEqual(group.position, "inside")
         self.assertIn("x_esc_ui_group", view.get_combined_arch())
+
+    def test_create_from_ui_add_selection_field(self):
+        bundle = self._create_bundle(code="client_ui_selection")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_after",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "email",
+                "payload": {
+                    "ttype": "selection",
+                    "string": "UI Status",
+                    "name": "x_esc_ui_status",
+                    "selection": [["open", "Open"], ["closed", "Closed"]],
+                },
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_status")
+        self.assertEqual(field.ttype, "selection")
+        self.assertIn("x_esc_ui_status", self.form_view.get_combined_arch())

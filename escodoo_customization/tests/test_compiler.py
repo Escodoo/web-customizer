@@ -127,6 +127,70 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertEqual(operation.state, "broken")
         self.assertIn("no_such_field", operation.broken_reason)
 
+    def test_add_selection_and_binary_fields(self):
+        bundle = self._create_bundle(
+            code="client_extra_ttypes",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "selection",
+                            "string": "Site Status",
+                            "name": "x_esc_site_status",
+                            "selection": [["draft", "Draft"], ["done", "Done"]],
+                        },
+                    }
+                ),
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 20,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "binary",
+                            "string": "Site Photo",
+                            "name": "x_esc_site_photo",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        selection = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_status")
+        self.assertEqual(selection.ttype, "selection")
+        self.assertEqual(
+            selection.selection_ids.mapped("value"),
+            ["draft", "done"],
+        )
+        binary = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_photo")
+        self.assertEqual(binary.ttype, "binary")
+
+    def test_add_monetary_without_currency_is_broken(self):
+        bundle = self._create_bundle(
+            code="client_monetary_bad",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "monetary",
+                            "string": "Site Amount",
+                            "name": "x_esc_site_amount",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        operation = bundle.operation_ids
+        self.assertEqual(operation.state, "broken")
+        self.assertIn("currency", operation.broken_reason)
+
     def test_place_field_after_custom_field_same_bundle(self):
         bundle = self._create_bundle(
             code="client_chain",
