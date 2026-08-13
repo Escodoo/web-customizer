@@ -41,6 +41,12 @@
                         string="Health Check"
                         groups="escodoo_customization.group_customization_manager"
                     />
+                    <button
+                        name="action_export"
+                        type="object"
+                        string="Export Addon"
+                        groups="escodoo_customization.group_customization_manager"
+                    />
                     <field
                         name="state"
                         widget="statusbar"

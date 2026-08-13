@@ -102,6 +102,18 @@ class CustomizationBundle(models.Model):
             operation.action_health_check()
         return True
 
+    def action_export(self):
+        """Download an installable addon generated from applied operations."""
+        self.ensure_one()
+        return {
+            "name": self.env._("Export Addon"),
+            "type": "ir.actions.act_window",
+            "res_model": "customization.export.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {"default_bundle_id": self.id},
+        }
+
     def unlink(self):
         # Cascade at SQL level would skip operation.unlink() and leak generated
         # views/fields. Unlink operations through the ORM first.

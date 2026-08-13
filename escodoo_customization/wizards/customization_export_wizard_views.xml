@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_customization_export_wizard_form" model="ir.ui.view">
+        <field name="name">customization.export.wizard.form</field>
+        <field name="model">customization.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export Addon">
+                <group>
+                    <field name="bundle_id" readonly="1" />
+                    <field name="data" filename="filename" />
+                    <field name="filename" invisible="1" />
+                </group>
+                <footer>
+                    <button string="Close" class="btn-primary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customization_export_wizard" model="ir.actions.act_window">
+        <field name="name">Export Addon</field>
+        <field name="res_model">customization.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

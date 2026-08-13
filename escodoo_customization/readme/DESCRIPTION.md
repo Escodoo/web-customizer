@@ -5,7 +5,8 @@ Each *bundle* groups operations for a client or project. Each *operation*
 declares an intent (`add_field`, `place_field`, hide a field, set a modifier)
 anchored on a **semantic target** (for example “after field `partner_id`” on a
 named view). A compiler turns those operations into regular `ir.model.fields`
-(`x_esc_*`) and inherited views.
+(`x_esc_*`) and inherited views. Applied bundles can be **exported** as a
+plain Odoo addon to version in git.
 
 On upgrade, a health check re-resolves anchors. Missing anchors are marked
 `broken` with a reason; other operations are left intact. Customizations never

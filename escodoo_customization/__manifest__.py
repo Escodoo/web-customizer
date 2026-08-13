@@ -18,6 +18,7 @@
         "views/customization_operation_views.xml",
         "views/customization_bundle_views.xml",
         "views/menu.xml",
+        "wizards/customization_export_wizard_views.xml",
     ],
     "uninstall_hook": "uninstall_hook",
     "installable": True,
