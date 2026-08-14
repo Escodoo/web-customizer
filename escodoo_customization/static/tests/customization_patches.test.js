@@ -15,6 +15,7 @@ import {
     onRpc,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
+import {MainComponentsContainer} from "@web/core/main_components_container";
 import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
 import {NavBar} from "@web/webclient/navbar/navbar";
 
@@ -391,4 +392,13 @@ test("NavBar patch opens the dialog for a menu with an XML ID", async () => {
         ".o_menu_sections [data-menu-xmlid='escodoo_customization.tester_users']"
     ).click();
     expect.verifySteps(["menu:escodoo_customization.tester_users"]);
+});
+
+test("banner appears in customization mode and Exit turns it off", async () => {
+    enableCustomization();
+    await mountWithCleanup(MainComponentsContainer);
+    expect(".o_esc_customization_banner").toHaveCount(1);
+    expect(".o_esc_customization_banner_title").toHaveText("Customization mode");
+    await contains(".o_esc_customization_banner_exit").click();
+    expect(".o_esc_customization_banner").toHaveCount(0);
 });

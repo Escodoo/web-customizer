@@ -1,12 +1,11 @@
 import {reactive, useState} from "@odoo/owl";
-import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 import {CustomizationFieldDialog} from "./customization_field_dialog";
 
 export const customizationService = {
-    dependencies: ["dialog", "notification"],
-    start(env, {dialog, notification}) {
+    dependencies: ["dialog"],
+    start(env, {dialog}) {
         const state = reactive({enabled: false});
         return {
             state,
@@ -16,14 +15,6 @@ export const customizationService = {
                     document.body.classList.toggle(
                         "o_esc_customization_mode",
                         state.enabled
-                    );
-                }
-                if (state.enabled) {
-                    notification.add(
-                        _t(
-                            "Customization mode is on. Click a field, page, group, button, list column, kanban card field or button, kanban header button, progressbar, search field or menu."
-                        ),
-                        {type: "info"}
                     );
                 }
             },

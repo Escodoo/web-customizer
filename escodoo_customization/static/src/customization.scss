@@ -1,5 +1,46 @@
 .o_esc_customization_systray_active {
-    color: #714b67;
+    background-color: #714b67 !important;
+    color: #fff !important;
+}
+
+.o_esc_customization_systray_label {
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.o_esc_customization_banner {
+    --o-esc-banner-height: 2rem;
+    position: fixed;
+    top: var(--o-navbar-height, 46px);
+    right: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: var(--o-esc-banner-height);
+    padding: 0 1rem;
+    background: #714b67;
+    color: #fff;
+    font-size: 0.8125rem;
+}
+
+.o_esc_customization_banner_title {
+    font-weight: 600;
+}
+
+.o_esc_customization_banner_hint {
+    opacity: 0.85;
+}
+
+.o_esc_customization_banner_exit {
+    margin-left: auto;
+}
+
+body.o_esc_customization_mode .o_action_manager,
+body.o_esc_customization_mode .o_home_menu {
+    padding-top: 2rem;
 }
 
 .o_esc_customization_target {

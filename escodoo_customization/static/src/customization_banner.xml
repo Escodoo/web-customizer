@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="escodoo_customization.Banner">
+        <div
+            t-if="customization.state.enabled"
+            class="o_esc_customization_banner"
+            role="status"
+        >
+            <span class="o_esc_customization_banner_title" t-esc="title" />
+            <span class="o_esc_customization_banner_hint" t-esc="hint" />
+            <button
+                class="btn btn-sm btn-light o_esc_customization_banner_exit"
+                t-on-click="exit"
+                t-esc="exitLabel"
+            />
+        </div>
+    </t>
+</templates>

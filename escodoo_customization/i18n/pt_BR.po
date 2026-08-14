@@ -486,6 +486,12 @@ msgid "Click a field, page, group or button to set the anchor."
 msgstr "Clique em um campo, página, grupo ou botão para definir a âncora."
 
 #. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+msgid "Click an outlined item"
+msgstr "Clique em um item destacado"
+
+#. module: escodoo_customization
 #: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_export_wizard_form
 msgid "Close"
 msgstr "Fechar"
@@ -586,9 +592,9 @@ msgstr "Personalização aplicada."
 
 #. module: escodoo_customization
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_service.js:0
-msgid "Customization mode is on. Click a field, page, group, button, list column, kanban card field or button, kanban header button, progressbar, search field or menu."
-msgstr "O modo de personalização está ativo. Clique em um campo, página, grupo, botão, coluna de lista, campo ou botão do kanban, botão do cabeçalho do kanban, barra de progresso, campo de pesquisa ou menu."
+#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+msgid "Customization mode"
+msgstr "Modo de personalização"
 
 #. module: escodoo_customization
 #. odoo-javascript
@@ -717,6 +723,12 @@ msgstr "Informe um nome de widget."
 #: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
 msgid "Existing field"
 msgstr "Campo existente"
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+msgid "Exit"
+msgstr "Sair"
 
 #. module: escodoo_customization
 #. odoo-javascript
@@ -1182,6 +1194,12 @@ msgstr "Somente gerentes de personalização podem alterar personalizações."
 #: code:addons/escodoo_customization/models/customization_bundle.py:0
 msgid "Only customization managers can edit forms in place."
 msgstr "Somente gerentes de personalização podem editar formulários no lugar."
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_systray.js:0
+msgid "On"
+msgstr "Ativo"
 
 #. module: escodoo_customization
 #: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__operation_count

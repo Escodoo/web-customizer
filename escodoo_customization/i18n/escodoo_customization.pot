@@ -496,6 +496,12 @@ msgid "Click a field, page, group or button to set the anchor."
 msgstr ""
 
 #. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+msgid "Click an outlined item"
+msgstr ""
+
+#. module: escodoo_customization
 #: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_export_wizard_form
 msgid "Close"
 msgstr ""
@@ -594,10 +600,8 @@ msgstr ""
 
 #. module: escodoo_customization
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_service.js:0
-msgid ""
-"Customization mode is on. Click a field, page, group, button, list column, "
-"kanban card field or button, search field or menu."
+#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+msgid "Customization mode"
 msgstr ""
 
 #. module: escodoo_customization
@@ -726,6 +730,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
 msgid "Existing field"
+msgstr ""
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+msgid "Exit"
 msgstr ""
 
 #. module: escodoo_customization
@@ -1183,6 +1193,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/escodoo_customization/models/customization_bundle.py:0
 msgid "Only customization managers can edit forms in place."
+msgstr ""
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_systray.js:0
+msgid "On"
 msgstr ""
 
 #. module: escodoo_customization

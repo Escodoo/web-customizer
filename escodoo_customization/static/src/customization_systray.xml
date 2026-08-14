@@ -9,9 +9,15 @@
                 class="dropdown-toggle o-dropdown--narrow"
                 t-att-class="{ o_esc_customization_systray_active: state.enabled }"
                 t-att-title="title"
+                t-att-aria-pressed="state.enabled"
                 t-on-click="toggle"
             >
                 <i class="fa fa-fw fa-magic" role="img" />
+                <span
+                    t-if="state.enabled"
+                    class="o_esc_customization_systray_label"
+                    t-esc="onLabel"
+                />
             </button>
         </div>
     </t>

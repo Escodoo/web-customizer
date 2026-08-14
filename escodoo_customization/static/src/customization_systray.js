@@ -1,3 +1,4 @@
+import "./customization_banner";
 import "./customization_field_patch";
 import "./customization_kanban_patch";
 import "./customization_list_patch";
@@ -29,6 +30,10 @@ export class CustomizationSystray extends Component {
         return this.state.enabled
             ? _t("Exit customization mode")
             : _t("Customize this view");
+    }
+
+    get onLabel() {
+        return _t("On");
     }
 
     toggle() {
