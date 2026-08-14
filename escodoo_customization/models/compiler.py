@@ -953,6 +953,17 @@ def restore_menu_operation(operation):
         menu.write(vals)
 
 
+def _add_field_schema_changed(field, ttype, related, payload):
+    """Return whether Re-apply must unlink and recreate the field."""
+    if field.ttype != ttype:
+        return True
+    if (field.related or False) != (related or False):
+        return True
+    if ttype in ("many2one", "many2many"):
+        return field.relation != (payload.get("relation") or False)
+    return False
+
+
 def _apply_add_field(operation):
     payload = dict(_payload(operation))
     model_name = operation.model
@@ -985,14 +996,23 @@ def _apply_add_field(operation):
     name = ensure_field_name(requested)
     if operation.generated_field_id:
         field = operation.generated_field_id
-        field.write(
-            {
-                "field_description": payload.get("string") or field.field_description,
-                "help": payload.get("help") or False,
-                "required": bool(payload.get("required")),
-            }
-        )
-        return
+        if _add_field_schema_changed(field, ttype, related, payload):
+            name = field.name
+            payload["name"] = name
+            field.unlink()
+            operation.generated_field_id = False
+            operation.env.flush_all()
+            operation.env.registry.clear_cache()
+        else:
+            field.write(
+                {
+                    "field_description": payload.get("string")
+                    or field.field_description,
+                    "help": payload.get("help") or False,
+                    "required": bool(payload.get("required")),
+                }
+            )
+            return
 
     name = unique_field_name(operation.env, model_name, name)
     vals = {

@@ -137,8 +137,12 @@ Usage
 5. Click **Apply** to compile fields and inherited views.
 6. After an Odoo upgrade (``-u``), a health check runs automatically and
    re-resolves anchors. You can still click **Health Check** on the
-   bundle. Broken operations keep their generated field and show
-   ``broken_reason``. **Re-apply** retries them.
+   bundle. Missing anchors are marked broken (inherit deactivated) and
+   show ``broken_reason``. If the anchor comes back, Health Check
+   rewrites the inherit — no extra **Re-apply** click. **Re-apply**
+   still recompiles every live operation. Changing an ``add_field`` type
+   or relation recreates the field (label, help and required update in
+   place).
 7. When the bundle is applied, click **Export Addon**. In the dialog,
    click **Download ZIP** and put that module in git; it does not depend
    on this ledger at runtime. Compiled fields, views and menus store

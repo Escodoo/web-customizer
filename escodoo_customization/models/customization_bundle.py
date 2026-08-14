@@ -128,7 +128,7 @@ class CustomizationBundle(models.Model):
         return True
 
     def action_health_check(self):
-        """Re-resolve anchors without creating fields or views."""
+        """Re-resolve anchors and rewrite inherits whose anchors are back."""
         self._check_manager_access()
         return self._health_check()
 

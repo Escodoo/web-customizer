@@ -15,6 +15,7 @@ def health_check_on_upgrade(env):
     ``customization.bundle._register_hook`` when the registry loaded at
     least one updated module (``-u odoo``, ``-u sale``, …), so dead
     anchors surface without a consultant clicking Health Check.
+    Restored anchors rewrite their inherit in the same pass.
     """
     bundles = env["customization.bundle"].sudo().search([])
     if not bundles:

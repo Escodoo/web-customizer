@@ -290,6 +290,98 @@ class TestCustomizationCompiler(CustomizationCase):
         arch = self.form_view.get_combined_arch()
         self.assertIn('name="x_esc_reapply_ref"', arch)
 
+    def test_health_check_heals_restored_anchor(self):
+        bundle = self._create_bundle(
+            code="client_health_heal",
+            operations=self._ops_add_and_place("x_esc_heal_ref", self.form_view),
+        )
+        bundle.action_apply()
+        place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
+        place.anchor_name = "missing_anchor"
+        bundle.action_health_check()
+        self.assertEqual(place.state, "broken")
+        place.anchor_name = "email"
+        bundle.action_health_check()
+        self.assertEqual(place.state, "applied")
+        self.assertFalse(place.broken_reason)
+        self.assertTrue(place.generated_view_id.active)
+        self.assertEqual(bundle.state, "applied")
+        arch = self.form_view.get_combined_arch()
+        self.assertIn('name="x_esc_heal_ref"', arch)
+
+    def test_reapply_updates_add_field_metadata(self):
+        bundle = self._create_bundle(
+            code="client_field_meta",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "char",
+                            "string": "Old Label",
+                            "name": "x_esc_meta_ref",
+                            "help": "Old help",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_meta_ref")
+        field_id = field.id
+        operation = bundle.operation_ids
+        operation.payload = {
+            **operation.payload,
+            "string": "New Label",
+            "help": "New help",
+        }
+        bundle.action_reapply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_meta_ref")
+        self.assertEqual(field.id, field_id)
+        self.assertEqual(field.ttype, "char")
+        self.assertEqual(field.field_description, "New Label")
+        self.assertEqual(field.help, "New help")
+
+    def test_reapply_changes_add_field_ttype(self):
+        bundle = self._create_bundle(
+            code="client_ttype_evolve",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "char",
+                            "string": "Site Flag",
+                            "name": "x_esc_site_flag",
+                        },
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_flag")
+        self.assertEqual(field.ttype, "char")
+        field_id = field.id
+        operation = bundle.operation_ids
+        operation.payload = {
+            **operation.payload,
+            "ttype": "boolean",
+            "string": "Site Flag",
+            "name": "x_esc_site_flag",
+        }
+        bundle.action_reapply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_flag")
+        self.assertTrue(field)
+        self.assertEqual(field.ttype, "boolean")
+        self.assertNotEqual(field.id, field_id)
+        self.assertEqual(operation.generated_field_id, field)
+        self.assertEqual(operation.state, "applied")
+        self.assertEqual(bundle.state, "applied")
+
     def test_place_field_sequence_is_stable(self):
         bundle = self._create_bundle(
             code="client_seq",

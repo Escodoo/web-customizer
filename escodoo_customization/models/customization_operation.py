@@ -620,12 +620,17 @@ class CustomizationOperation(models.Model):
         return True
 
     def action_health_check(self):
-        """Re-resolve anchors; missing ones are marked broken and kept."""
+        """Re-resolve anchors; heal broken ops whose anchors are valid again."""
         self.env["customization.bundle"]._check_manager_access()
         return self._health_check()
 
     def _health_check(self):
-        """Re-resolve anchors. Used by the UI and by the upgrade hook."""
+        """Re-resolve anchors. Used by the UI and by the upgrade hook.
+
+        A restored anchor is not enough on its own: the inherit was
+        deactivated (or is stale). Recompile the operation so the
+        consultant does not have to click Re-apply.
+        """
         for operation in self:
             if operation.state in ("archived", "draft"):
                 continue
@@ -633,20 +638,12 @@ class CustomizationOperation(models.Model):
                 if operation.generated_field_id:
                     operation._mark_applied()
                 continue
-            if operation.type in MENU_TYPES:
-                ok, reason = health_check_operation(operation)
-                if ok:
-                    if operation.state != "broken":
-                        operation._mark_applied()
-                else:
-                    operation._mark_broken(reason)
-                continue
             ok, reason = health_check_operation(operation)
             if ok:
                 if operation.state == "broken":
-                    # Keep broken until re-apply actually rewrites the inherit.
-                    continue
-                operation._mark_applied()
+                    operation._apply()
+                else:
+                    operation._mark_applied()
             else:
                 operation._mark_broken(reason)
         return True
