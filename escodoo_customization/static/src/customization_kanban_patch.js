@@ -22,7 +22,7 @@ patch(KanbanCompiler.prototype, {
             return compiled;
         }
         compiled.setAttribute(
-            "t-on-click",
+            "t-on-click.capture",
             `(ev) => __comp__.onCustomizationFieldClick(ev, ${JSON.stringify(fieldName)})`
         );
         combineAttributes(compiled, "class", ["o_esc_kanban_field"]);
@@ -43,8 +43,9 @@ patch(KanbanCompiler.prototype, {
         }
         const previous = compiled.getAttribute("t-on-click") || "";
         const fallback = previous || "() => {}";
+        compiled.removeAttribute("t-on-click");
         compiled.setAttribute(
-            "t-on-click",
+            "t-on-click.capture",
             `(ev) => __comp__.onCustomizationButtonClick(ev, ${JSON.stringify(anchor)}, ${JSON.stringify(label)}, () => {(${fallback})()})`
         );
         combineAttributes(compiled, "class", ["o_esc_kanban_button"]);
@@ -63,6 +64,14 @@ patch(KanbanRecord.prototype, {
             return `${classes} o_esc_customization_mode`.trim();
         }
         return classes;
+    },
+    onGlobalClick(ev) {
+        if (this.customization?.state.enabled && isKanbanRoot(this)) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            return;
+        }
+        return super.onGlobalClick(ev);
     },
     onCustomizationFieldClick(ev, fieldName) {
         if (!this.customization?.state.enabled || !isKanbanRoot(this)) {

@@ -23,6 +23,7 @@ class Partner extends models.Model {
 
     name = fields.Char();
     email = fields.Char();
+    is_favorite = fields.Boolean();
     state = fields.Selection({
         selection: [
             ["draft", "Draft"],
@@ -30,9 +31,25 @@ class Partner extends models.Model {
         ],
     });
 
+    action_view_tasks() {
+        return true;
+    }
+
     _records = [
-        {id: 1, name: "Ada", email: "ada@example.com", state: "draft"},
-        {id: 2, name: "Bob", email: "bob@example.com", state: "done"},
+        {
+            id: 1,
+            name: "Ada",
+            email: "ada@example.com",
+            is_favorite: false,
+            state: "draft",
+        },
+        {
+            id: 2,
+            name: "Bob",
+            email: "bob@example.com",
+            is_favorite: true,
+            state: "done",
+        },
     ];
 }
 
@@ -167,6 +184,7 @@ test("KanbanCompiler marks span fields and type-only buttons", () => {
     const html = compiled.outerHTML;
     expect(html).toMatch("o_esc_kanban_field");
     expect(html).toMatch("onCustomizationFieldClick");
+    expect(html).toMatch("t-on-click.capture");
     expect(html).toMatch("o_esc_kanban_button");
     expect(html).toMatch("onCustomizationButtonClick");
 });
@@ -238,6 +256,75 @@ test("kanban card field and type-only button open the dialog", async () => {
     expect.verifySteps(["field:name"]);
     await contains(".o_kanban_record .o_esc_kanban_button").click();
     expect.verifySteps(["button:edit"]);
+});
+
+test("kanban widget with stop still opens the dialog", async () => {
+    enableCustomization();
+    await mountView({
+        type: "kanban",
+        resModel: "partner",
+        arch: `
+            <kanban>
+                <templates>
+                    <t t-name="card">
+                        <field name="name"/>
+                        <field name="is_favorite" widget="boolean_favorite"/>
+                    </t>
+                </templates>
+            </kanban>`,
+    });
+    expect(".o_kanban_record .o_favorite").toHaveCount(2);
+    await contains(".o_kanban_record .o_favorite").click();
+    expect.verifySteps(["field:is_favorite"]);
+    expect(".o_kanban_record:not(.o_kanban_ghost) .fa-star-o").toHaveCount(1);
+});
+
+test("kanban object link opens the dialog instead of the action", async () => {
+    enableCustomization();
+    onRpc("action_view_tasks", () => {
+        expect.step("rpc:action_view_tasks");
+        return true;
+    });
+    await mountView({
+        type: "kanban",
+        resModel: "partner",
+        arch: `
+            <kanban>
+                <templates>
+                    <t t-name="card">
+                        <a name="action_view_tasks" type="object">
+                            <field name="name"/>
+                        </a>
+                    </t>
+                </templates>
+            </kanban>`,
+    });
+    expect(".o_kanban_record a[name=action_view_tasks]").toHaveClass(
+        "o_esc_customization_target"
+    );
+    await contains(".o_kanban_record a[name=action_view_tasks]").click();
+    expect.verifySteps(["button:action_view_tasks"]);
+});
+
+test("kanban card does not open the record while the wand is on", async () => {
+    enableCustomization();
+    await mountView({
+        type: "kanban",
+        resModel: "partner",
+        arch: `
+            <kanban>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_esc_card_chrome">Chrome</div>
+                        <field name="name"/>
+                    </t>
+                </templates>
+            </kanban>`,
+    });
+    await contains(".o_kanban_record .o_esc_card_chrome").click();
+    expect.verifySteps([]);
+    expect(".o_kanban_view").toHaveCount(1);
+    expect(".o_form_view").toHaveCount(0);
 });
 
 test("ListRenderer outlines columns and opens the dialog", async () => {

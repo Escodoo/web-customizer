@@ -134,6 +134,7 @@ export function openCustomizationFor(component, fieldName, ev, extra = {}) {
     if (ev) {
         ev.preventDefault();
         ev.stopPropagation();
+        ev.stopImmediatePropagation();
     }
     const record = formRecord(component);
     const name = fieldName || anchorString;

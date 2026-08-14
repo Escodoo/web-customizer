@@ -6,7 +6,16 @@
         t-inherit-mode="extension"
     >
         <xpath expr="//div" position="attributes">
-            <attribute name="t-on-click">onCustomizationClick</attribute>
+            <attribute name="t-on-click.capture">onCustomizationClick</attribute>
+        </xpath>
+    </t>
+    <t
+        t-name="escodoo_customization.ViewButton"
+        t-inherit="web.views.ViewButton"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//t[@t-tag='props.tag']" position="attributes">
+            <attribute name="t-on-click.capture">onCustomizationCapture</attribute>
         </xpath>
     </t>
     <t

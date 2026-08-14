@@ -103,13 +103,27 @@ patch(ViewButton.prototype, {
         }
         return names;
     },
+    onCustomizationCapture(ev) {
+        const anchor = viewButtonAnchor(this);
+        if (!anchor) {
+            return;
+        }
+        openCustomizationFor(this, anchor, ev, {
+            viewType: this.env.config?.viewType,
+            anchorKind: "button",
+            fieldLabel: this.props.string || anchor,
+            model: this.props.list?.resModel || this.props.record?.resModel,
+        });
+    },
     onClick(ev) {
         const anchor = viewButtonAnchor(this);
         if (
             anchor &&
             openCustomizationFor(this, anchor, ev, {
+                viewType: this.env.config?.viewType,
                 anchorKind: "button",
                 fieldLabel: this.props.string || anchor,
+                model: this.props.list?.resModel || this.props.record?.resModel,
             })
         ) {
             return;
