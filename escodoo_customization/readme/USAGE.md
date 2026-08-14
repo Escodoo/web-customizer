@@ -50,6 +50,24 @@
    bundles cannot compile two inherits for the same hide. Placing the
    same field twice on the same view is refused the same way.
 
+## Single-company pilot
+
+Use one company. Cover the surfaces below, then ship the ZIP — do not
+leave this ledger as the production runtime.
+
+1. **Form** — add or place a field; hide or rename a page, group or button.
+2. **List** — add, hide or relabel a column.
+3. **Search** — add, hide or relabel a search chip.
+4. **Kanban** — hide a card field, a header button or the column progressbar.
+5. **Menus** — hide, rename or move one navbar item that has an XML ID.
+6. Click **Apply**. Broken operations show `broken_reason`; fix the
+   anchor and run **Health Check** (or **Re-apply**).
+7. Click **Export Addon** → **Download ZIP**.
+8. Install that module on staging (`-i <bundle.code>`). Do not install
+   `escodoo_customization` there unless the wand is still needed.
+
+Calendar, graph, pivot and gantt stay out of this pilot.
+
 Generated field names always start with `x_esc_` and cannot contain `__`.
 Selection fields take one option per line as `value:Label`. Monetary
 fields need `currency_id` or `x_currency_id` on the model, or a
