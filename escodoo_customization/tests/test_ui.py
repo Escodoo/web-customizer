@@ -1,7 +1,7 @@
 # Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.exceptions import AccessError, UserError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests import tagged
 
 from .common import CustomizationCase
@@ -559,7 +559,7 @@ class TestCustomizationUiApi(CustomizationCase):
         )
         self.assertFalse(result["broken"])
         self.assertIn(
-            'expr="//button[@type=\'edit\']"',
+            "expr=\"//button[@type='edit']\"",
             bundle.operation_ids.generated_view_id.arch,
         )
 
@@ -777,3 +777,31 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertEqual(place.anchor_string, "Notes")
         self.assertEqual(place.position, "inside")
         self.assertIn("x_esc_ui_notes_extra", view.get_combined_arch())
+
+    def test_create_from_ui_refuses_second_hide_on_same_field(self):
+        bundle = self._create_bundle(code="client_ui_hide_owner")
+        self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.form_view.id,
+                "view_type": "form",
+                "anchor_name": "phone",
+                "apply": True,
+            }
+        )
+        other = self._create_bundle(code="client_ui_hide_intruder")
+        with self.assertRaises(ValidationError) as error:
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": other.id,
+                    "action": "hide",
+                    "model": "res.partner",
+                    "view_id": self.form_view.id,
+                    "view_type": "form",
+                    "anchor_name": "phone",
+                    "apply": True,
+                }
+            )
+        self.assertIn("client_ui_hide_owner", str(error.exception))

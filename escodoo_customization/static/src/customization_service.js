@@ -1,6 +1,7 @@
-import {reactive} from "@odoo/owl";
+import {reactive, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
+import {useService} from "@web/core/utils/hooks";
 import {CustomizationFieldDialog} from "./customization_field_dialog";
 
 export const customizationService = {
@@ -35,6 +36,16 @@ export const customizationService = {
 
 registry.category("services").add("escodoo_customization", customizationService);
 
+export function useCustomizationService() {
+    const customization = useService("escodoo_customization");
+    const state = useState(customization.state);
+    return {
+        state,
+        toggle: () => customization.toggle(),
+        openFieldDialog: (info) => customization.openFieldDialog(info),
+    };
+}
+
 function formRecord(component) {
     return component.props.record || component.env.model?.root;
 }
@@ -59,6 +70,28 @@ export function isListRoot(component) {
 export function isKanbanRoot(component) {
     const config = component.env.config || {};
     return config.viewType === "kanban" && Boolean(config.viewId);
+}
+
+export const BUTTON_TYPE_ANCHORS = [
+    "edit",
+    "open",
+    "delete",
+    "url",
+    "set_cover",
+    "archive",
+    "unarchive",
+];
+
+export function viewButtonAnchor(button) {
+    const name = button.clickParams?.name;
+    if (name) {
+        return String(name);
+    }
+    const type = button.clickParams?.type;
+    if (type && BUTTON_TYPE_ANCHORS.includes(type)) {
+        return String(type);
+    }
+    return "";
 }
 
 function fieldLabelOf(component, fieldName, extra) {

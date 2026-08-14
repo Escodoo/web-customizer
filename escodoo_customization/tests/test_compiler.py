@@ -2,9 +2,14 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import Command
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged
 
 from odoo.addons.escodoo_customization.hooks import uninstall_hook
+from odoo.addons.escodoo_customization.models.compiler import (
+    LEGACY_XMLID_MODULE,
+    rebind_generated_xmlids,
+)
 
 from .common import CustomizationCase
 
@@ -587,7 +592,7 @@ class TestCustomizationCompiler(CustomizationCase):
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
         generated = bundle.operation_ids.generated_view_id.arch
-        self.assertIn('expr="//button[@type=\'edit\']"', generated)
+        self.assertIn("expr=\"//button[@type='edit']\"", generated)
         self.assertIn('<attribute name="invisible">True</attribute>', generated)
 
     def test_place_field_on_search_view(self):
@@ -604,7 +609,47 @@ class TestCustomizationCompiler(CustomizationCase):
         arch = self.search_view.get_combined_arch()
         self.assertIn('name="x_esc_search_ref"', arch)
 
-    def test_uninstall_hook_removes_generated_artifacts(self):
+    def test_generated_xmlids_belong_to_bundle_code(self):
+        bundle = self._create_bundle(
+            code="client_xmlid_owner",
+            operations=self._ops_add_and_place("x_esc_xmlid_ref", self.form_view),
+        )
+        bundle.action_apply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_xmlid_ref")
+        place = bundle.operation_ids.filtered("generated_view_id")
+        view = place.generated_view_id
+        self.assertEqual(
+            field.get_external_id().get(field.id),
+            "client_xmlid_owner.field_res_partner_x_esc_xmlid_ref",
+        )
+        self.assertEqual(
+            view.get_external_id().get(view.id),
+            f"client_xmlid_owner.view_operation_{place.id}",
+        )
+
+    def test_rebind_migrates_legacy_ledger_xmlids(self):
+        bundle = self._create_bundle(
+            code="client_xmlid_rebind",
+            operations=self._ops_add_and_place("x_esc_rebind_ref", self.form_view),
+        )
+        bundle.action_apply()
+        place = bundle.operation_ids.filtered("generated_view_id")
+        view = place.generated_view_id
+        imd = self.env["ir.model.data"].search(
+            [("model", "=", "ir.ui.view"), ("res_id", "=", view.id)],
+            limit=1,
+        )
+        imd.write(
+            {
+                "module": LEGACY_XMLID_MODULE,
+                "name": f"generated_view_{place.id}",
+            }
+        )
+        rebind_generated_xmlids(self.env)
+        self.assertEqual(imd.module, "client_xmlid_rebind")
+        self.assertEqual(imd.name, f"view_operation_{place.id}")
+
+    def test_uninstall_hook_keeps_generated_artifacts(self):
         bundle = self._create_bundle(
             code="client_uninstall",
             operations=self._ops_add_and_place("x_esc_uninstall_ref", self.form_view),
@@ -614,8 +659,12 @@ class TestCustomizationCompiler(CustomizationCase):
         view = bundle.operation_ids.filtered("generated_view_id").generated_view_id
         field_id, view_id = field.id, view.id
         uninstall_hook(self.env)
-        self.assertFalse(self.env["ir.model.fields"].browse(field_id).exists())
-        self.assertFalse(self.env["ir.ui.view"].browse(view_id).exists())
+        self.assertTrue(self.env["ir.model.fields"].browse(field_id).exists())
+        self.assertTrue(self.env["ir.ui.view"].browse(view_id).exists())
+        self.assertEqual(
+            view.get_external_id().get(view.id).split(".", 1)[0],
+            "client_uninstall",
+        )
 
     def test_place_field_inside_named_page(self):
         view = self._form_with_page()
@@ -926,3 +975,202 @@ class TestCustomizationCompiler(CustomizationCase):
             place.generated_view_id.arch,
         )
         self.assertIn("x_esc_extra_note", view.get_combined_arch())
+
+    def test_second_bundle_cannot_hide_the_same_field(self):
+        first = self._create_bundle(
+            code="client_hide_owner",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        first.action_apply()
+        with self.assertRaises(ValidationError) as error:
+            self._create_bundle(
+                code="client_hide_intruder",
+                operations=[
+                    Command.create(
+                        {
+                            "type": "hide_field",
+                            "model_id": self.partner_model.id,
+                            "view_id": self.form_view.id,
+                            "view_type": "form",
+                            "anchor_name": "phone",
+                            "payload": {},
+                        }
+                    )
+                ],
+            )
+        self.assertIn("client_hide_owner", str(error.exception))
+        self.assertIn("Hide Field", str(error.exception))
+
+    def test_hide_and_rename_same_field_can_coexist(self):
+        hide = self._create_bundle(
+            code="client_hide_phone_ok",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        rename = self._create_bundle(
+            code="client_rename_phone_ok",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_string",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {"string": "Mobile"},
+                    }
+                )
+            ],
+        )
+        hide.action_apply()
+        rename.action_apply()
+        arch = self.form_view.get_combined_arch()
+        self.assertIn('invisible="True"', arch)
+        self.assertIn('string="Mobile"', arch)
+
+    def test_unlink_releases_view_write_for_another_bundle(self):
+        first = self._create_bundle(
+            code="client_hide_release",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        first.action_apply()
+        first.operation_ids.unlink()
+        second = self._create_bundle(
+            code="client_hide_takes_over",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        second.action_apply()
+        self.assertEqual(second.operation_ids.state, "applied")
+        self.assertIn("invisible", self.form_view.get_combined_arch())
+
+    def test_broken_view_write_does_not_block_another_bundle(self):
+        first = self._create_bundle(
+            code="client_hide_stale",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        first.operation_ids.write(
+            {"state": "broken", "broken_reason": "stale snapshot"}
+        )
+        second = self._create_bundle(
+            code="client_hide_after_broken",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "phone",
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        second.action_apply()
+        self.assertEqual(second.operation_ids.state, "applied")
+
+    def test_second_bundle_cannot_place_the_same_field(self):
+        first = self._create_bundle(
+            code="client_place_owner",
+            operations=self._ops_add_and_place("x_esc_place_once", self.form_view),
+        )
+        first.action_apply()
+        with self.assertRaises(ValidationError) as error:
+            self._create_bundle(
+                code="client_place_intruder",
+                operations=[
+                    Command.create(
+                        {
+                            "type": "place_field",
+                            "model_id": self.partner_model.id,
+                            "view_id": self.form_view.id,
+                            "view_type": "form",
+                            "anchor_name": "phone",
+                            "position": "after",
+                            "payload": {"field_name": "x_esc_place_once"},
+                        }
+                    )
+                ],
+            )
+        self.assertIn("client_place_owner", str(error.exception))
+        self.assertIn("Place Field", str(error.exception))
+
+    def test_place_same_field_on_form_and_list_can_coexist(self):
+        form = self._create_bundle(
+            code="client_place_form_ok",
+            operations=self._ops_add_and_place("x_esc_place_both", self.form_view),
+        )
+        form.action_apply()
+        listing = self._create_bundle(
+            code="client_place_list_ok",
+            operations=[
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.list_view.id,
+                        "view_type": "list",
+                        "anchor_name": "email",
+                        "position": "after",
+                        "payload": {"field_name": "x_esc_place_both"},
+                    }
+                )
+            ],
+        )
+        listing.action_apply()
+        self.assertEqual(listing.operation_ids.state, "applied")
+        self.assertIn("x_esc_place_both", self.list_view.get_combined_arch())

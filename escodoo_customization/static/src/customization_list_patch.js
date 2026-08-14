@@ -1,12 +1,15 @@
-import {isListRoot, openCustomizationFor} from "./customization_service";
-import {useService} from "@web/core/utils/hooks";
 import {patch} from "@web/core/utils/patch";
 import {ListRenderer} from "@web/views/list/list_renderer";
+import {
+    isListRoot,
+    openCustomizationFor,
+    useCustomizationService,
+} from "./customization_service";
 
 patch(ListRenderer.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     getColumnClass(column) {
         const names = super.getColumnClass(column);

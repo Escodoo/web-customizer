@@ -1,22 +1,23 @@
-import {
-    isFormRootField,
-    isKanbanRoot,
-    openCustomizationFor,
-} from "./customization_service";
 import {Notebook} from "@web/core/notebook/notebook";
-import {useService} from "@web/core/utils/hooks";
 import {patch} from "@web/core/utils/patch";
 import {Field} from "@web/views/fields/field";
 import {FormCompiler} from "@web/views/form/form_compiler";
 import {InnerGroup, OuterGroup} from "@web/views/form/form_group/form_group";
 import {FormLabel} from "@web/views/form/form_label";
-import {ViewButton} from "@web/views/view_button/view_button";
 import {toStringExpression} from "@web/views/utils";
+import {ViewButton} from "@web/views/view_button/view_button";
+import {
+    isFormRootField,
+    isKanbanRoot,
+    openCustomizationFor,
+    useCustomizationService,
+    viewButtonAnchor,
+} from "./customization_service";
 
 patch(Field.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     get classNames() {
         const names = super.classNames;
@@ -36,7 +37,7 @@ patch(Field.prototype, {
 patch(FormLabel.prototype, {
     setup() {
         super.setup?.(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     get className() {
         const names = super.className;
@@ -53,7 +54,7 @@ patch(FormLabel.prototype, {
 patch(Notebook.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     get navItems() {
         const items = super.navItems;
@@ -87,13 +88,13 @@ patch(Notebook.prototype, {
 patch(ViewButton.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     getClassName() {
         const names = super.getClassName();
-        const name = this.clickParams?.name;
+        const anchor = viewButtonAnchor(this);
         if (
-            name &&
+            anchor &&
             this.customization?.state.enabled &&
             (isFormRootField(this) || isKanbanRoot(this))
         ) {
@@ -102,12 +103,12 @@ patch(ViewButton.prototype, {
         return names;
     },
     onClick(ev) {
-        const name = this.clickParams?.name;
+        const anchor = viewButtonAnchor(this);
         if (
-            name &&
-            openCustomizationFor(this, String(name), ev, {
+            anchor &&
+            openCustomizationFor(this, anchor, ev, {
                 anchorKind: "button",
-                fieldLabel: this.props.string || String(name),
+                fieldLabel: this.props.string || anchor,
             })
         ) {
             return;
@@ -140,7 +141,7 @@ function patchFormGroup(GroupClass) {
     patch(GroupClass.prototype, {
         setup() {
             super.setup?.(...arguments);
-            this.customization = useService("escodoo_customization");
+            this.customization = useCustomizationService();
         },
         get customizationTargetClass() {
             if (

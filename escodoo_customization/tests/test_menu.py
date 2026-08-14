@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import Command
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
 
 from odoo.addons.escodoo_customization.hooks import uninstall_hook
@@ -151,7 +151,7 @@ class TestCustomizationMenu(CustomizationCase):
                 }
             )
 
-    def test_uninstall_hook_restores_menu(self):
+    def test_uninstall_hook_keeps_hidden_menu(self):
         bundle = self._create_bundle(
             code="client_menu_uninstall",
             operations=[
@@ -170,7 +170,7 @@ class TestCustomizationMenu(CustomizationCase):
         bundle.action_apply()
         self.assertFalse(self.test_menu.active)
         uninstall_hook(self.env)
-        self.assertTrue(self.test_menu.active)
+        self.assertFalse(self.test_menu.active)
 
     def _partner_action_xmlid(self):
         return "base.action_partner_form"
@@ -293,7 +293,7 @@ class TestCustomizationMenu(CustomizationCase):
                 }
             )
 
-    def test_uninstall_hook_removes_generated_menu(self):
+    def test_uninstall_hook_keeps_generated_menu(self):
         bundle = self._create_bundle(
             code="client_add_menu_uninstall",
             operations=[
@@ -314,9 +314,14 @@ class TestCustomizationMenu(CustomizationCase):
             ],
         )
         bundle.action_apply()
-        menu_id = bundle.operation_ids.generated_menu_id.id
+        menu = bundle.operation_ids.generated_menu_id
+        menu_id = menu.id
         uninstall_hook(self.env)
-        self.assertFalse(self.env["ir.ui.menu"].browse(menu_id).exists())
+        self.assertTrue(self.env["ir.ui.menu"].browse(menu_id).exists())
+        self.assertEqual(
+            menu.get_external_id().get(menu.id).split(".", 1)[0],
+            "client_add_menu_uninstall",
+        )
 
     def test_move_menu_after_and_restore(self):
         original_parent = self.test_menu.parent_id
@@ -453,8 +458,7 @@ class TestCustomizationMenu(CustomizationCase):
                 }
             )
 
-    def test_uninstall_hook_restores_moved_menu(self):
-        original_parent = self.test_menu.parent_id
+    def test_uninstall_hook_keeps_moved_menu(self):
         bundle = self._create_bundle(
             code="client_move_uninstall",
             operations=[
@@ -474,4 +478,270 @@ class TestCustomizationMenu(CustomizationCase):
         bundle.action_apply()
         self.assertEqual(self.test_menu.parent_id, self.dest_menu)
         uninstall_hook(self.env)
-        self.assertEqual(self.test_menu.parent_id, original_parent)
+        self.assertEqual(self.test_menu.parent_id, self.dest_menu)
+
+    def test_second_bundle_cannot_hide_the_same_menu(self):
+        first = self._create_bundle(
+            code="client_menu_owner",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        first.action_apply()
+        with self.assertRaises(ValidationError) as error:
+            self._create_bundle(
+                code="client_menu_intruder",
+                operations=[
+                    Command.create(
+                        {
+                            "type": "hide_menu",
+                            "menu_id": self.test_menu.id,
+                            "anchor_kind": "menu",
+                            "anchor_name": self.menu_xmlid,
+                            "payload": {},
+                        }
+                    )
+                ],
+            )
+        self.assertIn("client_menu_owner", str(error.exception))
+        self.assertIn("Hide Menu", str(error.exception))
+
+    def test_hide_and_rename_same_menu_can_coexist(self):
+        hide = self._create_bundle(
+            code="client_menu_hide_ok",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        rename = self._create_bundle(
+            code="client_menu_rename_ok",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_menu_string",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {"string": "Shared Label"},
+                    }
+                )
+            ],
+        )
+        hide.action_apply()
+        rename.action_apply()
+        self.assertFalse(self.test_menu.active)
+        self.assertEqual(self.test_menu.name, "Shared Label")
+        hide.operation_ids.unlink()
+        self.assertTrue(self.test_menu.active)
+        self.assertEqual(self.test_menu.name, "Shared Label")
+
+    def test_unlink_releases_menu_write_for_another_bundle(self):
+        first = self._create_bundle(
+            code="client_menu_release",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        first.action_apply()
+        first.operation_ids.unlink()
+        second = self._create_bundle(
+            code="client_menu_takes_over",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        second.action_apply()
+        self.assertFalse(self.test_menu.active)
+
+    def test_create_from_ui_refuses_second_hide(self):
+        bundle = self._create_bundle(code="client_menu_ui_owner")
+        self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "anchor_kind": "menu",
+                "menu_id": self.test_menu.id,
+                "apply": True,
+            }
+        )
+        other = self._create_bundle(code="client_menu_ui_intruder")
+        with self.assertRaises(ValidationError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": other.id,
+                    "action": "hide",
+                    "anchor_kind": "menu",
+                    "menu_id": self.test_menu.id,
+                    "apply": True,
+                }
+            )
+
+    def test_same_bundle_cannot_hide_the_same_menu_twice(self):
+        bundle = self._create_bundle(
+            code="client_menu_twice",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        with self.assertRaises(ValidationError) as error:
+            self.env["customization.operation"].create(
+                {
+                    "bundle_id": bundle.id,
+                    "type": "hide_menu",
+                    "menu_id": self.test_menu.id,
+                    "anchor_kind": "menu",
+                    "anchor_name": self.menu_xmlid,
+                    "payload": {},
+                }
+            )
+        self.assertIn("client_menu_twice", str(error.exception))
+
+    def test_second_bundle_cannot_move_the_same_menu(self):
+        first = self._create_bundle(
+            code="client_move_owner",
+            operations=[
+                Command.create(
+                    {
+                        "type": "move_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "position": "after",
+                        "payload": {"target_xmlid": self.dest_xmlid},
+                    }
+                )
+            ],
+        )
+        first.action_apply()
+        with self.assertRaises(ValidationError) as error:
+            self._create_bundle(
+                code="client_move_intruder",
+                operations=[
+                    Command.create(
+                        {
+                            "type": "move_menu",
+                            "menu_id": self.test_menu.id,
+                            "anchor_kind": "menu",
+                            "anchor_name": self.menu_xmlid,
+                            "position": "inside",
+                            "payload": {"target_xmlid": self.dest_xmlid},
+                        }
+                    )
+                ],
+            )
+        self.assertIn("Move Menu", str(error.exception))
+
+    def test_add_menu_and_hide_same_anchor_can_coexist(self):
+        add = self._create_bundle(
+            code="client_menu_add_ok",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "position": "after",
+                        "payload": {
+                            "string": "People Extra",
+                            "action_xmlid": self._partner_action_xmlid(),
+                            "name": "menu_people_extra",
+                        },
+                    }
+                )
+            ],
+        )
+        hide = self._create_bundle(
+            code="client_menu_hide_with_add",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        add.action_apply()
+        hide.action_apply()
+        self.assertTrue(add.operation_ids.generated_menu_id.exists())
+        self.assertFalse(self.test_menu.active)
+
+    def test_broken_menu_write_does_not_block_another_bundle(self):
+        first = self._create_bundle(
+            code="client_menu_stale",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        first.operation_ids.write(
+            {"state": "broken", "broken_reason": "stale snapshot"}
+        )
+        second = self._create_bundle(
+            code="client_menu_after_broken",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_menu",
+                        "menu_id": self.test_menu.id,
+                        "anchor_kind": "menu",
+                        "anchor_name": self.menu_xmlid,
+                        "payload": {},
+                    }
+                )
+            ],
+        )
+        second.action_apply()
+        self.assertFalse(self.test_menu.active)
+        self.assertEqual(second.operation_ids.state, "applied")

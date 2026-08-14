@@ -24,6 +24,12 @@
         "web.assets_backend": [
             "escodoo_customization/static/src/**/*",
         ],
+        "web.assets_unit_tests": [
+            "escodoo_customization/static/tests/customization_patches.test.js",
+        ],
+        "web.assets_tests": [
+            "escodoo_customization/static/tests/tours/**/*",
+        ],
     },
     "uninstall_hook": "uninstall_hook",
     "installable": True,

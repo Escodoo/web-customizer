@@ -19,9 +19,18 @@ submenu. Duplicate names (for example two `email`
 fields) are chosen in the dialog. That writes the same ledger operations as
 the backend form.
 
-On upgrade, a health check re-resolves anchors. Missing anchors are marked
-`broken` with a reason; other operations are left intact. Customizations never
-disappear silently.
+On module update (`-u`), a health check re-resolves anchors automatically.
+Missing anchors are marked `broken` with a reason; other operations are left
+intact. Customizations never disappear silently. Compiled artifacts own XML
+IDs under the bundle code, so uninstalling this ledger does not delete
+unexported fields, views or menus. Git still needs the exported addon.
+A hide, rename, groups or move write on a standard menu is exclusive
+per type: a second bundle cannot overwrite the same snapshot.
+The same rule applies to hide, label, widget, groups and modifier
+operations on a view node: two live inherits of the same type on the
+same anchor are refused. Placing the same field twice on one view is
+also refused. Company on a bundle is only a filter tag; compiled
+records stay global.
 
 This module is **not** a clone of Odoo Studio. Approvals stay in
 `base_tier_validation`. Automations stay in `base.automation` /

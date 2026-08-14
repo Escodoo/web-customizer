@@ -1,6 +1,7 @@
 # Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+import logging
 import re
 import unicodedata
 from xml.sax.saxutils import escape as xml_escape
@@ -10,6 +11,8 @@ from lxml import etree
 from odoo import Command, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import sql
+
+_logger = logging.getLogger(__name__)
 
 FIELD_PREFIX = "x_esc_"
 SUPPORTED_TTYPES = (
@@ -48,6 +51,12 @@ MENU_WRITE_TYPES = (
     "set_menu_groups",
     "move_menu",
 )
+MENU_WRITE_LABELS = {
+    "hide_menu": "Hide Menu",
+    "set_menu_string": "Set Menu Label",
+    "set_menu_groups": "Set Menu Groups",
+    "move_menu": "Move Menu",
+}
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -55,6 +64,13 @@ ATTRIBUTE_TYPES = (
     "set_modifier",
     "hide_field",
 )
+VIEW_WRITE_LABELS = {
+    "set_string": "Set Label",
+    "set_widget": "Set Widget",
+    "set_groups": "Set Groups",
+    "set_modifier": "Set Modifier",
+    "hide_field": "Hide Field",
+}
 MODIFIER_KEYS = ("invisible", "readonly", "required", "column_invisible")
 BUTTON_TYPE_ANCHORS = (
     "edit",
@@ -65,7 +81,7 @@ BUTTON_TYPE_ANCHORS = (
     "archive",
     "unarchive",
 )
-XMLID_MODULE = "escodoo_customization"
+LEGACY_XMLID_MODULE = "escodoo_customization"
 
 
 class AnchorError(Exception):
@@ -469,31 +485,141 @@ def health_check_operation(operation):
     return True, ""
 
 
+def field_xmlid_name(field):
+    """Stable XML ID name for a generated field (matches the exported addon)."""
+    model_key = (field.model or "").replace(".", "_")
+    return f"field_{model_key}_{field.name}"
+
+
+def view_xmlid_name(operation):
+    """Stable XML ID name for a generated inherit view."""
+    return f"view_operation_{operation.id}"
+
+
+def menu_xmlid_name(operation):
+    """Stable XML ID name for a generated menu (matches the exported addon)."""
+    payload = operation.payload or {}
+    name = (payload.get("name") or "").strip()
+    if name:
+        return name
+    slug = slugify_field_suffix(payload.get("string") or "menu")
+    return f"menu_{slug}_{operation.id}"
+
+
+def ensure_generated_xmlid(env, module, name, record):
+    """Point ``module.name`` at ``record``, migrating a legacy xmlid if needed.
+
+    Generated artifacts belong to the bundle code (the future exported
+    addon), not to ``escodoo_customization``. Uninstalling the ledger
+    must not cascade-delete compiled fields, views or menus.
+    """
+    Imd = env["ir.model.data"].sudo()
+    wanted = Imd.search([("module", "=", module), ("name", "=", name)], limit=1)
+    if wanted:
+        if wanted.model != record._name or wanted.res_id != record.id:
+            _logger.warning(
+                "XML ID %s.%s already points to %s(%s); not rebinding %s(%s)",
+                module,
+                name,
+                wanted.model,
+                wanted.res_id,
+                record._name,
+                record.id,
+            )
+            return wanted
+        return wanted
+    existing = Imd.search(
+        [
+            ("model", "=", record._name),
+            ("res_id", "=", record.id),
+            "|",
+            "|",
+            ("name", "=like", "generated_%"),
+            ("name", "=", name),
+            ("module", "=", LEGACY_XMLID_MODULE),
+        ],
+        limit=1,
+    )
+    if existing:
+        existing.write({"module": module, "name": name})
+        return existing
+    return Imd.create(
+        {
+            "module": module,
+            "name": name,
+            "model": record._name,
+            "res_id": record.id,
+            "noupdate": True,
+        }
+    )
+
+
+def bind_generated_xmlids(operation):
+    """Assign bundle-owned XML IDs to compiler-generated records."""
+    module = operation.bundle_id.code
+    if operation.generated_field_id:
+        field = operation.generated_field_id
+        ensure_generated_xmlid(operation.env, module, field_xmlid_name(field), field)
+    if operation.generated_view_id:
+        ensure_generated_xmlid(
+            operation.env,
+            module,
+            view_xmlid_name(operation),
+            operation.generated_view_id,
+        )
+    if operation.generated_menu_id:
+        ensure_generated_xmlid(
+            operation.env,
+            module,
+            menu_xmlid_name(operation),
+            operation.generated_menu_id,
+        )
+
+
+def rebind_generated_xmlids(env):
+    """Migrate legacy ledger-owned XML IDs onto the bundle code."""
+    operations = (
+        env["customization.operation"]
+        .sudo()
+        .search(
+            [
+                "|",
+                "|",
+                ("generated_view_id", "!=", False),
+                ("generated_field_id", "!=", False),
+                ("generated_menu_id", "!=", False),
+            ]
+        )
+    )
+    for operation in operations:
+        bind_generated_xmlids(operation)
+
+
 def apply_operation(operation):
     """Compile one operation into ir.model.fields / ir.ui.view records."""
     if operation.type == "add_field":
         _apply_add_field(operation)
-        return
-    if operation.type in MENU_TYPES:
+    elif operation.type in MENU_TYPES:
         _apply_menu(operation)
-        return
-    if operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
+    elif operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
         raise AnchorError(
             _("Anchor kind '%s' is not supported yet.") % operation.anchor_kind
         )
-    ok, reason = health_check_operation(operation)
-    if not ok:
-        raise AnchorError(reason)
-    if operation.type == "place_field":
-        _apply_place_field(operation)
-        return
-    if operation.type in STRUCTURE_TYPES:
-        _apply_add_structure(operation)
-        return
-    if operation.type in ATTRIBUTE_TYPES:
-        _apply_attributes(operation)
-        return
-    raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+    else:
+        ok, reason = health_check_operation(operation)
+        if not ok:
+            raise AnchorError(reason)
+        if operation.type == "place_field":
+            assert_no_place_field_conflict(operation)
+            _apply_place_field(operation)
+        elif operation.type in STRUCTURE_TYPES:
+            _apply_add_structure(operation)
+        elif operation.type in ATTRIBUTE_TYPES:
+            assert_no_view_write_conflict(operation)
+            _apply_attributes(operation)
+        else:
+            raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+    bind_generated_xmlids(operation)
 
 
 def _health_check_menu(operation):
@@ -546,10 +672,127 @@ def groups_from_xmlids(env, xmlids):
     return groups
 
 
+def menu_write_conflicts(operation):
+    """Return other live writes of the same type on the same standard menu."""
+    Operation = operation.env["customization.operation"]
+    if operation.type not in MENU_WRITE_TYPES or not operation.menu_id:
+        return Operation.browse()
+    domain = [
+        ("menu_id", "=", operation.menu_id.id),
+        ("type", "=", operation.type),
+        ("state", "in", ("draft", "applied")),
+    ]
+    if operation.id:
+        domain.append(("id", "!=", operation.id))
+    return Operation.search(domain, limit=1)
+
+
+def menu_write_conflict_message(operation, other):
+    """Explain which bundle already owns this menu write."""
+    return operation.env._(
+        "Bundle '%(bundle)s' already has a %(type)s operation on menu '%(menu)s'."
+    ) % {
+        "bundle": other.bundle_id.code,
+        "type": MENU_WRITE_LABELS.get(other.type, other.type),
+        "menu": operation.menu_id.display_name,
+    }
+
+
+def assert_no_menu_write_conflict(operation):
+    """Refuse a second hide/rename/groups/move on the same menu record."""
+    other = menu_write_conflicts(operation)
+    if other:
+        raise UserError(menu_write_conflict_message(operation, other))
+
+
+def view_write_conflicts(operation):
+    """Return other live writes of the same type on the same view anchor."""
+    Operation = operation.env["customization.operation"]
+    if operation.type not in ATTRIBUTE_TYPES or not operation.view_id:
+        return Operation.browse()
+    domain = [
+        ("view_id", "=", operation.view_id.id),
+        ("type", "=", operation.type),
+        ("anchor_kind", "=", operation.anchor_kind or "field"),
+        ("anchor_name", "=", operation.anchor_name or False),
+        ("anchor_string", "=", operation.anchor_string or False),
+        ("anchor_occurrence", "=", operation.anchor_occurrence or 0),
+        ("anchor_page", "=", operation.anchor_page or False),
+        ("state", "in", ("draft", "applied")),
+    ]
+    if operation.id:
+        domain.append(("id", "!=", operation.id))
+    return Operation.search(domain, limit=1)
+
+
+def view_write_conflict_message(operation, other):
+    """Explain which bundle already owns this view attribute write."""
+    anchor = operation.anchor_name or operation.anchor_string or ""
+    return operation.env._(
+        "Bundle '%(bundle)s' already has a %(type)s operation on "
+        "'%(anchor)s' in view '%(view)s'."
+    ) % {
+        "bundle": other.bundle_id.code,
+        "type": VIEW_WRITE_LABELS.get(other.type, other.type),
+        "anchor": anchor,
+        "view": operation.view_id.name,
+    }
+
+
+def assert_no_view_write_conflict(operation):
+    """Refuse a second hide/label/widget/groups/modifier on the same node."""
+    other = view_write_conflicts(operation)
+    if other:
+        raise UserError(view_write_conflict_message(operation, other))
+
+
+def place_field_conflicts(operation):
+    """Return another live place of the same field on the same view."""
+    Operation = operation.env["customization.operation"]
+    if operation.type != "place_field" or not operation.view_id:
+        return Operation.browse()
+    field_name = (operation.payload or {}).get("field_name")
+    if not field_name:
+        return Operation.browse()
+    domain = [
+        ("view_id", "=", operation.view_id.id),
+        ("type", "=", "place_field"),
+        ("state", "in", ("draft", "applied")),
+    ]
+    if operation.id:
+        domain.append(("id", "!=", operation.id))
+    others = Operation.search(domain)
+    return others.filtered(
+        lambda rec: (rec.payload or {}).get("field_name") == field_name
+    )[:1]
+
+
+def place_field_conflict_message(operation, other):
+    """Explain which bundle already placed this field on the view."""
+    field_name = (operation.payload or {}).get("field_name") or ""
+    return operation.env._(
+        "Bundle '%(bundle)s' already has a Place Field operation for "
+        "'%(field)s' in view '%(view)s'."
+    ) % {
+        "bundle": other.bundle_id.code,
+        "field": field_name,
+        "view": operation.view_id.name,
+    }
+
+
+def assert_no_place_field_conflict(operation):
+    """Refuse a second live place of the same field on the same view."""
+    other = place_field_conflicts(operation)
+    if other:
+        raise UserError(place_field_conflict_message(operation, other))
+
+
 def _apply_menu(operation):
     ok, reason = _health_check_menu(operation)
     if not ok:
         raise AnchorError(reason)
+    if operation.type in MENU_WRITE_TYPES:
+        assert_no_menu_write_conflict(operation)
     if operation.type == "add_menu":
         _apply_add_menu(operation)
         return
@@ -614,15 +857,6 @@ def _apply_add_menu(operation):
         menu.write(vals)
     else:
         menu = operation.env["ir.ui.menu"].create(vals)
-        operation.env["ir.model.data"].create(
-            {
-                "name": f"generated_menu_{operation.id}",
-                "model": "ir.ui.menu",
-                "module": XMLID_MODULE,
-                "res_id": menu.id,
-                "noupdate": True,
-            }
-        )
         operation.generated_menu_id = menu
     if not (payload.get("name") or "").strip():
         payload["name"] = ensure_menu_xmlid_name(
@@ -630,7 +864,7 @@ def _apply_add_menu(operation):
         )
     else:
         payload["name"] = ensure_menu_xmlid_name(payload["name"])
-    payload["xmlid"] = f"{XMLID_MODULE}.generated_menu_{operation.id}"
+    payload["xmlid"] = f"{operation.bundle_id.code}.{payload['name']}"
     payload["action_xmlid"] = action_xmlid
     operation.payload = payload
 
@@ -668,9 +902,7 @@ def _apply_move_menu(operation):
     if parent:
         parent_xmlid = parent.get_external_id().get(parent.id)
         if not parent_xmlid:
-            raise UserError(
-                _("Parent menu '%s' has no XML ID.") % parent.display_name
-            )
+            raise UserError(_("Parent menu '%s' has no XML ID.") % parent.display_name)
     else:
         parent_xmlid = False
     previous = dict(payload.get("previous") or {})
@@ -885,9 +1117,7 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
             f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
             f"{inner_xml}</xpath>"
         )
-    type_expr = _button_type_expr(
-        operation, arch_tree, tag, anchor, page, occurrence
-    )
+    type_expr = _button_type_expr(operation, arch_tree, tag, anchor, page, occurrence)
     if type_expr:
         return (
             f'<xpath expr="{_xml_attr(type_expr)}" position="{position}">'
@@ -918,15 +1148,6 @@ def _upsert_generated_view(operation, arch, active=True):
         view.write(values)
         return view
     view = operation.env["ir.ui.view"].create(values)
-    operation.env["ir.model.data"].create(
-        {
-            "name": f"generated_view_{operation.id}",
-            "model": "ir.ui.view",
-            "module": XMLID_MODULE,
-            "res_id": view.id,
-            "noupdate": True,
-        }
-    )
     operation.generated_view_id = view
     return view
 

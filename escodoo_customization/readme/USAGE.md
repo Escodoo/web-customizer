@@ -28,11 +28,23 @@
 4. Or add operations from the bundle form. Fill the payload fields for the
    selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.
-6. After an Odoo upgrade, click **Health Check**. Broken operations keep their
-   generated field and show `broken_reason`. **Re-apply** retries them.
+6. After an Odoo upgrade (`-u`), a health check runs automatically and
+   re-resolves anchors. You can still click **Health Check** on the bundle.
+   Broken operations keep their generated field and show `broken_reason`.
+   **Re-apply** retries them.
 7. When the bundle is applied, click **Export Addon**. In the dialog, click
    **Download ZIP** and put that module in git; it does not depend on this
-   ledger at runtime.
+   ledger at runtime. Compiled fields, views and menus store their XML IDs
+   under the bundle ``code`` (the future addon name). Uninstalling this
+   ledger leaves those records in the database. Unlink a bundle or
+   operation to undo a customization. Hide, rename, groups and move write
+   the standard ``ir.ui.menu`` record; only one live operation of each
+   type may target the same menu, so two bundles cannot overwrite each
+   other. Unlink restores that snapshot. Hide, label, widget, groups and
+   modifier operations on a view node are exclusive the same way: only
+   one live operation of each type may target the same anchor, so two
+   bundles cannot compile two inherits for the same hide. Placing the
+   same field twice on the same view is refused the same way.
 
 Generated field names always start with `x_esc_` and cannot contain `__`.
 Selection fields take one option per line as `value:Label`. Monetary

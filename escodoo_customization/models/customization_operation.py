@@ -17,7 +17,13 @@ from .compiler import (
     ensure_field_name,
     ensure_menu_xmlid_name,
     health_check_operation,
+    menu_write_conflict_message,
+    menu_write_conflicts,
+    place_field_conflict_message,
+    place_field_conflicts,
     restore_menu_operation,
+    view_write_conflict_message,
+    view_write_conflicts,
 )
 
 TTYPE_SELECTION = [
@@ -447,14 +453,7 @@ class CustomizationOperation(models.Model):
             if "payload_field_name" in ui:
                 self._set_payload_key(payload, "field_name", ui["payload_field_name"])
         elif op_type in STRUCTURE_TYPES + ("set_string", "set_menu_string", "add_menu"):
-            if "payload_string" in ui:
-                self._set_payload_key(payload, "string", ui["payload_string"])
-            if op_type in STRUCTURE_TYPES + ("add_menu",) and "payload_name" in ui:
-                self._set_payload_key(payload, "name", ui["payload_name"])
-            if op_type == "add_menu" and "payload_action_xmlid" in ui:
-                self._set_payload_key(
-                    payload, "action_xmlid", ui["payload_action_xmlid"]
-                )
+            self._apply_label_payload_ui(payload, op_type, ui)
         elif op_type == "move_menu":
             if "payload_target_xmlid" in ui:
                 self._set_payload_key(
@@ -467,21 +466,34 @@ class CustomizationOperation(models.Model):
             if "payload_groups" in ui:
                 self._set_payload_key(payload, "groups", ui["payload_groups"])
         elif op_type == "set_modifier":
-            modifiers = dict(payload.get("modifiers") or {})
-            mapping = (
-                ("payload_mod_invisible", "invisible"),
-                ("payload_mod_readonly", "readonly"),
-                ("payload_mod_required", "required"),
-                ("payload_mod_column_invisible", "column_invisible"),
-            )
-            for ui_name, key in mapping:
-                if ui_name in ui:
-                    self._set_payload_key(modifiers, key, ui[ui_name])
-            if modifiers:
-                payload["modifiers"] = modifiers
-            else:
-                payload.pop("modifiers", None)
+            self._apply_modifier_payload_ui(payload, ui)
         return payload
+
+    @api.model
+    def _apply_label_payload_ui(self, payload, op_type, ui):
+        if "payload_string" in ui:
+            self._set_payload_key(payload, "string", ui["payload_string"])
+        if op_type in STRUCTURE_TYPES + ("add_menu",) and "payload_name" in ui:
+            self._set_payload_key(payload, "name", ui["payload_name"])
+        if op_type == "add_menu" and "payload_action_xmlid" in ui:
+            self._set_payload_key(payload, "action_xmlid", ui["payload_action_xmlid"])
+
+    @api.model
+    def _apply_modifier_payload_ui(self, payload, ui):
+        modifiers = dict(payload.get("modifiers") or {})
+        mapping = (
+            ("payload_mod_invisible", "invisible"),
+            ("payload_mod_readonly", "readonly"),
+            ("payload_mod_required", "required"),
+            ("payload_mod_column_invisible", "column_invisible"),
+        )
+        for ui_name, key in mapping:
+            if ui_name in ui:
+                self._set_payload_key(modifiers, key, ui[ui_name])
+        if modifiers:
+            payload["modifiers"] = modifiers
+        else:
+            payload.pop("modifiers", None)
 
     @api.model
     def _vals_with_payload_ui(self, vals, current_payload=None, op_type=None):
@@ -515,41 +527,68 @@ class CustomizationOperation(models.Model):
         "menu_id",
         "anchor_name",
         "anchor_string",
+        "anchor_kind",
+        "anchor_occurrence",
+        "anchor_page",
         "payload",
         "model_id",
+        "state",
     )
     def _check_operation(self):
         for rec in self:
-            if rec.type == "add_field":
-                payload = rec.payload or {}
-                if not rec.model_id:
-                    raise ValidationError(
-                        self.env._("A model is required to add a field.")
-                    )
-                if not payload.get("ttype") and not payload.get("related"):
-                    raise ValidationError(
-                        self.env._("add_field requires a field type or a related path.")
-                    )
-                if payload.get("name"):
-                    ensure_field_name(payload["name"])
-            elif rec.type in MENU_TYPES:
-                if not rec.menu_id:
-                    raise ValidationError(self.env._("A menu is required."))
-                if rec.type == "add_menu" and (rec.payload or {}).get("name"):
-                    ensure_menu_xmlid_name(rec.payload["name"])
-            elif rec.type in ("place_field",) + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
-                if not rec.view_id:
-                    raise ValidationError(
-                        self.env._("A target view is required for this operation.")
-                    )
-                if not rec.anchor_name and not (
-                    rec.anchor_kind in ("page", "group") and rec.anchor_string
-                ):
-                    raise ValidationError(
-                        self.env._("An anchor name or title is required.")
-                    )
-                if rec.type in STRUCTURE_TYPES and (rec.payload or {}).get("name"):
-                    ensure_field_name(rec.payload["name"])
+            rec._check_one_operation()
+
+    def _check_one_operation(self):
+        self.ensure_one()
+        if self.type == "add_field":
+            self._check_add_field_operation()
+        elif self.type in MENU_TYPES:
+            self._check_menu_operation()
+        elif self.type in ("place_field",) + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
+            self._check_view_operation()
+
+    def _check_add_field_operation(self):
+        payload = self.payload or {}
+        if not self.model_id:
+            raise ValidationError(self.env._("A model is required to add a field."))
+        if not payload.get("ttype") and not payload.get("related"):
+            raise ValidationError(
+                self.env._("add_field requires a field type or a related path.")
+            )
+        if payload.get("name"):
+            ensure_field_name(payload["name"])
+
+    def _check_menu_operation(self):
+        if not self.menu_id:
+            raise ValidationError(self.env._("A menu is required."))
+        if self.type == "add_menu" and (self.payload or {}).get("name"):
+            ensure_menu_xmlid_name(self.payload["name"])
+        if self.state in ("draft", "applied"):
+            other = menu_write_conflicts(self)
+            if other:
+                raise ValidationError(menu_write_conflict_message(self, other))
+
+    def _check_view_operation(self):
+        if not self.view_id:
+            raise ValidationError(
+                self.env._("A target view is required for this operation.")
+            )
+        if not self.anchor_name and not (
+            self.anchor_kind in ("page", "group") and self.anchor_string
+        ):
+            raise ValidationError(self.env._("An anchor name or title is required."))
+        if self.type in STRUCTURE_TYPES and (self.payload or {}).get("name"):
+            ensure_field_name(self.payload["name"])
+        if self.state not in ("draft", "applied"):
+            return
+        if self.type in ATTRIBUTE_TYPES:
+            other = view_write_conflicts(self)
+            if other:
+                raise ValidationError(view_write_conflict_message(self, other))
+        elif self.type == "place_field":
+            other = place_field_conflicts(self)
+            if other:
+                raise ValidationError(place_field_conflict_message(self, other))
 
     def _mark_broken(self, reason):
         self.ensure_one()
@@ -562,6 +601,11 @@ class CustomizationOperation(models.Model):
 
     def action_apply(self):
         """Compile this operation. Anchor failures become broken, not silent."""
+        self.env["customization.bundle"]._check_manager_access()
+        return self._apply()
+
+    def _apply(self):
+        """Compile without an extra ACL check (bundle actions already checked)."""
         for operation in self:
             if operation.state == "archived":
                 continue
@@ -576,6 +620,11 @@ class CustomizationOperation(models.Model):
 
     def action_health_check(self):
         """Re-resolve anchors; missing ones are marked broken and kept."""
+        self.env["customization.bundle"]._check_manager_access()
+        return self._health_check()
+
+    def _health_check(self):
+        """Re-resolve anchors. Used by the UI and by the upgrade hook."""
         for operation in self:
             if operation.state in ("archived", "draft"):
                 continue
@@ -602,6 +651,7 @@ class CustomizationOperation(models.Model):
         return True
 
     def unlink(self):
+        self.env["customization.bundle"]._check_manager_access()
         menu_ops = self.filtered(lambda rec: rec.type in MENU_WRITE_TYPES).sorted(
             "sequence", reverse=True
         )

@@ -381,33 +381,81 @@ views. Applied bundles can be <strong>exported</strong> as a plain Odoo addon to
 version in git.</p>
 <p>Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
-list column header, a kanban card field, or a search field to add a
-field, place an existing field, add a notebook page or group, hide it,
-change its label, set a widget, restrict it to groups, or set modifiers.
-Click a navbar menu to hide it, rename it, or restrict it to groups.
-Duplicate names (for example two <tt class="docutils literal">email</tt> fields) are chosen in the
-dialog. That writes the same ledger operations as the backend form.</p>
-<p>On upgrade, a health check re-resolves anchors. Missing anchors are
-marked <tt class="docutils literal">broken</tt> with a reason; other operations are left intact.
-Customizations never disappear silently.</p>
+list column header, a kanban card field or button, or a search field to
+add a field, place an existing field, add a notebook page or group, hide
+it, change its label, set a widget, restrict it to groups, or set
+modifiers. Click a navbar menu to hide it, rename it, restrict it to
+groups, add a sibling or submenu (bound to a window action with an XML
+ID), or move it after another menu or as a submenu. Duplicate names (for
+example two <tt class="docutils literal">email</tt> fields) are chosen in the dialog. That writes the
+same ledger operations as the backend form.</p>
+<p>On module update (<tt class="docutils literal"><span class="pre">-u</span></tt>), a health check re-resolves anchors
+automatically. Missing anchors are marked <tt class="docutils literal">broken</tt> with a reason;
+other operations are left intact. Customizations never disappear
+silently. Compiled artifacts own XML IDs under the bundle code, so
+uninstalling this ledger does not delete unexported fields, views or
+menus. Git still needs the exported addon. A hide, rename, groups or
+move write on a standard menu is exclusive per type: a second bundle
+cannot overwrite the same snapshot. The same rule applies to hide,
+label, widget, groups and modifier operations on a view node: two live
+inherits of the same type on the same anchor are refused. Placing the
+same field twice on one view is also refused. Company on a bundle is
+only a filter tag; compiled records stay global.</p>
 <p>This module is <strong>not</strong> a clone of Odoo Studio. Approvals stay in
 <tt class="docutils literal">base_tier_validation</tt>. Automations stay in <tt class="docutils literal">base.automation</tt> /
 <tt class="docutils literal">automation_oca</tt>.</p>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#usage" id="toc-entry-1">Usage</a></li>
-<li><a class="reference internal" href="#bug-tracker" id="toc-entry-2">Bug Tracker</a></li>
-<li><a class="reference internal" href="#credits" id="toc-entry-3">Credits</a><ul>
-<li><a class="reference internal" href="#authors" id="toc-entry-4">Authors</a></li>
-<li><a class="reference internal" href="#contributors" id="toc-entry-5">Contributors</a></li>
-<li><a class="reference internal" href="#maintainers" id="toc-entry-6">Maintainers</a></li>
+<li><a class="reference internal" href="#installation" id="toc-entry-1">Installation</a></li>
+<li><a class="reference internal" href="#configuration" id="toc-entry-2">Configuration</a></li>
+<li><a class="reference internal" href="#usage" id="toc-entry-3">Usage</a></li>
+<li><a class="reference internal" href="#known-issues-roadmap" id="toc-entry-4">Known issues / Roadmap</a></li>
+<li><a class="reference internal" href="#changelog" id="toc-entry-5">Changelog</a><ul>
+<li><a class="reference internal" href="#section-1" id="toc-entry-6">18.0.1.0.0</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bug-tracker" id="toc-entry-7">Bug Tracker</a></li>
+<li><a class="reference internal" href="#credits" id="toc-entry-8">Credits</a><ul>
+<li><a class="reference internal" href="#authors" id="toc-entry-9">Authors</a></li>
+<li><a class="reference internal" href="#contributors" id="toc-entry-10">Contributors</a></li>
+<li><a class="reference internal" href="#maintainers" id="toc-entry-11">Maintainers</a></li>
 </ul>
 </li>
 </ul>
 </div>
+<div class="section" id="installation">
+<h1><a class="toc-backref" href="#toc-entry-1">Installation</a></h1>
+<p>Install this module on a database that already has <tt class="docutils literal">web</tt>. In a Doodba
+project, add <tt class="docutils literal">escodoo_customization</tt> to <tt class="docutils literal">addons.yaml</tt> and update the
+database (<tt class="docutils literal"><span class="pre">-i</span></tt> on a new database, <tt class="docutils literal"><span class="pre">-u</span></tt> afterwards).</p>
+<p>Developer mode is required to open <strong>Settings → Technical →
+Customization</strong>. Assign <strong>Customization / Manager</strong> to consultants who
+will compile or export bundles.</p>
+</div>
+<div class="section" id="configuration">
+<h1><a class="toc-backref" href="#toc-entry-2">Configuration</a></h1>
+<p>Assign groups under <strong>Settings → Users</strong>:</p>
+<ul class="simple">
+<li><strong>Customization / User</strong> — read the ledger (bundles and operations).
+Settings (<tt class="docutils literal">Administration / Settings</tt>) implies this group.</li>
+<li><strong>Customization / Manager</strong> — create and apply operations, use the
+systray wand, export an addon, and unlink a bundle. Apply, re-apply
+and health-check are refused in Python even if called over RPC.</li>
+</ul>
+<p>The wand and the bundle header buttons already require Manager. The
+backend methods enforce the same group so a Settings user without
+Manager cannot compile or drop customizations.</p>
+<p>Compiled fields, views and menus store XML IDs under the bundle
+<tt class="docutils literal">code</tt>. Uninstalling this module leaves those records; unlink a bundle
+to remove them. Export the addon to git — the database is not the source
+of truth.</p>
+<p><tt class="docutils literal">company_id</tt> on a bundle is only a filter tag. The compiled field,
+view and menu records are global: they apply to every company. Use one
+bundle per project, not one per company, unless you accept that overlap.</p>
+</div>
 <div class="section" id="usage">
-<h1><a class="toc-backref" href="#toc-entry-1">Usage</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-3">Usage</a></h1>
 <ol class="arabic simple">
 <li>Go to <strong>Settings → Technical → Customization → Bundles</strong> (debug
 mode).</li>
@@ -416,38 +464,82 @@ example <tt class="docutils literal">client_acme</tt>).</li>
 <li>On any form, list, kanban or search view, click the magic-wand icon
 in the systray (customization managers). Fields, page tabs, group
 titles and named buttons are outlined on forms; list column headers,
-kanban card fields and search fields are outlined on those views.
-Navbar menus (apps and sections with an XML ID) are also outlined.
-Click one to add a <strong>new</strong> field after it (or <strong>inside</strong> a page or
-group), <strong>place an existing field</strong>, add a <strong>page</strong> or <strong>group</strong>,
-hide it, change its label, set a widget, restrict it to groups
-(search by name), or set modifiers (invisible / readonly / required).
-Click a <strong>menu</strong> to hide it, rename it, or restrict it to groups. The
-clicked node is the semantic anchor. To mirror another field, fill
-<strong>Related path</strong> (for example <tt class="docutils literal">parent_id.email</tt>) instead of a field
-type. Pages and groups without a technical <tt class="docutils literal">name</tt> are anchored by
-their title (stored on the operation; the generated inherit xpath
-uses a unique field inside the node or the node position, because
-Odoo forbids <tt class="docutils literal">&#64;string</tt> selectors). If the same name appears more
-than once, choose the node in the dialog. A new page after a field is
-wrapped in a notebook; a new page after an existing tab is a sibling.</li>
+kanban card fields and buttons, and search fields are outlined on
+those views. Navbar menus (apps and sections with an XML ID) are also
+outlined. Click one to add a <strong>new</strong> field after it (or <strong>inside</strong> a
+page or group), <strong>place an existing field</strong>, add a <strong>page</strong> or
+<strong>group</strong>, hide it, change its label, set a widget, restrict it to
+groups (search by name), or set modifiers (invisible / readonly /
+required). Click a <strong>menu</strong> to hide it, rename it, restrict it to
+groups, add a <strong>sibling menu</strong> after it, add a <strong>submenu</strong>, or
+<strong>move</strong> it after another menu or as a submenu. New menus need a
+window action that already has an XML ID. The destination of a move
+must also have an XML ID. The clicked node is the semantic anchor. To
+mirror another field, fill <strong>Related path</strong> (for example
+<tt class="docutils literal">parent_id.email</tt>) instead of a field type. Pages and groups
+without a technical <tt class="docutils literal">name</tt> are anchored by their title (stored on
+the operation; the generated inherit xpath uses a unique field inside
+the node or the node position, because Odoo forbids <tt class="docutils literal">&#64;string</tt>
+selectors). If the same name appears more than once, choose the node
+in the dialog. A new page after a field is wrapped in a notebook; a
+new page after an existing tab is a sibling.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
 the selected type. The <strong>Raw JSON</strong> tab shows the stored intent.</li>
 <li>Click <strong>Apply</strong> to compile fields and inherited views.</li>
-<li>After an Odoo upgrade, click <strong>Health Check</strong>. Broken operations keep
-their generated field and show <tt class="docutils literal">broken_reason</tt>. <strong>Re-apply</strong>
-retries them.</li>
+<li>After an Odoo upgrade (<tt class="docutils literal"><span class="pre">-u</span></tt>), a health check runs automatically and
+re-resolves anchors. You can still click <strong>Health Check</strong> on the
+bundle. Broken operations keep their generated field and show
+<tt class="docutils literal">broken_reason</tt>. <strong>Re-apply</strong> retries them.</li>
 <li>When the bundle is applied, click <strong>Export Addon</strong>. In the dialog,
 click <strong>Download ZIP</strong> and put that module in git; it does not depend
-on this ledger at runtime.</li>
+on this ledger at runtime. Compiled fields, views and menus store
+their XML IDs under the bundle <tt class="docutils literal">code</tt> (the future addon name).
+Uninstalling this ledger leaves those records in the database. Unlink
+a bundle or operation to undo a customization. Hide, rename, groups
+and move write the standard <tt class="docutils literal">ir.ui.menu</tt> record; only one live
+operation of each type may target the same menu, so two bundles
+cannot overwrite each other. Unlink restores that snapshot. Hide,
+label, widget, groups and modifier operations on a view node are
+exclusive the same way: only one live operation of each type may
+target the same anchor, so two bundles cannot compile two inherits
+for the same hide. Placing the same field twice on the same view is
+refused the same way.</li>
 </ol>
 <p>Generated field names always start with <tt class="docutils literal">x_esc_</tt> and cannot contain
 <tt class="docutils literal">__</tt>. Selection fields take one option per line as <tt class="docutils literal">value:Label</tt>.
 Monetary fields need <tt class="docutils literal">currency_id</tt> or <tt class="docutils literal">x_currency_id</tt> on the model,
 or a currency field name in the payload.</p>
 </div>
+<div class="section" id="known-issues-roadmap">
+<h1><a class="toc-backref" href="#toc-entry-4">Known issues / Roadmap</a></h1>
+<p>Known gaps. Proposals are welcome.</p>
+<ul class="simple">
+<li>Calendar, graph, pivot and gantt views are not outlined or compiled.</li>
+<li>Free XPath anchors stay in the model for export compatibility but are
+not offered in the systray dialog.</li>
+<li>Kanban header and progressbar nodes are not semantic anchors yet.</li>
+</ul>
+</div>
+<div class="section" id="changelog">
+<h1><a class="toc-backref" href="#toc-entry-5">Changelog</a></h1>
+<div class="section" id="section-1">
+<h2><a class="toc-backref" href="#toc-entry-6">18.0.1.0.0</a></h2>
+<p>First public Beta.</p>
+<ul class="simple">
+<li>Ledger of semantic operations compiled to <tt class="docutils literal">x_esc_*</tt> fields,
+inherited views and writes on standard <tt class="docutils literal">ir.ui.menu</tt> records.</li>
+<li>Systray customization mode for form, list, kanban, search and navbar
+menus.</li>
+<li>Health check on module update; generated XML IDs belong to the bundle
+<tt class="docutils literal">code</tt>.</li>
+<li>Exclusive live writes per menu type, view-anchor attribute type and
+place of the same field on one view.</li>
+<li>Export as a standalone addon ZIP that does not depend on this ledger.</li>
+</ul>
+</div>
+</div>
 <div class="section" id="bug-tracker">
-<h1><a class="toc-backref" href="#toc-entry-2">Bug Tracker</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-7">Bug Tracker</a></h1>
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/Escodoo/escodoo-customization/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
@@ -455,15 +547,15 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
-<h1><a class="toc-backref" href="#toc-entry-3">Credits</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-8">Credits</a></h1>
 <div class="section" id="authors">
-<h2><a class="toc-backref" href="#toc-entry-4">Authors</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-9">Authors</a></h2>
 <ul class="simple">
 <li>Escodoo</li>
 </ul>
 </div>
 <div class="section" id="contributors">
-<h2><a class="toc-backref" href="#toc-entry-5">Contributors</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-10">Contributors</a></h2>
 <ul class="simple">
 <li><a class="reference external" href="https://escodoo.com.br">Escodoo</a>:<ul>
 <li>Marcel Savegnago &lt;<a class="reference external" href="mailto:marcel.savegnago&#64;escodoo.com.br">marcel.savegnago&#64;escodoo.com.br</a>&gt;</li>
@@ -472,7 +564,7 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="maintainers">
-<h2><a class="toc-backref" href="#toc-entry-6">Maintainers</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-11">Maintainers</a></h2>
 <p>Current maintainer:</p>
 <p><a class="reference external image-reference" href="https://github.com/marcelsavegnago"><img alt="marcelsavegnago" src="https://github.com/marcelsavegnago.png?size=40px" /></a></p>
 <p>This module is part of the <a class="reference external" href="https://github.com/Escodoo/escodoo-customization/tree/18.0/escodoo_customization">Escodoo/escodoo-customization</a> project on GitHub.</p>

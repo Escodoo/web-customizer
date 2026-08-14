@@ -1,12 +1,12 @@
 import {useEffect} from "@odoo/owl";
-import {useService} from "@web/core/utils/hooks";
 import {patch} from "@web/core/utils/patch";
 import {NavBar} from "@web/webclient/navbar/navbar";
+import {useCustomizationService} from "./customization_service";
 
 patch(NavBar.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
         useEffect(
             () => {
                 const el = this.root.el;

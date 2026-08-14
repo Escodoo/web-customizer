@@ -6,6 +6,7 @@ import re
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
+from ..hooks import health_check_on_upgrade
 from .compiler import (
     MODIFIER_KEYS,
     STRUCTURE_TYPES,
@@ -56,7 +57,12 @@ class CustomizationBundle(models.Model):
         compute="_compute_state",
         store=True,
     )
-    company_id = fields.Many2one("res.company", ondelete="set null")
+    company_id = fields.Many2one(
+        "res.company",
+        ondelete="set null",
+        help="Optional tag to filter this bundle. Compiled fields, views "
+        "and menus stay global; they are not scoped by company.",
+    )
     operation_ids = fields.One2many(
         "customization.operation",
         "bundle_id",
@@ -103,36 +109,46 @@ class CustomizationBundle(models.Model):
 
     def action_apply(self):
         """Compile draft and broken operations, in sequence."""
+        self._check_manager_access()
         self.ensure_one()
         operations = self.operation_ids.filtered(
             lambda o: o.state in ("draft", "broken")
         ).sorted("sequence")
-        for operation in operations:
-            operation.action_apply()
+        operations._apply()
         return True
 
     def action_reapply(self):
         """Recompile every non-archived operation."""
+        self._check_manager_access()
         self.ensure_one()
         operations = self.operation_ids.filtered(
             lambda o: o.state != "archived"
         ).sorted("sequence")
-        for operation in operations:
-            operation.action_apply()
+        operations._apply()
         return True
 
     def action_health_check(self):
         """Re-resolve anchors without creating fields or views."""
-        self.ensure_one()
-        operations = self.operation_ids.filtered(
-            lambda o: o.state not in ("archived", "draft")
-        ).sorted("sequence")
-        for operation in operations:
-            operation.action_health_check()
+        self._check_manager_access()
+        return self._health_check()
+
+    def _health_check(self):
+        """Re-resolve anchors. Used by the UI and by the upgrade hook."""
+        for bundle in self:
+            operations = bundle.operation_ids.filtered(
+                lambda o: o.state not in ("archived", "draft")
+            ).sorted("sequence")
+            operations._health_check()
         return True
+
+    def _register_hook(self):
+        super()._register_hook()
+        if self.env.registry.updated_modules:
+            health_check_on_upgrade(self.env)
 
     def action_export(self):
         """Open a dialog with the generated zip ready to download."""
+        self._check_manager_access()
         self.ensure_one()
         wizard = self.env["customization.export.wizard"]._create_from_bundle(self)
         return {
@@ -467,9 +483,7 @@ class CustomizationBundle(models.Model):
         if not menu.exists():
             raise UserError(self.env._("The destination menu is missing."))
         if exclude_id and menu.id == exclude_id:
-            raise UserError(
-                self.env._("Choose a different menu as the destination.")
-            )
+            raise UserError(self.env._("Choose a different menu as the destination."))
         xmlid = menu.get_external_id().get(menu.id)
         if not xmlid:
             raise UserError(
@@ -489,9 +503,7 @@ class CustomizationBundle(models.Model):
                     self.env._("Action '%s' is missing.") % action_xmlid
                 ) from err
             if action._name != "ir.actions.act_window":
-                raise UserError(
-                    self.env._("Select a window action with an XML ID.")
-                )
+                raise UserError(self.env._("Select a window action with an XML ID."))
             return action_xmlid
         action_id = payload.get("action_id")
         if not action_id:
@@ -804,15 +816,23 @@ class CustomizationBundle(models.Model):
             extra["anchor_string"] = anchor_string
         return extra
 
-    def _check_ui_access(self):
+    @api.model
+    def _check_manager_access(self, message=None):
         if not self.env.user.has_group(
             "escodoo_customization.group_customization_manager"
         ):
             raise AccessError(
-                self.env._("Only customization managers can edit forms in place.")
+                message
+                or self.env._("Only customization managers can change customizations.")
             )
 
+    def _check_ui_access(self):
+        self._check_manager_access(
+            self.env._("Only customization managers can edit forms in place.")
+        )
+
     def unlink(self):
+        self._check_manager_access()
         # Cascade at SQL level would skip operation.unlink() and leak generated
         # views/fields. Unlink operations through the ORM first.
         self.mapped("operation_ids").unlink()

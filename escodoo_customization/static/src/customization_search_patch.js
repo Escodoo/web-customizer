@@ -1,12 +1,11 @@
-import {openCustomizationFor} from "./customization_service";
-import {useService} from "@web/core/utils/hooks";
 import {patch} from "@web/core/utils/patch";
 import {SearchBar} from "@web/search/search_bar/search_bar";
+import {openCustomizationFor, useCustomizationService} from "./customization_service";
 
 patch(SearchBar.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     get showCustomizationSearchFields() {
         return Boolean(

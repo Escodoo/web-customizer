@@ -1,9 +1,12 @@
-import {isKanbanRoot, openCustomizationFor} from "./customization_service";
-import {useService} from "@web/core/utils/hooks";
-import {patch} from "@web/core/utils/patch";
 import {combineAttributes} from "@web/core/utils/xml";
+import {patch} from "@web/core/utils/patch";
 import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
 import {KanbanRecord} from "@web/views/kanban/kanban_record";
+import {
+    isKanbanRoot,
+    openCustomizationFor,
+    useCustomizationService,
+} from "./customization_service";
 
 patch(KanbanCompiler.prototype, {
     compileField(el, params) {
@@ -24,9 +27,10 @@ patch(KanbanCompiler.prototype, {
         return compiled;
     },
     compileButton(el, params) {
-        const compiled = super.compileButton(el, params);
         const name = el.getAttribute("name") || "";
         const type = el.getAttribute("type") || "";
+        const label = el.getAttribute("string") || name || type;
+        const compiled = super.compileButton(el, params);
         const anchor = /^\w+$/.test(name) ? name : /^\w+$/.test(type) ? type : "";
         if (!anchor) {
             return compiled;
@@ -35,7 +39,6 @@ patch(KanbanCompiler.prototype, {
         if (tag === "viewbutton") {
             return compiled;
         }
-        const label = el.getAttribute("string") || anchor;
         const previous = compiled.getAttribute("t-on-click") || "";
         const fallback = previous || "() => {}";
         compiled.setAttribute(
@@ -50,7 +53,7 @@ patch(KanbanCompiler.prototype, {
 patch(KanbanRecord.prototype, {
     setup() {
         super.setup(...arguments);
-        this.customization = useService("escodoo_customization");
+        this.customization = useCustomizationService();
     },
     getRecordClasses() {
         const classes = super.getRecordClasses();

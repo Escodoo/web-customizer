@@ -11,7 +11,7 @@ from lxml import etree
 from odoo import _
 from odoo.exceptions import UserError
 
-from .compiler import MENU_TYPES, slugify_field_suffix
+from .compiler import MENU_TYPES, field_xmlid_name, menu_xmlid_name, view_xmlid_name
 
 XML_HEADER = """<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2026 Escodoo
@@ -174,7 +174,7 @@ def _views_xml(views, operations):
 
 
 def _view_record(view, operation):
-    xmlid = f"view_operation_{operation.id}"
+    xmlid = view_xmlid_name(operation)
     inherit_xmlid = _record_xmlid(
         view.inherit_id,
         _("Target view '%s' has no XML ID. Export needs a stable inherit_id.")
@@ -189,7 +189,7 @@ def _view_record(view, operation):
         f'        <field name="type">{escape(view_type)}</field>\n'
         f'        <field name="inherit_id" ref="{inherit_xmlid}"/>\n'
         '        <field name="mode">extension</field>\n'
-        '        <field name="priority">99</field>\n'
+        f'        <field name="priority">{int(view.priority or 16)}</field>\n'
         '        <field name="arch" type="xml">\n'
         f"{_indent(arch, '            ')}\n"
         "        </field>\n"
@@ -213,8 +213,7 @@ def _indent(text, prefix):
 
 
 def _field_xmlid(field):
-    model_key = (field.model or "").replace(".", "_")
-    return f"field_{model_key}_{field.name}"
+    return field_xmlid_name(field)
 
 
 def _record_xmlid(record, missing_message):
@@ -330,10 +329,7 @@ def _menu_record(operation):
 def _add_menu_record(operation):
     """Export a newly created menu as a record in the client addon."""
     payload = operation.payload or {}
-    record_id = (payload.get("name") or "").strip()
-    if not record_id:
-        slug = slugify_field_suffix(payload.get("string") or "menu")
-        record_id = f"menu_{slug}_{operation.id}"
+    record_id = menu_xmlid_name(operation)
     string = payload.get("string") or ""
     if operation.generated_menu_id:
         string = string or operation.generated_menu_id.name or ""

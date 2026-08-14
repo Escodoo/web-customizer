@@ -89,12 +89,15 @@ class TestCustomizationExport(CustomizationCase):
         self.assertEqual(manifest["name"], "Test bundle")
         self.assertIn("base", manifest["depends"])
         self.assertIn("x_esc_export_ref", fields_xml)
+        self.assertIn('id="field_res_partner_x_esc_export_ref"', fields_xml)
         self.assertIn("Site Reference", fields_xml)
         self.assertIn("base.model_res_partner", fields_xml)
         self.assertIn('<field name="state">manual</field>', fields_xml)
         self.assertIn("escodoo_customization.tester_partner_form", views_xml)
+        self.assertIn('id="view_operation_', views_xml)
         self.assertIn('name="x_esc_export_ref"', views_xml)
         self.assertIn('position="after"', views_xml)
+        self.assertIn('<field name="priority">120</field>', views_xml)
 
     def test_export_skips_broken_operations(self):
         bundle = self._applied_bundle(code="client_export_broken")

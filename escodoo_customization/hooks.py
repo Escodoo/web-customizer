@@ -3,37 +3,42 @@
 
 import logging
 
-from .models.compiler import MENU_WRITE_TYPES, restore_menu_operation
+from .models.compiler import rebind_generated_xmlids
 
 _logger = logging.getLogger(__name__)
 
 
-def uninstall_hook(env):
-    """Remove compiler-generated fields, views and menus from the database."""
-    operations = env["customization.operation"].sudo().search([])
-    menu_ops = operations.filtered(lambda rec: rec.type in MENU_WRITE_TYPES).sorted(
-        "sequence", reverse=True
+def health_check_on_upgrade(env):
+    """Re-resolve applied anchors after a module install or upgrade.
+
+    ``post_init_hook`` only runs on first install. This is called from
+    ``customization.bundle._register_hook`` when the registry loaded at
+    least one updated module (``-u odoo``, ``-u sale``, …), so dead
+    anchors surface without a consultant clicking Health Check.
+    """
+    bundles = env["customization.bundle"].sudo().search([])
+    if not bundles:
+        return
+    _logger.info(
+        "Health-checking %s customization bundle(s) after module update",
+        len(bundles),
     )
-    for operation in menu_ops:
-        restore_menu_operation(operation)
-    views = operations.mapped("generated_view_id").exists()
-    fields = operations.mapped("generated_field_id").exists()
-    menus = operations.mapped("generated_menu_id").exists()
-    if views:
-        _logger.info(
-            "Uninstalling escodoo_customization: removing %s generated views",
-            len(views),
-        )
-        views.unlink()
-    if fields:
-        _logger.info(
-            "Uninstalling escodoo_customization: removing %s generated fields",
-            len(fields),
-        )
-        fields.unlink()
-    if menus:
-        _logger.info(
-            "Uninstalling escodoo_customization: removing %s generated menus",
-            len(menus),
-        )
-        menus.unlink()
+    try:
+        rebind_generated_xmlids(env)
+        bundles._health_check()
+    except Exception:
+        _logger.exception("Customization health check after upgrade failed")
+
+
+def uninstall_hook(env):
+    """Leave compiled fields, views and menus in the database.
+
+    Their XML IDs belong to the bundle code (the future exported addon),
+    not to this ledger. Uninstalling the authoring tool must not wipe
+    unexported customizations. Unlink a bundle or operation to undo.
+    """
+    rebind_generated_xmlids(env)
+    _logger.info(
+        "Uninstalling escodoo_customization: compiled customizations stay "
+        "in the database (XML IDs belong to each bundle code)"
+    )

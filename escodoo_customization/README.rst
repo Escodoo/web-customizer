@@ -35,16 +35,27 @@ version in git.
 
 Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
-list column header, a kanban card field, or a search field to add a
-field, place an existing field, add a notebook page or group, hide it,
-change its label, set a widget, restrict it to groups, or set modifiers.
-Click a navbar menu to hide it, rename it, or restrict it to groups.
-Duplicate names (for example two ``email`` fields) are chosen in the
-dialog. That writes the same ledger operations as the backend form.
+list column header, a kanban card field or button, or a search field to
+add a field, place an existing field, add a notebook page or group, hide
+it, change its label, set a widget, restrict it to groups, or set
+modifiers. Click a navbar menu to hide it, rename it, restrict it to
+groups, add a sibling or submenu (bound to a window action with an XML
+ID), or move it after another menu or as a submenu. Duplicate names (for
+example two ``email`` fields) are chosen in the dialog. That writes the
+same ledger operations as the backend form.
 
-On upgrade, a health check re-resolves anchors. Missing anchors are
-marked ``broken`` with a reason; other operations are left intact.
-Customizations never disappear silently.
+On module update (``-u``), a health check re-resolves anchors
+automatically. Missing anchors are marked ``broken`` with a reason;
+other operations are left intact. Customizations never disappear
+silently. Compiled artifacts own XML IDs under the bundle code, so
+uninstalling this ledger does not delete unexported fields, views or
+menus. Git still needs the exported addon. A hide, rename, groups or
+move write on a standard menu is exclusive per type: a second bundle
+cannot overwrite the same snapshot. The same rule applies to hide,
+label, widget, groups and modifier operations on a view node: two live
+inherits of the same type on the same anchor are refused. Placing the
+same field twice on one view is also refused. Company on a bundle is
+only a filter tag; compiled records stay global.
 
 This module is **not** a clone of Odoo Studio. Approvals stay in
 ``base_tier_validation``. Automations stay in ``base.automation`` /
@@ -54,6 +65,41 @@ This module is **not** a clone of Odoo Studio. Approvals stay in
 
 .. contents::
    :local:
+
+Installation
+============
+
+Install this module on a database that already has ``web``. In a Doodba
+project, add ``escodoo_customization`` to ``addons.yaml`` and update the
+database (``-i`` on a new database, ``-u`` afterwards).
+
+Developer mode is required to open **Settings → Technical →
+Customization**. Assign **Customization / Manager** to consultants who
+will compile or export bundles.
+
+Configuration
+=============
+
+Assign groups under **Settings → Users**:
+
+- **Customization / User** — read the ledger (bundles and operations).
+  Settings (``Administration / Settings``) implies this group.
+- **Customization / Manager** — create and apply operations, use the
+  systray wand, export an addon, and unlink a bundle. Apply, re-apply
+  and health-check are refused in Python even if called over RPC.
+
+The wand and the bundle header buttons already require Manager. The
+backend methods enforce the same group so a Settings user without
+Manager cannot compile or drop customizations.
+
+Compiled fields, views and menus store XML IDs under the bundle
+``code``. Uninstalling this module leaves those records; unlink a bundle
+to remove them. Export the addon to git — the database is not the source
+of truth.
+
+``company_id`` on a bundle is only a filter tag. The compiled field,
+view and menu records are global: they apply to every company. Use one
+bundle per project, not one per company, unless you accept that overlap.
 
 Usage
 =====
@@ -65,35 +111,79 @@ Usage
 3. On any form, list, kanban or search view, click the magic-wand icon
    in the systray (customization managers). Fields, page tabs, group
    titles and named buttons are outlined on forms; list column headers,
-   kanban card fields and search fields are outlined on those views.
-   Navbar menus (apps and sections with an XML ID) are also outlined.
-   Click one to add a **new** field after it (or **inside** a page or
-   group), **place an existing field**, add a **page** or **group**,
-   hide it, change its label, set a widget, restrict it to groups
-   (search by name), or set modifiers (invisible / readonly / required).
-   Click a **menu** to hide it, rename it, or restrict it to groups. The
-   clicked node is the semantic anchor. To mirror another field, fill
-   **Related path** (for example ``parent_id.email``) instead of a field
-   type. Pages and groups without a technical ``name`` are anchored by
-   their title (stored on the operation; the generated inherit xpath
-   uses a unique field inside the node or the node position, because
-   Odoo forbids ``@string`` selectors). If the same name appears more
-   than once, choose the node in the dialog. A new page after a field is
-   wrapped in a notebook; a new page after an existing tab is a sibling.
+   kanban card fields and buttons, and search fields are outlined on
+   those views. Navbar menus (apps and sections with an XML ID) are also
+   outlined. Click one to add a **new** field after it (or **inside** a
+   page or group), **place an existing field**, add a **page** or
+   **group**, hide it, change its label, set a widget, restrict it to
+   groups (search by name), or set modifiers (invisible / readonly /
+   required). Click a **menu** to hide it, rename it, restrict it to
+   groups, add a **sibling menu** after it, add a **submenu**, or
+   **move** it after another menu or as a submenu. New menus need a
+   window action that already has an XML ID. The destination of a move
+   must also have an XML ID. The clicked node is the semantic anchor. To
+   mirror another field, fill **Related path** (for example
+   ``parent_id.email``) instead of a field type. Pages and groups
+   without a technical ``name`` are anchored by their title (stored on
+   the operation; the generated inherit xpath uses a unique field inside
+   the node or the node position, because Odoo forbids ``@string``
+   selectors). If the same name appears more than once, choose the node
+   in the dialog. A new page after a field is wrapped in a notebook; a
+   new page after an existing tab is a sibling.
 4. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.
-6. After an Odoo upgrade, click **Health Check**. Broken operations keep
-   their generated field and show ``broken_reason``. **Re-apply**
-   retries them.
+6. After an Odoo upgrade (``-u``), a health check runs automatically and
+   re-resolves anchors. You can still click **Health Check** on the
+   bundle. Broken operations keep their generated field and show
+   ``broken_reason``. **Re-apply** retries them.
 7. When the bundle is applied, click **Export Addon**. In the dialog,
    click **Download ZIP** and put that module in git; it does not depend
-   on this ledger at runtime.
+   on this ledger at runtime. Compiled fields, views and menus store
+   their XML IDs under the bundle ``code`` (the future addon name).
+   Uninstalling this ledger leaves those records in the database. Unlink
+   a bundle or operation to undo a customization. Hide, rename, groups
+   and move write the standard ``ir.ui.menu`` record; only one live
+   operation of each type may target the same menu, so two bundles
+   cannot overwrite each other. Unlink restores that snapshot. Hide,
+   label, widget, groups and modifier operations on a view node are
+   exclusive the same way: only one live operation of each type may
+   target the same anchor, so two bundles cannot compile two inherits
+   for the same hide. Placing the same field twice on the same view is
+   refused the same way.
 
 Generated field names always start with ``x_esc_`` and cannot contain
 ``__``. Selection fields take one option per line as ``value:Label``.
 Monetary fields need ``currency_id`` or ``x_currency_id`` on the model,
 or a currency field name in the payload.
+
+Known issues / Roadmap
+======================
+
+Known gaps. Proposals are welcome.
+
+- Calendar, graph, pivot and gantt views are not outlined or compiled.
+- Free XPath anchors stay in the model for export compatibility but are
+  not offered in the systray dialog.
+- Kanban header and progressbar nodes are not semantic anchors yet.
+
+Changelog
+=========
+
+18.0.1.0.0
+----------
+
+First public Beta.
+
+- Ledger of semantic operations compiled to ``x_esc_*`` fields,
+  inherited views and writes on standard ``ir.ui.menu`` records.
+- Systray customization mode for form, list, kanban, search and navbar
+  menus.
+- Health check on module update; generated XML IDs belong to the bundle
+  ``code``.
+- Exclusive live writes per menu type, view-anchor attribute type and
+  place of the same field on one view.
+- Export as a standalone addon ZIP that does not depend on this ledger.
 
 Bug Tracker
 ===========
