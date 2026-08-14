@@ -1390,6 +1390,11 @@ msgid "Restrict to groups"
 msgstr "Restringir a grupos"
 
 #. module: escodoo_customization
+#: model:customization.bundle,name:escodoo_customization.bundle_sandbox
+msgid "Sandbox"
+msgstr "Sandbox"
+
+#. module: escodoo_customization
 #: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__view_type__search
 msgid "Search"
 msgstr "Pesquisa"

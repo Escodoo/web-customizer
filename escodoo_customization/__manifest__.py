@@ -15,6 +15,7 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "data/customization_bundle_data.xml",
         "views/customization_operation_views.xml",
         "views/customization_bundle_views.xml",
         "views/menu.xml",

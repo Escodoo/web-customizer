@@ -10,6 +10,12 @@ from .common import CustomizationCase
 
 @tagged("post_install", "-at_install")
 class TestCustomizationLedger(CustomizationCase):
+    def test_install_creates_sandbox_bundle(self):
+        bundle = self.env.ref("escodoo_customization.bundle_sandbox")
+        self.assertEqual(bundle.code, "sandbox")
+        self.assertFalse(bundle.operation_ids)
+        self.assertEqual(bundle.state, "draft")
+
     def test_bundle_code_constraint(self):
         with self.assertRaises(ValidationError):
             self._create_bundle(code="Invalid-Code")

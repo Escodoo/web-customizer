@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="bundle_sandbox" model="customization.bundle">
+        <field name="name">Sandbox</field>
+        <field name="code">sandbox</field>
+    </record>
+</odoo>

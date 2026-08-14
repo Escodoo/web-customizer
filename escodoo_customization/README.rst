@@ -76,7 +76,8 @@ database (``-i`` on a new database, ``-u`` afterwards).
 
 Developer mode is required to open **Settings → Technical →
 Customization**. Assign **Customization / Manager** to consultants who
-will compile or export bundles.
+will compile or export bundles. Install creates an empty **Sandbox**
+bundle so the wand has a target without a manual create.
 
 Configuration
 =============
@@ -106,10 +107,12 @@ Usage
 =====
 
 1. Go to **Settings → Technical → Customization → Bundles** (debug
-   mode).
-2. Create a bundle (``code`` is the future addon technical name, for
-   example ``client_acme``).
-3. On any form, list, kanban or search view, click the magic-wand icon
+   mode). Install creates an empty **Sandbox** bundle (``code``
+   ``sandbox``) so the wand can be tried immediately. Create a real
+   bundle (``client_acme``) before shipping; rename ``code`` before the
+   first Apply, or **Re-apply** after renaming so XML IDs follow the new
+   code.
+2. On any form, list, kanban or search view, click the magic-wand icon
    in the systray (customization managers). Fields, page tabs, group
    titles and named buttons are outlined on forms; list column headers,
    kanban card fields and buttons, kanban header buttons, column
@@ -132,10 +135,10 @@ Usage
    same name appears more than once, choose the node in the dialog. A
    new page after a field is wrapped in a notebook; a new page after an
    existing tab is a sibling.
-4. Or add operations from the bundle form. Fill the payload fields for
+3. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
-5. Click **Apply** to compile fields and inherited views.
-6. After an Odoo upgrade (``-u``), a health check runs automatically and
+4. Click **Apply** to compile fields and inherited views.
+5. After an Odoo upgrade (``-u``), a health check runs automatically and
    re-resolves anchors. You can still click **Health Check** on the
    bundle. Missing anchors are marked broken (inherit deactivated) and
    show ``broken_reason``. If the anchor comes back, Health Check
@@ -143,7 +146,7 @@ Usage
    still recompiles every live operation. Changing an ``add_field`` type
    or relation recreates the field and deletes values already stored in
    that column (label, help and required update in place).
-7. When the bundle is applied, click **Export Addon**. In the dialog,
+6. When the bundle is applied, click **Export Addon**. In the dialog,
    click **Download ZIP** and put that module in git; it does not depend
    on this ledger at runtime. Compiled fields, views and menus store
    their XML IDs under the bundle ``code`` (the future addon name).
@@ -159,7 +162,7 @@ Usage
    refused the same way.
 
 Single-company pilot
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 Use one company. Cover the surfaces below, then ship the ZIP — do not
 leave this ledger as the production runtime.
@@ -174,9 +177,8 @@ leave this ledger as the production runtime.
 6. Click **Apply**. Broken operations show ``broken_reason``; fix the
    anchor and run **Health Check** (or **Re-apply**).
 7. Click **Export Addon** → **Download ZIP**.
-8. Install that module on staging (``-i <bundle.code>``). Do not
-   install ``escodoo_customization`` there unless the wand is still
-   needed.
+8. Install that module on staging (``-i <bundle.code>``). Do not install
+   ``escodoo_customization`` there unless the wand is still needed.
 
 Calendar, graph, pivot and gantt stay out of this pilot.
 

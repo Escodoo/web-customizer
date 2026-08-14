@@ -4,4 +4,5 @@ database (``-i`` on a new database, ``-u`` afterwards).
 
 Developer mode is required to open **Settings → Technical →
 Customization**. Assign **Customization / Manager** to consultants who
-will compile or export bundles.
+will compile or export bundles. Install creates an empty **Sandbox**
+bundle so the wand has a target without a manual create.
