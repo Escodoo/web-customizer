@@ -4,7 +4,8 @@
 3. On any form, list, kanban or search view, click the magic-wand icon in the
    systray (customization managers). Fields, page tabs, group titles and
    named buttons are outlined on forms; list column headers, kanban card
-   fields and buttons, and search fields are outlined on those views.
+   fields and buttons, kanban header buttons, column progressbars, and
+   search fields are outlined on those views.
    Navbar menus
    (apps and sections with an XML ID) are also outlined. Click one to add a
    **new** field after it (or **inside** a page or group), **place an

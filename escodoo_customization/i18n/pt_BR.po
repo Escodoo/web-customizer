@@ -587,8 +587,8 @@ msgstr "Personalização aplicada."
 #. module: escodoo_customization
 #. odoo-javascript
 #: code:addons/escodoo_customization/static/src/customization_service.js:0
-msgid "Customization mode is on. Click a field, page, group, button, list column, kanban card field or button, search field or menu."
-msgstr "O modo de personalização está ativo. Clique em um campo, página, grupo, botão, coluna de lista, campo ou botão do kanban, campo de pesquisa ou menu."
+msgid "Customization mode is on. Click a field, page, group, button, list column, kanban card field or button, kanban header button, progressbar, search field or menu."
+msgstr "O modo de personalização está ativo. Clique em um campo, página, grupo, botão, coluna de lista, campo ou botão do kanban, botão do cabeçalho do kanban, barra de progresso, campo de pesquisa ou menu."
 
 #. module: escodoo_customization
 #. odoo-javascript
@@ -893,6 +893,12 @@ msgstr "Ocultar este botão"
 #: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
 msgid "Hide this field"
 msgstr "Ocultar este campo"
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+msgid "Hide this progressbar"
+msgstr "Ocultar esta barra de progresso"
 
 #. module: escodoo_customization
 #. odoo-javascript
@@ -1881,3 +1887,14 @@ msgid ""
 msgstr ""
 "Etiqueta opcional para filtrar este pacote. Campos, views e "
 "menus compilados continuam globais; não são isolados por empresa."
+
+#. module: escodoo_customization
+#. odoo-python
+#: code:addons/escodoo_customization/models/customization_bundle.py:0
+msgid "A progressbar can only be hidden."
+msgstr "Uma barra de progresso só pode ser ocultada."
+
+#. module: escodoo_customization
+#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__progressbar
+msgid "Progressbar"
+msgstr "Barra de progresso"

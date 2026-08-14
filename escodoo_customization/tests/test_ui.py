@@ -543,6 +543,68 @@ class TestCustomizationUiApi(CustomizationCase):
             hide.generated_view_id.arch,
         )
 
+    def test_create_from_ui_hide_kanban_header_button(self):
+        bundle = self._create_bundle(code="client_ui_kanban_header")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.board_kanban_view.id,
+                "view_type": "kanban",
+                "anchor_kind": "button",
+                "anchor_name": "toggle_active",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.anchor_kind, "button")
+        self.assertIn(
+            '<button name="toggle_active" position="attributes">',
+            hide.generated_view_id.arch,
+        )
+
+    def test_create_from_ui_hide_kanban_progressbar(self):
+        bundle = self._create_bundle(code="client_ui_kanban_progress")
+        result = self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.board_kanban_view.id,
+                "view_type": "kanban",
+                "anchor_kind": "progressbar",
+                "anchor_name": "company_type",
+                "apply": True,
+            }
+        )
+        self.assertFalse(result["broken"])
+        hide = bundle.operation_ids
+        self.assertEqual(hide.anchor_kind, "progressbar")
+        self.assertIn(
+            "expr=\"//progressbar[@field='company_type']\"",
+            hide.generated_view_id.arch,
+        )
+        self.assertNotIn("progressbar", self.board_kanban_view.get_combined_arch())
+
+    def test_create_from_ui_progressbar_rejects_rename(self):
+        bundle = self._create_bundle(code="client_ui_kanban_progress_rename")
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].create_from_ui(
+                {
+                    "bundle_id": bundle.id,
+                    "action": "rename",
+                    "model": "res.partner",
+                    "view_id": self.board_kanban_view.id,
+                    "view_type": "kanban",
+                    "anchor_kind": "progressbar",
+                    "anchor_name": "company_type",
+                    "payload": {"string": "Status"},
+                    "apply": True,
+                }
+            )
+
     def test_create_from_ui_hide_kanban_button_type(self):
         bundle = self._create_bundle(code="client_ui_kanban_edit")
         result = self.env["customization.bundle"].create_from_ui(

@@ -177,6 +177,9 @@ export class CustomizationFieldDialog extends Component {
                 {value: "set_modifier", label: _t("Set modifiers")},
             ];
         }
+        if (this.anchorKind === "progressbar") {
+            return [{value: "hide", label: _t("Hide this progressbar")}];
+        }
         if (this.anchorKind === "menu") {
             return [
                 {value: "hide", label: _t("Hide this menu")},
@@ -185,7 +188,10 @@ export class CustomizationFieldDialog extends Component {
                 {value: "add_menu", label: _t("Add menu after this one")},
                 {value: "add_submenu", label: _t("Add submenu")},
                 {value: "move_menu", label: _t("Move after another menu")},
-                {value: "move_as_submenu", label: _t("Move as submenu of another menu")},
+                {
+                    value: "move_as_submenu",
+                    label: _t("Move as submenu of another menu"),
+                },
             ];
         }
         const fieldActions = [

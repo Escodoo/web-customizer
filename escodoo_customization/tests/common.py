@@ -65,6 +65,34 @@ class CustomizationCase(TransactionCase):
                 """,
             }
         )
+        cls.board_kanban_view = cls.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.kanban.board",
+                "model": "res.partner",
+                "type": "kanban",
+                "arch": """
+                    <kanban default_group_by="company_type">
+                        <header>
+                            <button
+                                name="toggle_active"
+                                type="object"
+                                string="Archive"
+                                display="always"
+                            />
+                        </header>
+                        <progressbar
+                            field="company_type"
+                            colors='{"person": "success", "company": "warning"}'
+                        />
+                        <templates>
+                            <t t-name="card">
+                                <field name="name"/>
+                            </t>
+                        </templates>
+                    </kanban>
+                """,
+            }
+        )
         cls.search_view = cls.env["ir.ui.view"].create(
             {
                 "name": "customization.tester.partner.search",

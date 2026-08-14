@@ -1,6 +1,8 @@
+import {useEffect} from "@odoo/owl";
 import {combineAttributes} from "@web/core/utils/xml";
 import {patch} from "@web/core/utils/patch";
 import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
+import {KanbanHeader} from "@web/views/kanban/kanban_header";
 import {KanbanRecord} from "@web/views/kanban/kanban_record";
 import {
     isKanbanRoot,
@@ -89,5 +91,43 @@ patch(KanbanRecord.prototype, {
         if (typeof original === "function") {
             original();
         }
+    },
+});
+
+patch(KanbanHeader.prototype, {
+    setup() {
+        super.setup(...arguments);
+        this.customization = useCustomizationService();
+        useEffect(
+            () => {
+                const el = this.rootRef?.el;
+                if (!el) {
+                    return;
+                }
+                const onClick = (ev) => this.onCustomizationProgressClick(ev);
+                el.addEventListener("click", onClick, true);
+                return () => el.removeEventListener("click", onClick, true);
+            },
+            () => [this.rootRef?.el]
+        );
+    },
+    onCustomizationProgressClick(ev) {
+        if (!this.customization?.state.enabled || !isKanbanRoot(this)) {
+            return;
+        }
+        const counter = ev.target.closest(".o_kanban_counter");
+        if (!counter || !this.rootRef?.el.contains(counter)) {
+            return;
+        }
+        const fieldName = this.props.progressBarState?.progressAttributes?.fieldName;
+        if (!fieldName) {
+            return;
+        }
+        openCustomizationFor(this, fieldName, ev, {
+            viewType: "kanban",
+            anchorKind: "progressbar",
+            fieldLabel: fieldName,
+            model: this.props.list?.resModel,
+        });
     },
 });

@@ -11,3 +11,4 @@ First public Beta.
 - Exclusive live writes per menu type, view-anchor attribute type and
   place of the same field on one view.
 - Export as a standalone addon ZIP that does not depend on this ledger.
+- Kanban header buttons and column progressbars are semantic anchors.

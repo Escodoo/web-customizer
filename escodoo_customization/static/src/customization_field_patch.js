@@ -5,6 +5,7 @@ import {FormCompiler} from "@web/views/form/form_compiler";
 import {InnerGroup, OuterGroup} from "@web/views/form/form_group/form_group";
 import {FormLabel} from "@web/views/form/form_label";
 import {toStringExpression} from "@web/views/utils";
+import {MultiRecordViewButton} from "@web/views/view_button/multi_record_view_button";
 import {ViewButton} from "@web/views/view_button/view_button";
 import {
     isFormRootField,
@@ -114,6 +115,24 @@ patch(ViewButton.prototype, {
             return;
         }
         return super.onClick(ev);
+    },
+});
+
+patch(MultiRecordViewButton.prototype, {
+    async onClick(ev) {
+        const anchor = viewButtonAnchor(this);
+        if (
+            anchor &&
+            openCustomizationFor(this, anchor, ev, {
+                viewType: this.env.config?.viewType,
+                anchorKind: "button",
+                fieldLabel: this.props.string || anchor,
+                model: this.props.list?.resModel,
+            })
+        ) {
+            return;
+        }
+        return super.onClick(...arguments);
     },
 });
 

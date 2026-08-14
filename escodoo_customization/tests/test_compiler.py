@@ -595,6 +595,58 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertIn("expr=\"//button[@type='edit']\"", generated)
         self.assertIn('<attribute name="invisible">True</attribute>', generated)
 
+    def test_hide_kanban_header_button(self):
+        bundle = self._create_bundle(
+            code="client_kanban_header",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": self.board_kanban_view.id,
+                        "view_type": "kanban",
+                        "anchor_kind": "button",
+                        "anchor_name": "toggle_active",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn(
+            '<button name="toggle_active" position="attributes">',
+            generated,
+        )
+        self.assertIn('<attribute name="invisible">True</attribute>', generated)
+
+    def test_hide_kanban_progressbar(self):
+        bundle = self._create_bundle(
+            code="client_kanban_progress",
+            operations=[
+                Command.create(
+                    {
+                        "type": "hide_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "view_id": self.board_kanban_view.id,
+                        "view_type": "kanban",
+                        "anchor_kind": "progressbar",
+                        "anchor_name": "company_type",
+                        "payload": {},
+                    }
+                ),
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        generated = bundle.operation_ids.generated_view_id.arch
+        self.assertIn("expr=\"//progressbar[@field='company_type']\"", generated)
+        self.assertIn('position="replace"', generated)
+        self.assertNotIn("progressbar", self.board_kanban_view.get_combined_arch())
+
     def test_place_field_on_search_view(self):
         bundle = self._create_bundle(
             code="client_search",

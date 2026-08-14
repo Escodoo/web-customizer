@@ -381,14 +381,15 @@ views. Applied bundles can be <strong>exported</strong> as a plain Odoo addon to
 version in git.</p>
 <p>Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
-list column header, a kanban card field or button, or a search field to
-add a field, place an existing field, add a notebook page or group, hide
-it, change its label, set a widget, restrict it to groups, or set
-modifiers. Click a navbar menu to hide it, rename it, restrict it to
-groups, add a sibling or submenu (bound to a window action with an XML
-ID), or move it after another menu or as a submenu. Duplicate names (for
-example two <tt class="docutils literal">email</tt> fields) are chosen in the dialog. That writes the
-same ledger operations as the backend form.</p>
+list column header, a kanban card field or button, a kanban header
+button or progressbar, or a search field to add a field, place an
+existing field, add a notebook page or group, hide it, change its label,
+set a widget, restrict it to groups, or set modifiers. Click a navbar
+menu to hide it, rename it, restrict it to groups, add a sibling or
+submenu (bound to a window action with an XML ID), or move it after
+another menu or as a submenu. Duplicate names (for example two <tt class="docutils literal">email</tt>
+fields) are chosen in the dialog. That writes the same ledger operations
+as the backend form.</p>
 <p>On module update (<tt class="docutils literal"><span class="pre">-u</span></tt>), a health check re-resolves anchors
 automatically. Missing anchors are marked <tt class="docutils literal">broken</tt> with a reason;
 other operations are left intact. Customizations never disappear
@@ -464,25 +465,26 @@ example <tt class="docutils literal">client_acme</tt>).</li>
 <li>On any form, list, kanban or search view, click the magic-wand icon
 in the systray (customization managers). Fields, page tabs, group
 titles and named buttons are outlined on forms; list column headers,
-kanban card fields and buttons, and search fields are outlined on
-those views. Navbar menus (apps and sections with an XML ID) are also
-outlined. Click one to add a <strong>new</strong> field after it (or <strong>inside</strong> a
-page or group), <strong>place an existing field</strong>, add a <strong>page</strong> or
-<strong>group</strong>, hide it, change its label, set a widget, restrict it to
-groups (search by name), or set modifiers (invisible / readonly /
-required). Click a <strong>menu</strong> to hide it, rename it, restrict it to
-groups, add a <strong>sibling menu</strong> after it, add a <strong>submenu</strong>, or
-<strong>move</strong> it after another menu or as a submenu. New menus need a
-window action that already has an XML ID. The destination of a move
-must also have an XML ID. The clicked node is the semantic anchor. To
-mirror another field, fill <strong>Related path</strong> (for example
-<tt class="docutils literal">parent_id.email</tt>) instead of a field type. Pages and groups
-without a technical <tt class="docutils literal">name</tt> are anchored by their title (stored on
-the operation; the generated inherit xpath uses a unique field inside
-the node or the node position, because Odoo forbids <tt class="docutils literal">&#64;string</tt>
-selectors). If the same name appears more than once, choose the node
-in the dialog. A new page after a field is wrapped in a notebook; a
-new page after an existing tab is a sibling.</li>
+kanban card fields and buttons, kanban header buttons, column
+progressbars, and search fields are outlined on those views. Navbar
+menus (apps and sections with an XML ID) are also outlined. Click one
+to add a <strong>new</strong> field after it (or <strong>inside</strong> a page or group),
+<strong>place an existing field</strong>, add a <strong>page</strong> or <strong>group</strong>, hide it,
+change its label, set a widget, restrict it to groups (search by
+name), or set modifiers (invisible / readonly / required). Click a
+<strong>menu</strong> to hide it, rename it, restrict it to groups, add a
+<strong>sibling menu</strong> after it, add a <strong>submenu</strong>, or <strong>move</strong> it after
+another menu or as a submenu. New menus need a window action that
+already has an XML ID. The destination of a move must also have an
+XML ID. The clicked node is the semantic anchor. To mirror another
+field, fill <strong>Related path</strong> (for example <tt class="docutils literal">parent_id.email</tt>)
+instead of a field type. Pages and groups without a technical
+<tt class="docutils literal">name</tt> are anchored by their title (stored on the operation; the
+generated inherit xpath uses a unique field inside the node or the
+node position, because Odoo forbids <tt class="docutils literal">&#64;string</tt> selectors). If the
+same name appears more than once, choose the node in the dialog. A
+new page after a field is wrapped in a notebook; a new page after an
+existing tab is a sibling.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
 the selected type. The <strong>Raw JSON</strong> tab shows the stored intent.</li>
 <li>Click <strong>Apply</strong> to compile fields and inherited views.</li>
@@ -517,7 +519,6 @@ or a currency field name in the payload.</p>
 <li>Calendar, graph, pivot and gantt views are not outlined or compiled.</li>
 <li>Free XPath anchors stay in the model for export compatibility but are
 not offered in the systray dialog.</li>
-<li>Kanban header and progressbar nodes are not semantic anchors yet.</li>
 </ul>
 </div>
 <div class="section" id="changelog">
@@ -535,6 +536,7 @@ menus.</li>
 <li>Exclusive live writes per menu type, view-anchor attribute type and
 place of the same field on one view.</li>
 <li>Export as a standalone addon ZIP that does not depend on this ledger.</li>
+<li>Kanban header buttons and column progressbars are semantic anchors.</li>
 </ul>
 </div>
 </div>

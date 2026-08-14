@@ -29,12 +29,13 @@ SUPPORTED_TTYPES = (
     "binary",
     "monetary",
 )
-SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group")
+SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group", "progressbar")
 ANCHOR_TAGS = {
     "field": "field",
     "page": "page",
     "button": "button",
     "group": "group",
+    "progressbar": "progressbar",
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
 STRUCTURE_TYPES = ("add_page", "add_group")
@@ -345,7 +346,8 @@ def _anchor_nodes(arch_tree, tag, anchor_name, anchor_string=None):
     if name:
         if not re.match(r"^[\w.]+$", name):
             return []
-        nodes = arch_tree.xpath(f"//{tag}[@name='{name}']")
+        attr = "field" if tag == "progressbar" else "name"
+        nodes = arch_tree.xpath(f"//{tag}[@{attr}='{name}']")
         if nodes or tag != "button" or name not in BUTTON_TYPE_ANCHORS:
             return nodes
         return arch_tree.xpath(f"//{tag}[@type='{name}']")
@@ -1123,6 +1125,14 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
             f'<xpath expr="{_xml_attr(type_expr)}" position="{position}">'
             f"{inner_xml}</xpath>"
         )
+    if tag == "progressbar":
+        expr = f"//progressbar[@field='{anchor}']"
+        if occurrence:
+            expr = f"({expr})[{int(occurrence)}]"
+        return (
+            f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
+            f"{inner_xml}</xpath>"
+        )
     if occurrence:
         expr = f"(//{tag}[@name='{anchor}'])[{int(occurrence)}]"
         return f'<xpath expr="{expr}" position="{position}">{inner_xml}</xpath>'
@@ -1239,6 +1249,11 @@ def _apply_attributes(operation):
             if key in modifiers:
                 parts.append(_attribute_xml(key, modifiers[key]))
     elif operation.type == "hide_field":
+        if (operation.anchor_kind or "field") == "progressbar":
+            # The kanban parser ignores invisible on <progressbar>; drop the node.
+            arch = _inherit_arch(operation, "", "replace")
+            _upsert_generated_view(operation, arch, active=True)
+            return
         attr = "column_invisible" if operation.view_type == "list" else "invisible"
         parts.append(_attribute_xml(attr, "True"))
     arch = _inherit_arch(operation, "".join(parts), "attributes")

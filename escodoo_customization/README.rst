@@ -35,14 +35,15 @@ version in git.
 
 Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
-list column header, a kanban card field or button, or a search field to
-add a field, place an existing field, add a notebook page or group, hide
-it, change its label, set a widget, restrict it to groups, or set
-modifiers. Click a navbar menu to hide it, rename it, restrict it to
-groups, add a sibling or submenu (bound to a window action with an XML
-ID), or move it after another menu or as a submenu. Duplicate names (for
-example two ``email`` fields) are chosen in the dialog. That writes the
-same ledger operations as the backend form.
+list column header, a kanban card field or button, a kanban header
+button or progressbar, or a search field to add a field, place an
+existing field, add a notebook page or group, hide it, change its label,
+set a widget, restrict it to groups, or set modifiers. Click a navbar
+menu to hide it, rename it, restrict it to groups, add a sibling or
+submenu (bound to a window action with an XML ID), or move it after
+another menu or as a submenu. Duplicate names (for example two ``email``
+fields) are chosen in the dialog. That writes the same ledger operations
+as the backend form.
 
 On module update (``-u``), a health check re-resolves anchors
 automatically. Missing anchors are marked ``broken`` with a reason;
@@ -111,25 +112,26 @@ Usage
 3. On any form, list, kanban or search view, click the magic-wand icon
    in the systray (customization managers). Fields, page tabs, group
    titles and named buttons are outlined on forms; list column headers,
-   kanban card fields and buttons, and search fields are outlined on
-   those views. Navbar menus (apps and sections with an XML ID) are also
-   outlined. Click one to add a **new** field after it (or **inside** a
-   page or group), **place an existing field**, add a **page** or
-   **group**, hide it, change its label, set a widget, restrict it to
-   groups (search by name), or set modifiers (invisible / readonly /
-   required). Click a **menu** to hide it, rename it, restrict it to
-   groups, add a **sibling menu** after it, add a **submenu**, or
-   **move** it after another menu or as a submenu. New menus need a
-   window action that already has an XML ID. The destination of a move
-   must also have an XML ID. The clicked node is the semantic anchor. To
-   mirror another field, fill **Related path** (for example
-   ``parent_id.email``) instead of a field type. Pages and groups
-   without a technical ``name`` are anchored by their title (stored on
-   the operation; the generated inherit xpath uses a unique field inside
-   the node or the node position, because Odoo forbids ``@string``
-   selectors). If the same name appears more than once, choose the node
-   in the dialog. A new page after a field is wrapped in a notebook; a
-   new page after an existing tab is a sibling.
+   kanban card fields and buttons, kanban header buttons, column
+   progressbars, and search fields are outlined on those views. Navbar
+   menus (apps and sections with an XML ID) are also outlined. Click one
+   to add a **new** field after it (or **inside** a page or group),
+   **place an existing field**, add a **page** or **group**, hide it,
+   change its label, set a widget, restrict it to groups (search by
+   name), or set modifiers (invisible / readonly / required). Click a
+   **menu** to hide it, rename it, restrict it to groups, add a
+   **sibling menu** after it, add a **submenu**, or **move** it after
+   another menu or as a submenu. New menus need a window action that
+   already has an XML ID. The destination of a move must also have an
+   XML ID. The clicked node is the semantic anchor. To mirror another
+   field, fill **Related path** (for example ``parent_id.email``)
+   instead of a field type. Pages and groups without a technical
+   ``name`` are anchored by their title (stored on the operation; the
+   generated inherit xpath uses a unique field inside the node or the
+   node position, because Odoo forbids ``@string`` selectors). If the
+   same name appears more than once, choose the node in the dialog. A
+   new page after a field is wrapped in a notebook; a new page after an
+   existing tab is a sibling.
 4. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
 5. Click **Apply** to compile fields and inherited views.
@@ -165,7 +167,6 @@ Known gaps. Proposals are welcome.
 - Calendar, graph, pivot and gantt views are not outlined or compiled.
 - Free XPath anchors stay in the model for export compatibility but are
   not offered in the systray dialog.
-- Kanban header and progressbar nodes are not semantic anchors yet.
 
 Changelog
 =========
@@ -184,6 +185,7 @@ First public Beta.
 - Exclusive live writes per menu type, view-anchor attribute type and
   place of the same field on one view.
 - Export as a standalone addon ZIP that does not depend on this ledger.
+- Kanban header buttons and column progressbars are semantic anchors.
 
 Bug Tracker
 ===========

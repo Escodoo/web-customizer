@@ -244,7 +244,12 @@ class CustomizationBundle(models.Model):
             )
         if action == "set_widget" and anchor_kind != "field":
             raise UserError(self.env._("Widgets can only be set on fields."))
-        if action in ("add_after", "place_after") and anchor_kind == "button":
+        if action != "hide" and anchor_kind == "progressbar":
+            raise UserError(self.env._("A progressbar can only be hidden."))
+        if action in ("add_after", "place_after") and anchor_kind in (
+            "button",
+            "progressbar",
+        ):
             raise UserError(
                 self.env._("Place a field on a page or after another field.")
             )
@@ -253,7 +258,7 @@ class CustomizationBundle(models.Model):
                 raise UserError(
                     self.env._("Pages and groups can only be added on forms.")
                 )
-            if anchor_kind == "button":
+            if anchor_kind in ("button", "progressbar"):
                 raise UserError(
                     self.env._("Place a page or group on a field, page or group.")
                 )

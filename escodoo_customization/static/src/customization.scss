@@ -36,6 +36,17 @@ th.o_esc_customization_target,
     width: 100%;
 }
 
+body.o_esc_customization_mode .o_kanban_counter {
+    outline: 1px dashed #714b67 !important;
+    outline-offset: -1px;
+    cursor: pointer !important;
+}
+
+body.o_esc_customization_mode .o_kanban_counter:hover {
+    outline: 2px solid #714b67 !important;
+    background-color: rgba(113, 75, 103, 0.08);
+}
+
 body.o_esc_customization_mode .o_menu_brand,
 body.o_esc_customization_mode .o_nav_entry,
 body.o_esc_customization_mode .o_menu_sections [data-menu-xmlid],

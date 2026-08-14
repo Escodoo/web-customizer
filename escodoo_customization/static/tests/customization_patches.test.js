@@ -23,8 +23,17 @@ class Partner extends models.Model {
 
     name = fields.Char();
     email = fields.Char();
+    state = fields.Selection({
+        selection: [
+            ["draft", "Draft"],
+            ["done", "Done"],
+        ],
+    });
 
-    _records = [{id: 1, name: "Ada", email: "ada@example.com"}];
+    _records = [
+        {id: 1, name: "Ada", email: "ada@example.com", state: "draft"},
+        {id: 2, name: "Bob", email: "bob@example.com", state: "done"},
+    ];
 }
 
 class Users extends models.Model {
@@ -162,6 +171,50 @@ test("KanbanCompiler marks span fields and type-only buttons", () => {
     expect(html).toMatch("onCustomizationButtonClick");
 });
 
+test("kanban header button opens the dialog", async () => {
+    enableCustomization();
+    await mountView({
+        type: "kanban",
+        resModel: "partner",
+        arch: `
+            <kanban>
+                <header>
+                    <button name="toggle_active" type="object" string="Archive" display="always"/>
+                </header>
+                <templates>
+                    <t t-name="card">
+                        <field name="name"/>
+                    </t>
+                </templates>
+            </kanban>`,
+    });
+    expect(".o_control_panel button[name=toggle_active]").toHaveClass(
+        "o_esc_customization_target"
+    );
+    await contains(".o_control_panel button[name=toggle_active]").click();
+    expect.verifySteps(["button:toggle_active"]);
+});
+
+test("kanban progressbar opens the dialog", async () => {
+    enableCustomization();
+    await mountView({
+        type: "kanban",
+        resModel: "partner",
+        arch: `
+            <kanban default_group_by="state">
+                <progressbar field="state" colors='{"draft": "success", "done": "warning"}'/>
+                <templates>
+                    <t t-name="card">
+                        <field name="name"/>
+                    </t>
+                </templates>
+            </kanban>`,
+    });
+    expect(".o_kanban_counter").toHaveCount(2);
+    await contains(".o_kanban_counter").click();
+    expect.verifySteps(["progressbar:state"]);
+});
+
 test("kanban card field and type-only button open the dialog", async () => {
     enableCustomization();
     await mountView({
@@ -180,7 +233,7 @@ test("kanban card field and type-only button open the dialog", async () => {
     expect(".o_kanban_record:not(.o_kanban_ghost)").toHaveClass(
         "o_esc_customization_mode"
     );
-    expect(".o_kanban_record .o_esc_kanban_field").toHaveCount(1);
+    expect(".o_kanban_record .o_esc_kanban_field").toHaveCount(2);
     await contains(".o_kanban_record .o_esc_kanban_field").click();
     expect.verifySteps(["field:name"]);
     await contains(".o_kanban_record .o_esc_kanban_button").click();

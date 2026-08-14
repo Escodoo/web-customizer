@@ -125,6 +125,7 @@ class CustomizationOperation(models.Model):
             ("page", "Page"),
             ("button", "Button"),
             ("group", "Group"),
+            ("progressbar", "Progressbar"),
             ("menu", "Menu"),
             ("xpath", "XPath"),
         ],
