@@ -117,6 +117,12 @@ export class CustomizationFieldDialog extends Component {
         });
     }
 
+    get ttypeDataLossHint() {
+        return _t(
+            "Changing this type later and clicking Re-apply deletes values already stored in the field."
+        );
+    }
+
     get title() {
         const label = this.props.fieldLabel || this.props.fieldName;
         if (this.anchorKind === "page") {

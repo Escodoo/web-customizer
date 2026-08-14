@@ -33,6 +33,7 @@
                         name="action_reapply"
                         type="object"
                         string="Re-apply"
+                        confirm="Re-apply recreates a field if its type or relation changed. Existing values in that column are deleted."
                         groups="escodoo_customization.group_customization_manager"
                     />
                     <button

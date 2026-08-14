@@ -770,6 +770,21 @@ msgid "Field Type"
 msgstr ""
 
 #. module: escodoo_customization
+#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_ttype
+msgid ""
+"Changing the type and clicking Re-apply deletes values already stored in "
+"this field."
+msgstr ""
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+msgid ""
+"Changing this type later and clicking Re-apply deletes values already stored "
+"in the field."
+msgstr ""
+
+#. module: escodoo_customization
 #. odoo-python
 #: code:addons/escodoo_customization/models/compiler.py:0
 msgid ""
@@ -1285,6 +1300,13 @@ msgstr ""
 #. module: escodoo_customization
 #: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
 msgid "Re-apply"
+msgstr ""
+
+#. module: escodoo_customization
+#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
+msgid ""
+"Re-apply recreates a field if its type or relation changed. Existing values "
+"in that column are deleted."
 msgstr ""
 
 #. module: escodoo_customization

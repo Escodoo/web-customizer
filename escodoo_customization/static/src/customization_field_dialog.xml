@@ -70,6 +70,7 @@
                                 />
                             </t>
                         </select>
+                        <div class="form-text text-warning" t-esc="ttypeDataLossHint" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Label</label>

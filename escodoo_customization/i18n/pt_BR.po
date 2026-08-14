@@ -760,6 +760,25 @@ msgid "Field Type"
 msgstr "Tipo de campo"
 
 #. module: escodoo_customization
+#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_ttype
+msgid ""
+"Changing the type and clicking Re-apply deletes values already stored in "
+"this field."
+msgstr ""
+"Alterar o tipo e clicar em Reaplicar apaga os valores já gravados neste "
+"campo."
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+msgid ""
+"Changing this type later and clicking Re-apply deletes values already stored "
+"in the field."
+msgstr ""
+"Alterar este tipo depois e clicar em Reaplicar apaga os valores já gravados "
+"no campo."
+
+#. module: escodoo_customization
 #. odoo-python
 #: code:addons/escodoo_customization/models/compiler.py:0
 msgid "Field name '%s' is invalid. Use lowercase letters, digits and single underscores after the x_esc_ prefix."
@@ -1280,6 +1299,15 @@ msgstr "JSON bruto"
 #: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
 msgid "Re-apply"
 msgstr "Reaplicar"
+
+#. module: escodoo_customization
+#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
+msgid ""
+"Re-apply recreates a field if its type or relation changed. Existing values "
+"in that column are deleted."
+msgstr ""
+"Reaplicar recria o campo se o tipo ou a relação mudou. Os valores já "
+"gravados nessa coluna são apagados."
 
 #. module: escodoo_customization
 #. odoo-javascript

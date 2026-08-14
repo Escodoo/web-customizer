@@ -166,6 +166,8 @@ class CustomizationOperation(models.Model):
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
         string="Field Type",
+        help="Changing the type and clicking Re-apply deletes values "
+        "already stored in this field.",
     )
     payload_string = fields.Char(
         compute="_compute_payload_ui",
