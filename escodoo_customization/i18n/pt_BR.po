@@ -534,6 +534,18 @@ msgstr "Criar um pacote de personalização"
 #. module: escodoo_customization
 #. odoo-javascript
 #: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+msgid "Could not apply customization."
+msgstr "Não foi possível aplicar a personalização."
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+msgid "Could not load customization context."
+msgstr "Não foi possível carregar o contexto de personalização."
+
+#. module: escodoo_customization
+#. odoo-javascript
+#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
 msgid "Create a customization bundle first."
 msgstr "Crie primeiro um pacote de personalização."
 

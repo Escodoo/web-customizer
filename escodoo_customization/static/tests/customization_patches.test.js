@@ -1,5 +1,6 @@
 import {expect, test} from "@odoo/hoot";
 import {animationFrame} from "@odoo/hoot-mock";
+import {CustomizationFieldDialog} from "@escodoo_customization/customization_field_dialog";
 import {customizationService} from "@escodoo_customization/customization_service";
 import {user} from "@web/core/user";
 import {
@@ -8,6 +9,7 @@ import {
     defineModels,
     fields,
     getService,
+    makeDialogMockEnv,
     mockService,
     models,
     mountView,
@@ -401,4 +403,51 @@ test("banner appears in customization mode and Exit turns it off", async () => {
     expect(".o_esc_customization_banner_title").toHaveText("Customization mode");
     await contains(".o_esc_customization_banner_exit").click();
     expect(".o_esc_customization_banner").toHaveCount(0);
+});
+
+test("dialog reports RPC failures and stays open", async () => {
+    mockService("notification", {
+        add(message, options) {
+            expect.step(`${options.type}:${message}`);
+        },
+    });
+    mockService("orm", {
+        async call(model, method) {
+            if (method === "get_ui_context") {
+                return {
+                    bundles: [{id: 1, name: "Sandbox"}],
+                    anchor_count: 1,
+                    anchor_unique: true,
+                    candidates: [],
+                };
+            }
+            if (method === "create_from_ui") {
+                const error = new Error("Could not apply customization.");
+                error.data = {message: "Could not apply customization."};
+                throw error;
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+        async read() {
+            return [];
+        },
+    });
+    const env = await makeDialogMockEnv();
+    await mountWithCleanup(CustomizationFieldDialog, {
+        env,
+        props: {
+            close() {
+                expect.step("close");
+            },
+            fieldName: "email",
+            fieldLabel: "Email",
+            model: "res.partner",
+            viewId: 1,
+            viewType: "form",
+        },
+    });
+    expect(".o_esc_customization_dialog").toHaveCount(1);
+    await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps(["danger:Could not apply customization."]);
+    expect(".o_esc_customization_dialog").toHaveCount(1);
 });

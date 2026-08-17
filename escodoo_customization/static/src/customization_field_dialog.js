@@ -95,24 +95,36 @@ export class CustomizationFieldDialog extends Component {
             candidates: [],
             anchorIndex: 0,
             anchorPage: "",
+            loadError: "",
         });
         onWillStart(async () => {
-            const info = await this.orm.call("customization.bundle", "get_ui_context", [
-                this.props.viewId || false,
-                this.props.anchorString ? false : this.props.fieldName,
-                this.anchorKind,
-                this.props.anchorString || false,
-            ]);
-            this.state.bundles = info.bundles || [];
-            this.state.anchorCount = info.anchor_count || 0;
-            this.state.anchorUnique = Boolean(info.anchor_unique);
-            this.state.candidates = info.candidates || [];
-            if (this.state.candidates.length) {
-                this.state.anchorIndex = this.state.candidates[0].index;
-                this.state.anchorPage = this.state.candidates[0].page || "";
-            }
-            if (this.state.bundles.length) {
-                this.state.bundleId = this.state.bundles[0].id;
+            try {
+                const info = await this.orm.call(
+                    "customization.bundle",
+                    "get_ui_context",
+                    [
+                        this.props.viewId || false,
+                        this.props.anchorString ? false : this.props.fieldName,
+                        this.anchorKind,
+                        this.props.anchorString || false,
+                    ]
+                );
+                this.state.bundles = info.bundles || [];
+                this.state.anchorCount = info.anchor_count || 0;
+                this.state.anchorUnique = Boolean(info.anchor_unique);
+                this.state.candidates = info.candidates || [];
+                if (this.state.candidates.length) {
+                    this.state.anchorIndex = this.state.candidates[0].index;
+                    this.state.anchorPage = this.state.candidates[0].page || "";
+                }
+                if (this.state.bundles.length) {
+                    this.state.bundleId = this.state.bundles[0].id;
+                }
+            } catch (error) {
+                this.state.loadError =
+                    error.data?.message ||
+                    error.message ||
+                    _t("Could not load customization context.");
             }
         });
     }
@@ -474,6 +486,12 @@ export class CustomizationFieldDialog extends Component {
             if (result.reload) {
                 browser.location.reload();
             }
+        } catch (error) {
+            this.notifyError(
+                error.data?.message ||
+                    error.message ||
+                    _t("Could not apply customization.")
+            );
         } finally {
             this.state.busy = false;
         }
