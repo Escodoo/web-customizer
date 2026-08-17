@@ -803,6 +803,12 @@ msgid ""
 msgstr ""
 
 #. module: escodoo_customization
+#. odoo-python
+#: code:addons/escodoo_customization/models/compiler.py:0
+msgid "Field name '%s' is not valid for placing a field."
+msgstr ""
+
+#. module: escodoo_customization
 #. odoo-javascript
 #: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
 msgid "Field type"

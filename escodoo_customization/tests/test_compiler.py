@@ -1,6 +1,8 @@
 # Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+from lxml import etree
+
 from odoo import Command
 from odoo.exceptions import ValidationError
 from odoo.tests import tagged
@@ -1192,6 +1194,72 @@ class TestCustomizationCompiler(CustomizationCase):
         arch = self.form_view.get_combined_arch()
         self.assertIn('invisible="True"', arch)
         self.assertIn('string="Mobile"', arch)
+
+    def test_set_string_escapes_special_xml_characters(self):
+        bundle = self._create_bundle(
+            code="client_rename_amp",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_string",
+                        "model_id": self.partner_model.id,
+                        "view_id": self.form_view.id,
+                        "view_type": "form",
+                        "anchor_name": "email",
+                        "payload": {"string": 'Sales & "Marketing"'},
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        operation = bundle.operation_ids
+        self.assertEqual(operation.state, "applied")
+        self.assertIn('Sales &amp; "Marketing"', operation.generated_view_id.arch)
+        tree = etree.fromstring(self.form_view.get_combined_arch().encode())
+        nodes = tree.xpath("//field[@name='email']")
+        self.assertEqual(nodes[0].get("string"), 'Sales & "Marketing"')
+
+    def test_set_string_escapes_apostrophe_in_page_name(self):
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.apostrophe.page",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <notebook>
+                                <page name="client's" string="Client">
+                                    <field name="email"/>
+                                </page>
+                            </notebook>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+        bundle = self._create_bundle(
+            code="client_rename_page_apos",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_string",
+                        "model_id": self.partner_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_name": "email",
+                        "anchor_page": "client's",
+                        "payload": {"string": "Work Email"},
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        operation = bundle.operation_ids
+        self.assertEqual(operation.state, "applied")
+        tree = etree.fromstring(view.get_combined_arch().encode())
+        nodes = tree.xpath("//field[@name='email']")
+        self.assertEqual(nodes[0].get("string"), "Work Email")
 
     def test_unlink_releases_view_write_for_another_bundle(self):
         first = self._create_bundle(

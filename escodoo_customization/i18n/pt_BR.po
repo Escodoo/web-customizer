@@ -797,6 +797,12 @@ msgid "Field name '%s' is invalid. Use lowercase letters, digits and single unde
 msgstr "O nome de campo '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado após o prefixo x_esc_."
 
 #. module: escodoo_customization
+#. odoo-python
+#: code:addons/escodoo_customization/models/compiler.py:0
+msgid "Field name '%s' is not valid for placing a field."
+msgstr "O nome de campo '%s' não é válido para posicionar um campo."
+
+#. module: escodoo_customization
 #. odoo-javascript
 #: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
 msgid "Field type"

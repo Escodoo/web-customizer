@@ -964,6 +964,58 @@ def _add_field_schema_changed(field, ttype, related, payload):
     return False
 
 
+def _add_field_vals(operation, name, ttype, related, payload):
+    """Build ``ir.model.fields`` values for a new generated field."""
+    vals = {
+        "name": name,
+        "model_id": operation.model_id.id,
+        "ttype": ttype,
+        "state": "manual",
+        "field_description": payload.get("string") or name,
+        "help": payload.get("help") or False,
+        "required": bool(payload.get("required")),
+    }
+    if related:
+        vals["related"] = related
+        vals["store"] = bool(payload.get("store"))
+        vals["readonly"] = True
+        vals["copied"] = False
+    if ttype in ("many2one", "many2many"):
+        relation = payload.get("relation")
+        if not relation:
+            raise UserError(_("A relation model is required for %s fields.") % ttype)
+        vals["relation"] = relation
+    if ttype == "selection" and not related:
+        selection = payload.get("selection") or []
+        if not selection:
+            raise UserError(_("Selection fields need at least one option."))
+        vals["selection_ids"] = [
+            Command.create(
+                {
+                    "value": str(value),
+                    "name": str(label),
+                    "sequence": index,
+                }
+            )
+            for index, (value, label) in enumerate(selection)
+        ]
+    if ttype == "monetary":
+        currency_field = payload.get("currency_field")
+        if currency_field:
+            vals["currency_field"] = currency_field
+        elif not (
+            operation.env["ir.model.fields"]._get(operation.model, "currency_id")
+            or operation.env["ir.model.fields"]._get(operation.model, "x_currency_id")
+        ):
+            raise UserError(
+                _(
+                    "Monetary fields need a currency field on the model "
+                    "(currency_id or x_currency_id)."
+                )
+            )
+    return vals
+
+
 def _apply_add_field(operation):
     payload = dict(_payload(operation))
     model_name = operation.model
@@ -1015,54 +1067,7 @@ def _apply_add_field(operation):
             return
 
     name = unique_field_name(operation.env, model_name, name)
-    vals = {
-        "name": name,
-        "model_id": operation.model_id.id,
-        "ttype": ttype,
-        "state": "manual",
-        "field_description": payload.get("string") or name,
-        "help": payload.get("help") or False,
-        "required": bool(payload.get("required")),
-    }
-    if related:
-        vals["related"] = related
-        vals["store"] = bool(payload.get("store"))
-        vals["readonly"] = True
-        vals["copied"] = False
-    if ttype in ("many2one", "many2many"):
-        relation = payload.get("relation")
-        if not relation:
-            raise UserError(_("A relation model is required for %s fields.") % ttype)
-        vals["relation"] = relation
-    if ttype == "selection" and not related:
-        selection = payload.get("selection") or []
-        if not selection:
-            raise UserError(_("Selection fields need at least one option."))
-        vals["selection_ids"] = [
-            Command.create(
-                {
-                    "value": str(value),
-                    "name": str(label),
-                    "sequence": index,
-                }
-            )
-            for index, (value, label) in enumerate(selection)
-        ]
-    if ttype == "monetary":
-        currency_field = payload.get("currency_field")
-        if currency_field:
-            vals["currency_field"] = currency_field
-        elif not (
-            operation.env["ir.model.fields"]._get(model_name, "currency_id")
-            or operation.env["ir.model.fields"]._get(model_name, "x_currency_id")
-        ):
-            raise UserError(
-                _(
-                    "Monetary fields need a currency field on the model "
-                    "(currency_id or x_currency_id)."
-                )
-            )
-
+    vals = _add_field_vals(operation, name, ttype, related, payload)
     field = operation.env["ir.model.fields"].create(vals)
     operation.generated_field_id = field
     payload["name"] = field.name
@@ -1110,10 +1115,10 @@ def _button_type_expr(operation, arch_tree, tag, anchor, page, occurrence):
     if node.get("name") == anchor or node.get("type") != anchor:
         return None
     if occurrence:
-        return f"(//button[@type='{anchor}'])[{int(occurrence)}]"
+        return f"(//button[@type={xpath_quote(anchor)}])[{int(occurrence)}]"
     if page:
-        return f"//page[@name='{page}']//button[@type='{anchor}']"
-    return f"//button[@type='{anchor}']"
+        return f"//page[@name={xpath_quote(page)}]//button[@type={xpath_quote(anchor)}]"
+    return f"//button[@type={xpath_quote(anchor)}]"
 
 
 def _inherit_arch(operation, inner_xml, position, arch_tree=None):
@@ -1146,7 +1151,7 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
             f"{inner_xml}</xpath>"
         )
     if tag == "progressbar":
-        expr = f"//progressbar[@field='{anchor}']"
+        expr = f"//progressbar[@field={xpath_quote(anchor)}]"
         if occurrence:
             expr = f"({expr})[{int(occurrence)}]"
         return (
@@ -1154,12 +1159,21 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
             f"{inner_xml}</xpath>"
         )
     if occurrence:
-        expr = f"(//{tag}[@name='{anchor}'])[{int(occurrence)}]"
-        return f'<xpath expr="{expr}" position="{position}">{inner_xml}</xpath>'
+        expr = f"(//{tag}[@name={xpath_quote(anchor)}])[{int(occurrence)}]"
+        return (
+            f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
+            f"{inner_xml}</xpath>"
+        )
     if page:
-        expr = f"//page[@name='{page}']//{tag}[@name='{anchor}']"
-        return f'<xpath expr="{expr}" position="{position}">{inner_xml}</xpath>'
-    return f'<{tag} name="{anchor}" position="{position}">{inner_xml}</{tag}>'
+        expr = f"//page[@name={xpath_quote(page)}]//{tag}[@name={xpath_quote(anchor)}]"
+        return (
+            f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
+            f"{inner_xml}</xpath>"
+        )
+    return (
+        f'<{tag} name="{_xml_attr(anchor)}" position="{position}">'
+        f"{inner_xml}</{tag}>"
+    )
 
 
 def _upsert_generated_view(operation, arch, active=True):
@@ -1230,17 +1244,23 @@ def _apply_place_field(operation):
     field_name = payload.get("field_name")
     if not field_name:
         raise UserError(_("place_field requires payload.field_name."))
+    if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
+        raise UserError(
+            _("Field name '%s' is not valid for placing a field.") % field_name
+        )
     position = operation.position or "after"
     if position not in FIELD_POSITIONS:
         raise AnchorError(
             _("Position '%s' is not valid for placing a field.") % position
         )
-    arch = _inherit_arch(operation, f'<field name="{field_name}"/>', position)
+    arch = _inherit_arch(
+        operation, f'<field name="{_xml_attr(field_name)}"/>', position
+    )
     _upsert_generated_view(operation, arch, active=True)
 
 
 def _attribute_xml(name, value):
-    return f'<attribute name="{name}">{value}</attribute>'
+    return f'<attribute name="{name}">{xml_escape(str(value))}</attribute>'
 
 
 def _apply_attributes(operation):
