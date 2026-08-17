@@ -49,6 +49,42 @@ class TestCustomizationSecurity(CustomizationCase):
             ],
         )
 
+    def test_user_cannot_read_other_company_operations(self):
+        company_b = self.env["res.company"].create({"name": "Other Co"})
+        user_a = new_test_user(
+            self.env,
+            login="esc_cust_co_a",
+            groups="escodoo_customization.group_customization_user",
+            company_id=self.env.company.id,
+            company_ids=[Command.set(self.env.company.ids)],
+        )
+        bundle_b = self.env["customization.bundle"].create(
+            {
+                "name": "Other company",
+                "code": "client_other_co",
+                "company_id": company_b.id,
+                "operation_ids": [
+                    Command.create(
+                        {
+                            "type": "hide_field",
+                            "model_id": self.partner_model.id,
+                            "view_id": self.form_view.id,
+                            "view_type": "form",
+                            "anchor_name": "email",
+                            "payload": {},
+                        }
+                    )
+                ],
+            }
+        )
+        operation = bundle_b.operation_ids
+        visible = (
+            self.env["customization.operation"]
+            .with_user(user_a)
+            .search([("id", "=", operation.id)])
+        )
+        self.assertFalse(visible)
+
     def test_user_can_read_but_not_create(self):
         bundle = self._create_bundle(code="client_acl_read")
         self.assertEqual(
