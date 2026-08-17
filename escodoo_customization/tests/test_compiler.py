@@ -176,6 +176,50 @@ class TestCustomizationCompiler(CustomizationCase):
         binary = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_photo")
         self.assertEqual(binary.ttype, "binary")
 
+    def test_reapply_syncs_selection_options(self):
+        bundle = self._create_bundle(
+            code="client_sel_sync",
+            operations=[
+                Command.create(
+                    {
+                        "type": "add_field",
+                        "sequence": 10,
+                        "model_id": self.partner_model.id,
+                        "payload": {
+                            "ttype": "selection",
+                            "string": "Site Status",
+                            "name": "x_esc_sel_sync",
+                            "selection": [["draft", "Draft"], ["done", "Done"]],
+                        },
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_sel_sync")
+        field_id = field.id
+        partner = self.env["res.partner"].create(
+            {"name": "Sel Sync", "x_esc_sel_sync": "draft"}
+        )
+        operation = bundle.operation_ids
+        operation.payload = {
+            **operation.payload,
+            "selection": [
+                ["draft", "To Do"],
+                ["done", "Done"],
+                ["cancel", "Cancelled"],
+            ],
+        }
+        bundle.action_reapply()
+        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_sel_sync")
+        self.assertEqual(field.id, field_id)
+        self.assertEqual(
+            [(opt.value, opt.name) for opt in field.selection_ids.sorted("sequence")],
+            [("draft", "To Do"), ("done", "Done"), ("cancel", "Cancelled")],
+        )
+        self.assertEqual(partner.x_esc_sel_sync, "draft")
+        self.assertEqual(operation.state, "applied")
+
     def test_add_monetary_without_currency_is_broken(self):
         bundle = self._create_bundle(
             code="client_monetary_bad",

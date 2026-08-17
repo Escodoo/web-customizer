@@ -964,6 +964,69 @@ def _add_field_schema_changed(field, ttype, related, payload):
     return False
 
 
+def _handle_existing_generated_field(operation, ttype, related, payload):
+    """Update the generated field in place or unlink it when schema changed.
+
+    Return ``(done, name)``. ``done`` means Re-apply finished without
+    creating a new field. ``name`` is the technical name to reuse after
+    a schema change.
+    """
+    field = operation.generated_field_id
+    if not field:
+        return False, None
+    if not _add_field_schema_changed(field, ttype, related, payload):
+        _update_generated_field(field, ttype, related, payload)
+        return True, None
+    name = field.name
+    payload["name"] = name
+    field.unlink()
+    operation.generated_field_id = False
+    operation.env.flush_all()
+    operation.env.registry.clear_cache()
+    return False, name
+
+
+def _update_generated_field(field, ttype, related, payload):
+    """Update metadata of an existing generated field on Re-apply."""
+    vals = {
+        "field_description": payload.get("string") or field.field_description,
+        "help": payload.get("help") or False,
+        "required": bool(payload.get("required")),
+    }
+    if ttype == "selection" and not related:
+        selection = payload.get("selection") or []
+        if not selection:
+            raise UserError(_("Selection fields need at least one option."))
+        vals["selection_ids"] = _selection_commands(field, selection)
+    if ttype == "monetary":
+        currency_field = payload.get("currency_field")
+        if currency_field:
+            vals["currency_field"] = currency_field
+    field.write(vals)
+
+
+def _selection_commands(field, selection):
+    """Sync selection options in place so existing values are kept."""
+    existing = {opt.value: opt for opt in field.selection_ids}
+    wanted = [(str(value), str(label)) for value, label in selection]
+    wanted_values = {value for value, _label in wanted}
+    commands = []
+    for index, (value, label) in enumerate(wanted):
+        current = existing.get(value)
+        if current:
+            commands.append(
+                Command.update(current.id, {"name": label, "sequence": index})
+            )
+        else:
+            commands.append(
+                Command.create({"value": value, "name": label, "sequence": index})
+            )
+    for value, current in existing.items():
+        if value not in wanted_values:
+            commands.append(Command.delete(current.id))
+    return commands
+
+
 def _add_field_vals(operation, name, ttype, related, payload):
     """Build ``ir.model.fields`` values for a new generated field."""
     vals = {
@@ -1046,25 +1109,13 @@ def _apply_add_field(operation):
         payload.get("string") or (related and related.split(".")[-1]) or ""
     )
     name = ensure_field_name(requested)
-    if operation.generated_field_id:
-        field = operation.generated_field_id
-        if _add_field_schema_changed(field, ttype, related, payload):
-            name = field.name
-            payload["name"] = name
-            field.unlink()
-            operation.generated_field_id = False
-            operation.env.flush_all()
-            operation.env.registry.clear_cache()
-        else:
-            field.write(
-                {
-                    "field_description": payload.get("string")
-                    or field.field_description,
-                    "help": payload.get("help") or False,
-                    "required": bool(payload.get("required")),
-                }
-            )
-            return
+    done, reused_name = _handle_existing_generated_field(
+        operation, ttype, related, payload
+    )
+    if done:
+        return
+    if reused_name:
+        name = reused_name
 
     name = unique_field_name(operation.env, model_name, name)
     vals = _add_field_vals(operation, name, ttype, related, payload)
