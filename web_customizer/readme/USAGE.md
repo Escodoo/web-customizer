@@ -59,7 +59,8 @@ Use one company. Cover the surfaces below, then ship the ZIP — do not
 leave this module as the production runtime.
 
 1. **Form** — add or place a field; hide or rename a page, group or button.
-2. **List** — add, hide or relabel a column.
+2. **List** — add, hide, relabel a column, or make it optional so users
+   can turn it on from the column picker.
 3. **Search** — add, hide or relabel a search chip.
 4. **Kanban** — hide a card field, a header button or the column progressbar.
 5. **Pivot** — click a measure header to relabel, hide or add a measure.

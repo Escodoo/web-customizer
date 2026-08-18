@@ -82,6 +82,7 @@ export class CustomizationFieldDialog extends Component {
             actionId: false,
             targetMenuId: false,
             widget: "",
+            optional: "hide",
             groupIds: [],
             modInvisible: "",
             modReadonly: "",
@@ -244,6 +245,12 @@ export class CustomizationFieldDialog extends Component {
             fieldActions.splice(3, 0, {
                 value: "add_page",
                 label: _t("Add page after this one"),
+            });
+        }
+        if (this.props.viewType === "list") {
+            fieldActions.splice(2, 0, {
+                value: "set_optional",
+                label: _t("Make column optional"),
             });
         }
         return fieldActions;
@@ -439,6 +446,9 @@ export class CustomizationFieldDialog extends Component {
                 return false;
             }
             return {widget};
+        }
+        if (action === "set_optional") {
+            return {optional: this.state.optional};
         }
         if (action === "set_groups") {
             if (!this.state.groupIds.length) {

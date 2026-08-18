@@ -173,6 +173,15 @@
                                 />
                             </group>
                             <group
+                                string="Optional Column"
+                                invisible="type != 'set_optional'"
+                            >
+                                <field
+                                    name="payload_optional"
+                                    required="type == 'set_optional'"
+                                />
+                            </group>
+                            <group
                                 string="Set Groups"
                                 invisible="type not in ('set_groups', 'set_menu_groups')"
                             >

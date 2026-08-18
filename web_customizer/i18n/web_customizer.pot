@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-18 19:17+0000\n"
-"PO-Revision-Date: 2026-08-18 19:17+0000\n"
+"POT-Creation-Date: 2026-08-18 22:00+0000\n"
+"PO-Revision-Date: 2026-08-18 22:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -538,6 +538,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Choose whether the column shows or hides."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Click a field, page, group or button to set the anchor."
 msgstr ""
 
@@ -565,6 +571,12 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_column_invisible
 msgid "Column Invisible"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Column visibility"
 msgstr ""
 
 #. module: web_customizer
@@ -977,6 +989,13 @@ msgid "Help"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_optional__hide
+msgid "Hidden by default"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__hide_field
 msgid "Hide Field"
 msgstr ""
@@ -1100,6 +1119,12 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__list
 msgid "List"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Make column optional"
 msgstr ""
 
 #. module: web_customizer
@@ -1286,6 +1311,12 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Only a column can be made optional."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Only customization managers can change customizations."
 msgstr ""
@@ -1319,6 +1350,18 @@ msgstr ""
 #: model:ir.ui.menu,name:web_customizer.menu_customization_operation
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Operations"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_optional
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Optional Column"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Optional columns only exist on list views."
 msgstr ""
 
 #. module: web_customizer
@@ -1435,6 +1478,11 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__progressbar
 msgid "Progressbar"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_optional
+msgid "Put the column in the list column picker instead of pinning it."
 msgstr ""
 
 #. module: web_customizer
@@ -1673,6 +1721,11 @@ msgid "Set Modifier"
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_optional
+msgid "Set Optional Column"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_widget
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Set Widget"
@@ -1696,6 +1749,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set widget"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_optional__show
+msgid "Shown by default"
 msgstr ""
 
 #. module: web_customizer
@@ -1765,6 +1825,14 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.constraint,message:web_customizer.constraint_customization_bundle_code_unique
 msgid "The bundle code must be unique."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"The column moves to the list column picker, so users\n"
+"                            can turn it on themselves."
 msgstr ""
 
 #. module: web_customizer
@@ -2035,6 +2103,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "set_modifier requires payload.modifiers."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "set_optional requires payload.optional to be one of: %s."
 msgstr ""
 
 #. module: web_customizer

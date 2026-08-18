@@ -50,9 +50,7 @@ class TestCustomizationAggregateViews(CustomizationCase):
                         },
                     }
                 ),
-                self._place(
-                    self.pivot_view, "pivot", "color", "x_cust_visit_count"
-                ),
+                self._place(self.pivot_view, "pivot", "color", "x_cust_visit_count"),
             ],
         )
         bundle.action_apply()

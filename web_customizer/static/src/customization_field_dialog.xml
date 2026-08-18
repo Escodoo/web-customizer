@@ -282,6 +282,28 @@
                         </datalist>
                     </div>
                 </t>
+                <t t-if="state.action === 'set_optional'">
+                    <div class="mb-3">
+                        <label class="form-label">Column visibility</label>
+                        <select
+                            class="form-select"
+                            t-on-change="(ev) => state.optional = ev.target.value"
+                        >
+                            <option
+                                value="hide"
+                                t-att-selected="state.optional === 'hide'"
+                            >Hidden by default</option>
+                            <option
+                                value="show"
+                                t-att-selected="state.optional === 'show'"
+                            >Shown by default</option>
+                        </select>
+                        <div class="form-text">
+                            The column moves to the list column picker, so users
+                            can turn it on themselves.
+                        </div>
+                    </div>
+                </t>
                 <t t-if="state.action === 'set_groups'">
                     <div class="mb-3">
                         <label class="form-label">Groups</label>

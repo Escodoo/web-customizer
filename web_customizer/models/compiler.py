@@ -79,6 +79,7 @@ ATTRIBUTE_TYPES = (
     "set_widget",
     "set_groups",
     "set_modifier",
+    "set_optional",
     "hide_field",
 )
 VIEW_WRITE_LABELS = {
@@ -86,8 +87,10 @@ VIEW_WRITE_LABELS = {
     "set_widget": "Set Widget",
     "set_groups": "Set Groups",
     "set_modifier": "Set Modifier",
+    "set_optional": "Set Optional Column",
     "hide_field": "Hide Field",
 }
+OPTIONAL_VALUES = ("show", "hide")
 MODIFIER_KEYS = ("invisible", "readonly", "required", "column_invisible")
 BUTTON_TYPE_ANCHORS = (
     "edit",
@@ -1387,50 +1390,91 @@ def _attribute_xml(name, value):
     return f'<attribute name="{name}">{xml_escape(str(value))}</attribute>'
 
 
-def _apply_attributes(operation):
-    payload = _payload(operation)
-    parts = []
-    if operation.type == "set_string":
-        string = payload.get("string")
-        if not string:
-            raise UserError(_("set_string requires payload.string."))
-        parts.append(_attribute_xml("string", string))
-    elif operation.type == "set_widget":
-        widget = payload.get("widget")
-        if not widget:
-            raise UserError(_("set_widget requires payload.widget."))
-        parts.append(_attribute_xml("widget", widget))
-    elif operation.type == "set_groups":
-        groups = payload.get("groups")
-        if not groups:
-            raise UserError(_("set_groups requires payload.groups."))
-        parts.append(_attribute_xml("groups", groups))
-    elif operation.type == "set_modifier":
-        modifiers = payload.get("modifiers") or {}
-        if not modifiers:
-            raise UserError(_("set_modifier requires payload.modifiers."))
-        if operation.view_type in AGGREGATE_VIEW_TYPES:
-            # Those parsers read invisible only, and only as a literal.
-            unsupported = sorted(set(modifiers) - {"invisible"})
-            if unsupported:
-                raise UserError(
-                    _(
-                        "Only invisible can be set on a %(view)s view, not "
-                        "%(keys)s.",
-                        view=operation.view_type,
-                        keys=", ".join(unsupported),
-                    )
+def _set_string_parts(operation):
+    string = _payload(operation).get("string")
+    if not string:
+        raise UserError(_("set_string requires payload.string."))
+    return [_attribute_xml("string", string)]
+
+
+def _set_widget_parts(operation):
+    widget = _payload(operation).get("widget")
+    if not widget:
+        raise UserError(_("set_widget requires payload.widget."))
+    return [_attribute_xml("widget", widget)]
+
+
+def _set_groups_parts(operation):
+    groups = _payload(operation).get("groups")
+    if not groups:
+        raise UserError(_("set_groups requires payload.groups."))
+    return [_attribute_xml("groups", groups)]
+
+
+def _set_modifier_parts(operation):
+    modifiers = _payload(operation).get("modifiers") or {}
+    if not modifiers:
+        raise UserError(_("set_modifier requires payload.modifiers."))
+    if operation.view_type in AGGREGATE_VIEW_TYPES:
+        # Those parsers read invisible only, and only as a literal.
+        unsupported = sorted(set(modifiers) - {"invisible"})
+        if unsupported:
+            raise UserError(
+                _(
+                    "Only invisible can be set on a %(view)s view, not %(keys)s.",
+                    view=operation.view_type,
+                    keys=", ".join(unsupported),
                 )
-        for key in MODIFIER_KEYS:
-            if key in modifiers:
-                parts.append(_attribute_xml(key, modifiers[key]))
-    elif operation.type == "hide_field":
-        if (operation.anchor_kind or "field") == "progressbar":
-            # The kanban parser ignores invisible on <progressbar>; drop the node.
-            arch = _inherit_arch(operation, "", "replace")
-            _upsert_generated_view(operation, arch, active=True)
-            return
-        attr = "column_invisible" if operation.view_type == "list" else "invisible"
-        parts.append(_attribute_xml(attr, "True"))
-    arch = _inherit_arch(operation, "".join(parts), "attributes")
+            )
+    return [
+        _attribute_xml(key, modifiers[key]) for key in MODIFIER_KEYS if key in modifiers
+    ]
+
+
+def _set_optional_parts(operation):
+    # Only the list renderer builds a column picker, so the attribute is inert
+    # anywhere else.
+    if operation.view_type != "list":
+        raise UserError(_("Optional columns only exist on list views."))
+    if (operation.anchor_kind or "field") != "field":
+        raise UserError(_("Only a column can be made optional."))
+    optional = (_payload(operation).get("optional") or "").strip()
+    if optional not in OPTIONAL_VALUES:
+        raise UserError(
+            _(
+                "set_optional requires payload.optional to be one of: %s.",
+                ", ".join(OPTIONAL_VALUES),
+            )
+        )
+    return [_attribute_xml("optional", optional)]
+
+
+def _hide_field_parts(operation):
+    attr = "column_invisible" if operation.view_type == "list" else "invisible"
+    return [_attribute_xml(attr, "True")]
+
+
+ATTRIBUTE_PARTS = {
+    "set_string": _set_string_parts,
+    "set_widget": _set_widget_parts,
+    "set_groups": _set_groups_parts,
+    "set_modifier": _set_modifier_parts,
+    "set_optional": _set_optional_parts,
+    "hide_field": _hide_field_parts,
+}
+
+
+def _apply_attributes(operation):
+    if (
+        operation.type == "hide_field"
+        and (operation.anchor_kind or "field") == "progressbar"
+    ):
+        # The kanban parser ignores invisible on <progressbar>; drop the node.
+        arch = _inherit_arch(operation, "", "replace")
+        _upsert_generated_view(operation, arch, active=True)
+        return
+    build = ATTRIBUTE_PARTS.get(operation.type)
+    if not build:
+        raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+    arch = _inherit_arch(operation, "".join(build(operation)), "attributes")
     _upsert_generated_view(operation, arch, active=True)

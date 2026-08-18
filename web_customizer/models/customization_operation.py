@@ -53,6 +53,7 @@ PAYLOAD_UI_FIELDS = (
     "payload_currency_field",
     "payload_field_name",
     "payload_field_type",
+    "payload_optional",
     "payload_widget",
     "payload_groups",
     "payload_mod_invisible",
@@ -87,6 +88,7 @@ class CustomizationOperation(models.Model):
             ("set_widget", "Set Widget"),
             ("set_groups", "Set Groups"),
             ("set_modifier", "Set Modifier"),
+            ("set_optional", "Set Optional Column"),
             ("hide_field", "Hide Field"),
             ("hide_menu", "Hide Menu"),
             ("set_menu_string", "Set Menu Label"),
@@ -241,6 +243,16 @@ class CustomizationOperation(models.Model):
         help="Role of the field on a pivot or graph view. Pivot accepts "
         "measure, row and col; graph accepts measure and grouping.",
     )
+    payload_optional = fields.Selection(
+        selection=[
+            ("show", "Shown by default"),
+            ("hide", "Hidden by default"),
+        ],
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Optional Column",
+        help="Put the column in the list column picker instead of pinning it.",
+    )
     payload_widget = fields.Char(
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
@@ -369,6 +381,7 @@ class CustomizationOperation(models.Model):
             rec.payload_currency_field = payload.get("currency_field") or False
             rec.payload_field_name = payload.get("field_name") or False
             rec.payload_field_type = payload.get("field_type") or False
+            rec.payload_optional = payload.get("optional") or False
             rec.payload_widget = payload.get("widget") or False
             rec.payload_groups = payload.get("groups") or False
             rec.payload_mod_invisible = modifiers.get("invisible") or False
@@ -484,6 +497,9 @@ class CustomizationOperation(models.Model):
         elif op_type == "set_widget":
             if "payload_widget" in ui:
                 self._set_payload_key(payload, "widget", ui["payload_widget"])
+        elif op_type == "set_optional":
+            if "payload_optional" in ui:
+                self._set_payload_key(payload, "optional", ui["payload_optional"])
         elif op_type in ("set_groups", "set_menu_groups"):
             if "payload_groups" in ui:
                 self._set_payload_key(payload, "groups", ui["payload_groups"])

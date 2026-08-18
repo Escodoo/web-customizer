@@ -10,6 +10,7 @@ from ..hooks import health_check_on_upgrade
 from .compiler import (
     AGGREGATE_VIEW_TYPES,
     MODIFIER_KEYS,
+    OPTIONAL_VALUES,
     STRUCTURE_TYPES,
     SUPPORTED_ANCHOR_KINDS,
     arch_tree,
@@ -29,6 +30,7 @@ UI_ACTIONS = (
     "set_widget",
     "set_groups",
     "set_modifier",
+    "set_optional",
     "add_page",
     "add_group",
     "add_menu",
@@ -680,6 +682,17 @@ class CustomizationBundle(models.Model):
                     "type": "set_widget",
                     "position": "attributes",
                     "payload": {"widget": widget},
+                }
+            )
+        elif action == "set_optional":
+            optional = (payload.get("optional") or "").strip()
+            if optional not in OPTIONAL_VALUES:
+                raise UserError(self.env._("Choose whether the column shows or hides."))
+            vals.update(
+                {
+                    "type": "set_optional",
+                    "position": "attributes",
+                    "payload": {"optional": optional},
                 }
             )
         elif action == "set_groups":

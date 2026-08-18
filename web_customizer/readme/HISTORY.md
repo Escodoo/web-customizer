@@ -14,3 +14,5 @@ First public Beta.
 - Kanban header buttons and column progressbars are semantic anchors.
 - Pivot and graph fields compile with their aggregate role (measure, row,
   col or grouping); pivot measures are clickable in customization mode.
+- A list column can be made optional, so it moves to the column picker
+  instead of being pinned or hidden outright.

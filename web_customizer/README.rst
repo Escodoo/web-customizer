@@ -184,7 +184,8 @@ leave this module as the production runtime.
 
 1. **Form** — add or place a field; hide or rename a page, group or
    button.
-2. **List** — add, hide or relabel a column.
+2. **List** — add, hide, relabel a column, or make it optional so users
+   can turn it on from the column picker.
 3. **Search** — add, hide or relabel a search chip.
 4. **Kanban** — hide a card field, a header button or the column
    progressbar.
@@ -256,6 +257,8 @@ First public Beta.
 - Pivot and graph fields compile with their aggregate role (measure,
   row, col or grouping); pivot measures are clickable in customization
   mode.
+- A list column can be made optional, so it moves to the column picker
+  instead of being pinned or hidden outright.
 
 Bug Tracker
 ===========
