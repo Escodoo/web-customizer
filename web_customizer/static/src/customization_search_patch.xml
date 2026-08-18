@@ -16,6 +16,15 @@
                         t-esc="item.description"
                     />
                 </t>
+                <t t-foreach="customizationSearchFilters" t-as="item" t-key="item.id">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-link fst-italic o_esc_customization_target px-1"
+                        t-att-title="item.name"
+                        t-on-click.prevent.stop="(ev) => this.onCustomizationSearchFilterClick(ev, item)"
+                        t-esc="item.description"
+                    />
+                </t>
             </t>
         </xpath>
     </t>

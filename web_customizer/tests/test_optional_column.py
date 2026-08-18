@@ -81,7 +81,9 @@ class TestCustomizationOptionalColumn(CustomizationCase):
         with self.assertRaises(ValidationError) as error:
             self._create_bundle(
                 code="client_optional_second",
-                operations=[self._set_optional(self.list_view, "list", "email", "show")],
+                operations=[
+                    self._set_optional(self.list_view, "list", "email", "show")
+                ],
             )
         self.assertIn("client_optional_first", str(error.exception))
 

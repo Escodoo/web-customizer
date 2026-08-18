@@ -378,6 +378,26 @@ test("PivotRenderer still sorts while customization is off", async () => {
     expect(".o_pivot_sort_order_asc, .o_pivot_sort_order_desc").toHaveCount(1);
 });
 
+test("SearchBar outlines arch filters and opens the dialog", async () => {
+    enableCustomization();
+    await mountView({
+        type: "list",
+        resModel: "partner",
+        arch: `
+            <list>
+                <field name="name"/>
+            </list>`,
+        searchViewId: 99,
+        searchViewArch: `
+            <search>
+                <filter name="favorites" string="Favorites"
+                    domain="[('is_favorite', '=', True)]"/>
+            </search>`,
+    });
+    await contains(".o_searchview .o_esc_customization_target").click();
+    expect.verifySteps(["filter:favorites"]);
+});
+
 test("SearchBar outlines search fields and opens the dialog", async () => {
     enableCustomization();
     await mountView({

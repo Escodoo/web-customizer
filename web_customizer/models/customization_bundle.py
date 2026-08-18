@@ -33,6 +33,7 @@ UI_ACTIONS = (
     "set_optional",
     "add_page",
     "add_group",
+    "add_filter",
     "add_menu",
     "add_submenu",
     "move_menu",
@@ -245,26 +246,7 @@ class CustomizationBundle(models.Model):
                 source_unnamed_page_string(view, raw_string, tag=anchor_kind)
                 or raw_string
             )
-        if action == "set_widget" and anchor_kind != "field":
-            raise UserError(self.env._("Widgets can only be set on fields."))
-        if action != "hide" and anchor_kind == "progressbar":
-            raise UserError(self.env._("A progressbar can only be hidden."))
-        if action in ("add_after", "place_after") and anchor_kind in (
-            "button",
-            "progressbar",
-        ):
-            raise UserError(
-                self.env._("Place a field on a page or after another field.")
-            )
-        if action in STRUCTURE_TYPES:
-            if (params.get("view_type") or "form") != "form":
-                raise UserError(
-                    self.env._("Pages and groups can only be added on forms.")
-                )
-            if anchor_kind in ("button", "progressbar"):
-                raise UserError(
-                    self.env._("Place a page or group on a field, page or group.")
-                )
+        self._assert_ui_action_fits_anchor(action, anchor_kind, params)
         view_type = params.get("view_type") or "form"
         payload = dict(params.get("payload") or {})
         apply = params.get("apply", True)
@@ -307,6 +289,20 @@ class CustomizationBundle(models.Model):
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
                 field_type=payload.get("field_type"),
+            )
+        elif action == "add_filter":
+            operations = self._ui_action_add_filter(
+                bundle,
+                sequence,
+                model,
+                view,
+                view_type,
+                anchor_name,
+                payload,
+                apply,
+                anchor_kind=anchor_kind,
+                occurrence=occurrence,
+                anchor_string=anchor_string,
             )
         elif action in STRUCTURE_TYPES:
             operations = self._ui_action_add_structure(
@@ -589,6 +585,75 @@ class CustomizationBundle(models.Model):
             field_type=field_type,
         )
         return add_op | place_op
+
+    def _assert_ui_action_fits_anchor(self, action, anchor_kind, params):
+        """Reject a click the target node could never carry."""
+        if action == "set_widget" and anchor_kind != "field":
+            raise UserError(self.env._("Widgets can only be set on fields."))
+        if action != "hide" and anchor_kind == "progressbar":
+            raise UserError(self.env._("A progressbar can only be hidden."))
+        if action in ("add_after", "place_after") and anchor_kind in (
+            "button",
+            "progressbar",
+        ):
+            raise UserError(
+                self.env._("Place a field on a page or after another field.")
+            )
+        if action == "add_filter" and anchor_kind not in ("field", "filter"):
+            raise UserError(
+                self.env._("Add a filter next to a search field or another filter.")
+            )
+        if action in STRUCTURE_TYPES:
+            if (params.get("view_type") or "form") != "form":
+                raise UserError(
+                    self.env._("Pages and groups can only be added on forms.")
+                )
+            if anchor_kind in ("button", "progressbar"):
+                raise UserError(
+                    self.env._("Place a page or group on a field, page or group.")
+                )
+
+    def _ui_action_add_filter(
+        self,
+        bundle,
+        sequence,
+        model,
+        view,
+        view_type,
+        anchor_name,
+        payload,
+        apply,
+        anchor_kind="field",
+        occurrence=0,
+        anchor_string=False,
+    ):
+        """Create an add_filter operation next to the clicked search item."""
+        if view_type != "search":
+            raise UserError(self.env._("Filters only exist on search views."))
+        string = (payload.get("string") or "").strip()
+        if not string:
+            raise UserError(self.env._("A filter label is required."))
+        vals = {
+            "bundle_id": bundle.id,
+            "sequence": sequence,
+            "type": "add_filter",
+            "model_id": model.id,
+            "view_id": view.id,
+            "view_type": view_type,
+            "anchor_kind": anchor_kind,
+            "anchor_name": anchor_name,
+            "position": "after",
+            "payload": {
+                "string": string,
+                "domain": (payload.get("domain") or "").strip(),
+                "group_by": (payload.get("group_by") or "").strip(),
+            },
+        }
+        vals.update(self._ui_anchor_extra(occurrence, False, anchor_string))
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return operation
 
     def _ui_action_add_structure(
         self,

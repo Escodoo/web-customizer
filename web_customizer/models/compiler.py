@@ -1,6 +1,7 @@
 # Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+import ast
 import logging
 import re
 import unicodedata
@@ -10,6 +11,7 @@ from lxml import etree
 
 from odoo import Command, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.osv import expression
 from odoo.tools import sql
 
 _logger = logging.getLogger(__name__)
@@ -29,7 +31,19 @@ SUPPORTED_TTYPES = (
     "binary",
     "monetary",
 )
-SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group", "progressbar")
+SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group", "progressbar", "filter")
+# Mirrors GROUPABLE_TYPES in @web/search/utils/misc: grouping by anything else
+# is refused by the client, so a filter built on it would never work.
+GROUPABLE_TTYPES = (
+    "boolean",
+    "char",
+    "date",
+    "datetime",
+    "integer",
+    "many2one",
+    "many2many",
+    "selection",
+)
 # Pivot and graph describe themselves with measures and groupings instead of a
 # tree of widgets, so they only ever anchor on <field> and only understand the
 # attributes their arch parsers read.
@@ -52,6 +66,7 @@ ANCHOR_TAGS = {
     "button": "button",
     "group": "group",
     "progressbar": "progressbar",
+    "filter": "filter",
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
 STRUCTURE_TYPES = ("add_page", "add_group")
@@ -663,6 +678,8 @@ def apply_operation(operation):
         if operation.type == "place_field":
             assert_no_place_field_conflict(operation)
             _apply_place_field(operation)
+        elif operation.type == "add_filter":
+            _apply_add_filter(operation)
         elif operation.type in STRUCTURE_TYPES:
             _apply_add_structure(operation)
         elif operation.type in ATTRIBUTE_TYPES:
@@ -1336,6 +1353,89 @@ def _apply_add_structure(operation):
     payload["name"] = name
     if string:
         payload["string"] = string
+    operation.payload = payload
+
+
+def validated_filter_domain(domain):
+    """Refuse a domain that would otherwise fail later, at search time.
+
+    A dynamic domain (``context_today()`` and friends) cannot be evaluated
+    here, so it only gets a syntax check. A literal one is also checked for
+    shape, which is what catches a missing tuple or a stray operator.
+    """
+    domain = (domain or "").strip()
+    if not domain:
+        raise UserError(_("add_filter requires a domain or a grouping."))
+    try:
+        ast.parse(domain, mode="eval")
+    except SyntaxError as err:
+        raise UserError(_("The filter domain is not valid Python: %s") % err) from err
+    try:
+        literal = ast.literal_eval(domain)
+    except (ValueError, SyntaxError):
+        return domain
+    if not isinstance(literal, list | tuple):
+        raise UserError(_("The filter domain must be a list of conditions."))
+    try:
+        expression.normalize_domain(list(literal))
+    except (ValueError, AssertionError) as err:
+        raise UserError(_("The filter domain is malformed: %s") % err) from err
+    return domain
+
+
+def validated_group_by(operation, field_name):
+    """Return a field name that the client will accept as a grouping."""
+    field_name = (field_name or "").strip()
+    if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
+        raise UserError(_("Group by '%s' is not a valid field name.") % field_name)
+    field = operation.env["ir.model.fields"]._get(operation.model, field_name)
+    if not field:
+        raise UserError(
+            _(
+                "Field '%(field)s' does not exist on %(model)s.",
+                field=field_name,
+                model=operation.model,
+            )
+        )
+    if field.ttype not in GROUPABLE_TTYPES:
+        raise UserError(
+            _(
+                "A %(ttype)s field cannot be grouped by.",
+                ttype=field.ttype,
+            )
+        )
+    return field_name
+
+
+def _apply_add_filter(operation):
+    """Compile add_filter into a <filter> node on a search view."""
+    if operation.view_type != "search":
+        raise UserError(_("Filters only exist on search views."))
+    payload = dict(_payload(operation))
+    string = (payload.get("string") or "").strip()
+    if not string:
+        raise UserError(_("A filter label is required."))
+    name = ensure_field_name(payload.get("name") or slugify_field_suffix(string))
+    group_by = (payload.get("group_by") or "").strip()
+    domain = (payload.get("domain") or "").strip()
+    if group_by and domain:
+        raise UserError(_("A filter carries either a domain or a grouping."))
+    head = f'<filter name="{_xml_attr(name)}" string="{_xml_attr(string)}"'
+    if group_by:
+        group_by = validated_group_by(operation, group_by)
+        context = f"{{'group_by': '{group_by}'}}"
+        inner = f'{head} context="{_xml_attr(context)}"/>'
+    else:
+        domain = validated_filter_domain(domain)
+        inner = f'{head} domain="{_xml_attr(domain)}"/>'
+    position = operation.position or "after"
+    if position not in FIELD_POSITIONS:
+        raise AnchorError(
+            _("Position '%s' is not valid for adding a filter.") % position
+        )
+    arch = _inherit_arch(operation, inner, position)
+    _upsert_generated_view(operation, arch, active=True)
+    payload["name"] = name
     operation.payload = payload
 
 

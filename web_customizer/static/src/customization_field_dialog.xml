@@ -164,6 +164,44 @@
                         </div>
                     </div>
                 </t>
+                <t t-if="state.action === 'add_filter'">
+                    <div class="mb-3">
+                        <label class="form-label">Filter label</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Active Customers"
+                            t-att-value="state.string"
+                            t-on-input="(ev) => state.string = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Domain</label>
+                        <input
+                            type="text"
+                            class="form-control font-monospace"
+                            placeholder="[('active', '=', True)]"
+                            t-att-value="state.filterDomain"
+                            t-att-disabled="state.filterGroupBy.trim() ? 'disabled' : false"
+                            t-on-input="(ev) => state.filterDomain = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">or group by field</label>
+                        <input
+                            type="text"
+                            class="form-control font-monospace"
+                            placeholder="user_id"
+                            t-att-value="state.filterGroupBy"
+                            t-att-disabled="state.filterDomain.trim() ? 'disabled' : false"
+                            t-on-input="(ev) => state.filterGroupBy = ev.target.value"
+                        />
+                        <div class="form-text">
+                            A filter either narrows the records with a domain or
+                            groups them by a field, never both.
+                        </div>
+                    </div>
+                </t>
                 <t t-if="state.action === 'add_page' || state.action === 'add_group'">
                     <div class="mb-3">
                         <label class="form-label">

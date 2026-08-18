@@ -89,7 +89,7 @@
                     <notebook>
                         <page string="Payload" name="payload">
                             <group
-                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu')"
+                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu', 'add_filter')"
                             >
                                 <field
                                     name="payload_string"
@@ -170,6 +170,17 @@
                                 <field
                                     name="payload_widget"
                                     required="type == 'set_widget'"
+                                />
+                            </group>
+                            <group string="Add Filter" invisible="type != 'add_filter'">
+                                <field name="payload_name" />
+                                <field
+                                    name="payload_domain"
+                                    invisible="payload_group_by"
+                                />
+                                <field
+                                    name="payload_group_by"
+                                    invisible="payload_domain"
                                 />
                             </group>
                             <group

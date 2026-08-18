@@ -53,6 +53,8 @@ PAYLOAD_UI_FIELDS = (
     "payload_currency_field",
     "payload_field_name",
     "payload_field_type",
+    "payload_domain",
+    "payload_group_by",
     "payload_optional",
     "payload_widget",
     "payload_groups",
@@ -84,6 +86,7 @@ class CustomizationOperation(models.Model):
             ("place_field", "Place Field"),
             ("add_page", "Add Page"),
             ("add_group", "Add Group"),
+            ("add_filter", "Add Filter"),
             ("set_string", "Set Label"),
             ("set_widget", "Set Widget"),
             ("set_groups", "Set Groups"),
@@ -131,6 +134,7 @@ class CustomizationOperation(models.Model):
             ("button", "Button"),
             ("group", "Group"),
             ("progressbar", "Progressbar"),
+            ("filter", "Filter"),
             ("menu", "Menu"),
             ("xpath", "XPath"),
         ],
@@ -242,6 +246,18 @@ class CustomizationOperation(models.Model):
         string="Aggregate Role",
         help="Role of the field on a pivot or graph view. Pivot accepts "
         "measure, row and col; graph accepts measure and grouping.",
+    )
+    payload_domain = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Filter Domain",
+        help="Odoo domain, for example [('active', '=', True)].",
+    )
+    payload_group_by = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Group By Field",
+        help="Field name to group by. Leave the domain empty when set.",
     )
     payload_optional = fields.Selection(
         selection=[
@@ -381,6 +397,8 @@ class CustomizationOperation(models.Model):
             rec.payload_currency_field = payload.get("currency_field") or False
             rec.payload_field_name = payload.get("field_name") or False
             rec.payload_field_type = payload.get("field_type") or False
+            rec.payload_domain = payload.get("domain") or False
+            rec.payload_group_by = payload.get("group_by") or False
             rec.payload_optional = payload.get("optional") or False
             rec.payload_widget = payload.get("widget") or False
             rec.payload_groups = payload.get("groups") or False
@@ -500,6 +518,8 @@ class CustomizationOperation(models.Model):
         elif op_type == "set_optional":
             if "payload_optional" in ui:
                 self._set_payload_key(payload, "optional", ui["payload_optional"])
+        elif op_type == "add_filter":
+            self._apply_filter_payload_ui(payload, ui)
         elif op_type in ("set_groups", "set_menu_groups"):
             if "payload_groups" in ui:
                 self._set_payload_key(payload, "groups", ui["payload_groups"])
@@ -515,6 +535,17 @@ class CustomizationOperation(models.Model):
             self._set_payload_key(payload, "name", ui["payload_name"])
         if op_type == "add_menu" and "payload_action_xmlid" in ui:
             self._set_payload_key(payload, "action_xmlid", ui["payload_action_xmlid"])
+
+    @api.model
+    def _apply_filter_payload_ui(self, payload, ui):
+        if "payload_string" in ui:
+            self._set_payload_key(payload, "string", ui["payload_string"])
+        if "payload_name" in ui:
+            self._set_payload_key(payload, "name", ui["payload_name"])
+        if "payload_domain" in ui:
+            self._set_payload_key(payload, "domain", ui["payload_domain"])
+        if "payload_group_by" in ui:
+            self._set_payload_key(payload, "group_by", ui["payload_group_by"])
 
     @api.model
     def _apply_modifier_payload_ui(self, payload, ui):

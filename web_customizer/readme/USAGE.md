@@ -61,7 +61,8 @@ leave this module as the production runtime.
 1. **Form** — add or place a field; hide or rename a page, group or button.
 2. **List** — add, hide, relabel a column, or make it optional so users
    can turn it on from the column picker.
-3. **Search** — add, hide or relabel a search chip.
+3. **Search** — add, hide or relabel a search chip, or add a filter with a
+   domain or a group by.
 4. **Kanban** — hide a card field, a header button or the column progressbar.
 5. **Pivot** — click a measure header to relabel, hide or add a measure.
 6. **Menus** — hide, rename or move one navbar item that has an XML ID.

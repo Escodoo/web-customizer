@@ -16,3 +16,5 @@ First public Beta.
   col or grouping); pivot measures are clickable in customization mode.
 - A list column can be made optional, so it moves to the column picker
   instead of being pinned or hidden outright.
+- Search filters and groupings are semantic anchors, and a filter can be
+  added with a validated domain or a group by.

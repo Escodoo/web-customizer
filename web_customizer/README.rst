@@ -67,6 +67,12 @@ upgrade the only recovery path is to discard the customizations on that
 view. Here the intent outlives the artifact: a moved anchor is
 re-resolved and only a genuinely missing one is reported.
 
+On a search view, filters and groupings are anchors of their own: click
+one to hide or relabel it, or add a filter next to it. A new filter
+either narrows records with a domain or groups them by a field. The
+domain is checked before it is written, so a typo becomes a broken
+operation with a reason instead of a search view nobody can open.
+
 Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and
@@ -186,7 +192,8 @@ leave this module as the production runtime.
    button.
 2. **List** — add, hide, relabel a column, or make it optional so users
    can turn it on from the column picker.
-3. **Search** — add, hide or relabel a search chip.
+3. **Search** — add, hide or relabel a search chip, or add a filter with
+   a domain or a group by.
 4. **Kanban** — hide a card field, a header button or the column
    progressbar.
 5. **Pivot** — click a measure header to relabel, hide or add a measure.
@@ -259,6 +266,8 @@ First public Beta.
   mode.
 - A list column can be made optional, so it moves to the column picker
   instead of being pinned or hidden outright.
+- Search filters and groupings are semantic anchors, and a filter can be
+  added with a validated domain or a group by.
 
 Bug Tracker
 ===========

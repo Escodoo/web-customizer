@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-18 22:00+0000\n"
-"PO-Revision-Date: 2026-08-18 22:00+0000\n"
+"POT-Creation-Date: 2026-08-18 22:13+0000\n"
+"PO-Revision-Date: 2026-08-18 22:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "A %(ttype)s field cannot be grouped by."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A %(view)s view can only anchor on a field, not on a %(kind)s."
 msgstr ""
 
@@ -50,6 +56,31 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A field type or a related path is required."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "A filter carries either a domain or a grouping."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"A filter either narrows the records with a domain or\n"
+"                            groups them by a field, never both."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "A filter label is required."
 msgstr ""
 
 #. module: web_customizer
@@ -165,9 +196,21 @@ msgid "Action '%s' is missing."
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Active Customers"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_field
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Add Field"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_filter
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Add Filter"
 msgstr ""
 
 #. module: web_customizer
@@ -192,6 +235,12 @@ msgid "Add Page or Group"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Add a filter next to a search field or another filter."
+msgstr ""
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add at least one selection option."
@@ -213,6 +262,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add field in this page"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Add filter after this one"
 msgstr ""
 
 #. module: web_customizer
@@ -694,6 +749,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize filter %s"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize group %s"
 msgstr ""
 
@@ -786,6 +847,12 @@ msgid "Display Name"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Domain"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_related
 msgid "Dotted path to an existing field, for example parent_id.email."
 msgstr ""
@@ -799,6 +866,12 @@ msgstr ""
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_bundle__state__draft
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__draft
 msgid "Draft"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Enter a domain or a field to group by."
 msgstr ""
 
 #. module: web_customizer
@@ -846,6 +919,12 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%(field)s' does not exist on %(model)s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Field '%s' does not exist on %s."
 msgstr ""
@@ -875,6 +954,11 @@ msgid "Field name '%s' is not valid for placing a field."
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_group_by
+msgid "Field name to group by. Leave the domain empty when set."
+msgstr ""
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Field type"
@@ -897,6 +981,29 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__filename
 msgid "Filename"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__filter
+msgid "Filter"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_domain
+msgid "Filter Domain"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Filter label"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Filters only exist on search views."
 msgstr ""
 
 #. module: web_customizer
@@ -950,6 +1057,17 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Group '%s' has no XML ID and cannot be used in a view."
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_group_by
+msgid "Group By Field"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Group by '%s' is not a valid field name."
 msgstr ""
 
 #. module: web_customizer
@@ -1022,6 +1140,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this field"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Hide this filter"
 msgstr ""
 
 #. module: web_customizer
@@ -1291,6 +1415,11 @@ msgid "New label"
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_domain
+msgid "Odoo domain, for example [('active', '=', True)]."
+msgstr ""
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_systray.js:0
 msgid "On"
@@ -1467,6 +1596,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%(position)s' is not valid for placing a %(tag)s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Position '%s' is not valid for adding a filter."
 msgstr ""
 
 #. module: web_customizer
@@ -1850,6 +1985,24 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "The filter domain is malformed: %s"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "The filter domain is not valid Python: %s"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "The filter domain must be a list of conditions."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "The model %s does not support adding fields."
 msgstr ""
 
@@ -1993,9 +2146,21 @@ msgid "XPath"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "[('active', '=', True)]"
+msgstr ""
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_operation.py:0
 msgid "add_field requires a field type or a related path."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "add_filter requires a domain or a grouping."
 msgstr ""
 
 #. module: web_customizer
@@ -2054,6 +2219,12 @@ msgstr ""
 msgid ""
 "nodes. Choose which one\n"
 "                    to customize."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "or group by field"
 msgstr ""
 
 #. module: web_customizer
@@ -2121,6 +2292,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "set_widget requires payload.widget."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "user_id"
 msgstr ""
 
 #. module: web_customizer

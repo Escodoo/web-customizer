@@ -83,6 +83,8 @@ export class CustomizationFieldDialog extends Component {
             targetMenuId: false,
             widget: "",
             optional: "hide",
+            filterDomain: "",
+            filterGroupBy: "",
             groupIds: [],
             modInvisible: "",
             modReadonly: "",
@@ -159,6 +161,9 @@ export class CustomizationFieldDialog extends Component {
         if (this.props.viewType === "kanban") {
             return _t("Customize kanban field %s", label);
         }
+        if (this.anchorKind === "filter") {
+            return _t("Customize filter %s", label);
+        }
         if (this.props.viewType === "search") {
             return _t("Customize search field %s", label);
         }
@@ -201,6 +206,14 @@ export class CustomizationFieldDialog extends Component {
         }
         if (this.anchorKind === "progressbar") {
             return [{value: "hide", label: _t("Hide this progressbar")}];
+        }
+        if (this.anchorKind === "filter") {
+            return [
+                {value: "add_filter", label: _t("Add filter after this one")},
+                {value: "hide", label: _t("Hide this filter")},
+                {value: "rename", label: _t("Change label")},
+                {value: "set_groups", label: _t("Restrict to groups")},
+            ];
         }
         if (this.anchorKind === "menu") {
             return [
@@ -251,6 +264,12 @@ export class CustomizationFieldDialog extends Component {
             fieldActions.splice(2, 0, {
                 value: "set_optional",
                 label: _t("Make column optional"),
+            });
+        }
+        if (this.props.viewType === "search") {
+            fieldActions.splice(2, 0, {
+                value: "add_filter",
+                label: _t("Add filter after this one"),
             });
         }
         return fieldActions;
@@ -415,6 +434,24 @@ export class CustomizationFieldDialog extends Component {
                 payload.name = this.state.name;
             }
             return payload;
+        }
+        if (action === "add_filter") {
+            const string = this.state.string.trim();
+            if (!string) {
+                this.notifyError(_t("A filter label is required."));
+                return false;
+            }
+            const groupBy = this.state.filterGroupBy.trim();
+            const domain = this.state.filterDomain.trim();
+            if (!groupBy && !domain) {
+                this.notifyError(_t("Enter a domain or a field to group by."));
+                return false;
+            }
+            if (groupBy && domain) {
+                this.notifyError(_t("A filter carries either a domain or a grouping."));
+                return false;
+            }
+            return {string, domain, group_by: groupBy};
         }
         if (action === "move_menu" || action === "move_as_submenu") {
             if (!this.state.targetMenuId) {
