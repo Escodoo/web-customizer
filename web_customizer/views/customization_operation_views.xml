@@ -154,16 +154,16 @@
                             </group>
                             <group
                                 string="Place Field"
-                                invisible="type != 'place_field'"
+                                invisible="type not in ('place_field', 'move_field')"
                             >
                                 <field
                                     name="payload_field_name"
-                                    required="type == 'place_field'"
+                                    required="type in ('place_field', 'move_field')"
                                 />
                                 <field
                                     name="payload_field_type"
-                                    invisible="view_type not in ('pivot', 'graph')"
-                                    required="view_type == 'pivot'"
+                                    invisible="type != 'place_field' or view_type not in ('pivot', 'graph')"
+                                    required="type == 'place_field' and view_type == 'pivot'"
                                 />
                             </group>
                             <group string="Set Widget" invisible="type != 'set_widget'">

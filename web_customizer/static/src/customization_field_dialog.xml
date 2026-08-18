@@ -278,7 +278,9 @@
                         </div>
                     </div>
                 </t>
-                <t t-if="state.action === 'place_after'">
+                <t
+                    t-if="state.action === 'place_after' || state.action === 'move_after'"
+                >
                     <div class="mb-3">
                         <label class="form-label">Existing field</label>
                         <RecordSelector
@@ -289,6 +291,10 @@
                             fieldString.translate="Existing field"
                             placeholder.translate="Search a field..."
                         />
+                        <div class="form-text" t-if="state.action === 'move_after'">
+                            The field must already be in this view. It is
+                            relocated, not duplicated.
+                        </div>
                     </div>
                 </t>
                 <t t-if="state.action === 'rename'">

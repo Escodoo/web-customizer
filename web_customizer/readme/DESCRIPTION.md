@@ -15,7 +15,8 @@ Customization managers can turn on customization mode from the systray and
 click a field, page tab, group title, or named button on a form, a list column
 header, a kanban card field or button, a kanban header button or
 progressbar, or a search field to add a field, place an
-existing field, add a notebook page or group, hide it, change its label, set a
+existing field, move a field the view already declares, add a notebook page
+or group, hide it, change its label, set a
 widget, restrict it to groups, or set modifiers. Click a navbar menu to hide
 it, rename it, restrict it to groups, add a sibling or submenu (bound to a
 window action with an XML ID), or move it after another menu or as a
@@ -32,9 +33,16 @@ A hide, rename, groups or move write on a standard menu is exclusive
 per type: a second bundle cannot overwrite the same snapshot.
 The same rule applies to hide, label, widget, groups and modifier
 operations on a view node: two live inherits of the same type on the
-same anchor are refused. Placing the same field twice on one view is
-also refused. Company on a bundle is only a filter tag; compiled
+same anchor are refused. Two operations positioning the same field on one
+view are also refused. Company on a bundle is only a filter tag; compiled
 records stay global.
+
+Moving a field relocates the node the view already declares instead of
+adding a second copy, so it arrives with the widget, label and modifiers
+the base view gave it, and it returns to its original spot once the
+operation is dropped. A source that is missing, or that the view declares
+more than once, is reported as broken rather than compiled into an
+inherit the renderer would choke on.
 
 What sets this apart from Odoo Studio is the storage model. Studio mutates
 the database and keeps the result, so when a core view moves on upgrade the

@@ -54,6 +54,7 @@ AGGREGATE_FIELD_TYPES = {
 }
 AGGREGATE_OPERATION_TYPES = (
     "place_field",
+    "move_field",
     "set_string",
     "set_widget",
     "set_groups",
@@ -69,6 +70,16 @@ ANCHOR_TAGS = {
     "filter": "filter",
 }
 FIELD_POSITIONS = ("before", "after", "inside", "replace")
+# A move relocates the existing node, so "replace" would drop the anchor
+# instead of relocating anything.
+MOVE_POSITIONS = ("before", "after", "inside")
+# Both types decide where a field sits in the view, so two of them on the
+# same field would fight over the same node.
+PLACEMENT_TYPES = ("place_field", "move_field")
+PLACEMENT_LABELS = {
+    "place_field": "Place Field",
+    "move_field": "Move Field",
+}
 STRUCTURE_TYPES = ("add_page", "add_group")
 MENU_TYPES = (
     "hide_menu",
@@ -489,6 +500,37 @@ def resolve_field_anchor(arch_tree, anchor_name):
     return resolve_anchor(arch_tree, anchor_name, "field")
 
 
+def _check_move_source(operation, arch_tree, anchor_node):
+    """Refuse a move whose source node the inheritance engine cannot relocate.
+
+    A missing source makes the inherit raise at render time and takes the whole
+    view down, and ``locate_node`` silently picks the first field carrying the
+    name, so an ambiguous source would move a node the user never clicked.
+    """
+    field_name = (_payload(operation).get("field_name") or "").strip()
+    if not field_name:
+        raise AnchorError(_("move_field requires payload.field_name."))
+    if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
+        raise AnchorError(_("Field name '%s' is not valid.") % field_name)
+    nodes = arch_tree.xpath(f"//field[@name={xpath_quote(field_name)}]")
+    if not nodes:
+        raise AnchorError(
+            _("Field '%s' is not in the target view, so it cannot be moved.")
+            % field_name
+        )
+    if len(nodes) > 1:
+        raise AnchorError(
+            _(
+                "Field '%(field)s' appears %(count)s times in the target view, "
+                "so the node to move is ambiguous.",
+                field=field_name,
+                count=len(nodes),
+            )
+        )
+    if nodes[0] is anchor_node:
+        raise AnchorError(_("Field '%s' cannot be moved next to itself.") % field_name)
+
+
 def health_check_operation(operation):
     """Resolve the operation anchor without writing fields or views.
 
@@ -506,7 +548,7 @@ def health_check_operation(operation):
         return False, _("A target view is required.")
     try:
         arch_tree = combined_arch_for_operation(operation.view_id, operation)
-        resolve_anchor(
+        anchor_node = resolve_anchor(
             arch_tree,
             operation.anchor_name,
             operation.anchor_kind,
@@ -514,6 +556,8 @@ def health_check_operation(operation):
             operation.anchor_page,
             operation.anchor_string,
         )
+        if operation.type == "move_field":
+            _check_move_source(operation, arch_tree, anchor_node)
     except AnchorError as err:
         return False, err.reason
     except (ValueError, etree.ParseError) as err:
@@ -675,9 +719,12 @@ def apply_operation(operation):
         ok, reason = health_check_operation(operation)
         if not ok:
             raise AnchorError(reason)
-        if operation.type == "place_field":
+        if operation.type in PLACEMENT_TYPES:
             assert_no_place_field_conflict(operation)
-            _apply_place_field(operation)
+            if operation.type == "move_field":
+                _apply_move_field(operation)
+            else:
+                _apply_place_field(operation)
         elif operation.type == "add_filter":
             _apply_add_filter(operation)
         elif operation.type in STRUCTURE_TYPES:
@@ -815,16 +862,16 @@ def assert_no_view_write_conflict(operation):
 
 
 def place_field_conflicts(operation):
-    """Return another live place of the same field on the same view."""
+    """Return another live placement of the same field on the same view."""
     Operation = operation.env["customization.operation"]
-    if operation.type != "place_field" or not operation.view_id:
+    if operation.type not in PLACEMENT_TYPES or not operation.view_id:
         return Operation.browse()
     field_name = (operation.payload or {}).get("field_name")
     if not field_name:
         return Operation.browse()
     domain = [
         ("view_id", "=", operation.view_id.id),
-        ("type", "=", "place_field"),
+        ("type", "in", list(PLACEMENT_TYPES)),
         ("state", "in", ("draft", "applied")),
     ]
     if operation.id:
@@ -836,13 +883,14 @@ def place_field_conflicts(operation):
 
 
 def place_field_conflict_message(operation, other):
-    """Explain which bundle already placed this field on the view."""
+    """Explain which bundle already positions this field on the view."""
     field_name = (operation.payload or {}).get("field_name") or ""
     return operation.env._(
-        "Bundle '%(bundle)s' already has a Place Field operation for "
+        "Bundle '%(bundle)s' already has a %(type)s operation for "
         "'%(field)s' in view '%(view)s'."
     ) % {
         "bundle": other.bundle_id.code,
+        "type": PLACEMENT_LABELS.get(other.type, other.type),
         "field": field_name,
         "view": operation.view_id.name,
     }
@@ -1464,15 +1512,36 @@ def aggregate_field_type(operation):
     return "" if field_type == "groupby" else field_type
 
 
-def _apply_place_field(operation):
-    payload = _payload(operation)
-    field_name = payload.get("field_name")
+def placement_field_name(operation):
+    """Return the field a place/move operation acts on."""
+    field_name = _payload(operation).get("field_name")
     if not field_name:
-        raise UserError(_("place_field requires payload.field_name."))
-    if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
         raise UserError(
-            _("Field name '%s' is not valid for placing a field.") % field_name
+            _("%s requires payload.field_name.") % (operation.type or "place_field")
         )
+    if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
+        raise UserError(_("Field name '%s' is not valid.") % field_name)
+    return field_name
+
+
+def _apply_move_field(operation):
+    """Relocate an existing field node instead of adding a second one."""
+    field_name = placement_field_name(operation)
+    position = operation.position or "after"
+    if position not in MOVE_POSITIONS:
+        raise AnchorError(
+            _("Position '%s' is not valid for moving a field.") % position
+        )
+    arch = _inherit_arch(
+        operation,
+        f'<field name="{_xml_attr(field_name)}" position="move"/>',
+        position,
+    )
+    _upsert_generated_view(operation, arch, active=True)
+
+
+def _apply_place_field(operation):
+    field_name = placement_field_name(operation)
     position = operation.position or "after"
     if position not in FIELD_POSITIONS:
         raise AnchorError(

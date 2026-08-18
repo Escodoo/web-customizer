@@ -10,6 +10,7 @@ from .compiler import (
     ATTRIBUTE_TYPES,
     MENU_TYPES,
     MENU_WRITE_TYPES,
+    PLACEMENT_TYPES,
     STRUCTURE_TYPES,
     AnchorError,
     _deactivate_generated_view,
@@ -84,6 +85,7 @@ class CustomizationOperation(models.Model):
         selection=[
             ("add_field", "Add Field"),
             ("place_field", "Place Field"),
+            ("move_field", "Move Field"),
             ("add_page", "Add Page"),
             ("add_group", "Add Group"),
             ("add_filter", "Add Filter"),
@@ -344,6 +346,11 @@ class CustomizationOperation(models.Model):
                     f"Place {payload.get('field_name') or '?'} "
                     f"{rec.position or 'after'} {anchor}"
                 )
+            elif rec.type == "move_field":
+                rec.name = (
+                    f"Move {payload.get('field_name') or '?'} "
+                    f"{rec.position or 'after'} {anchor}"
+                )
             elif rec.type == "add_page":
                 rec.name = (
                     f"Add page {payload.get('string') or payload.get('name') or '?'}"
@@ -500,7 +507,7 @@ class CustomizationOperation(models.Model):
         payload = dict(payload or {})
         if op_type == "add_field":
             self._apply_add_field_payload_ui(payload, ui)
-        elif op_type == "place_field":
+        elif op_type in PLACEMENT_TYPES:
             if "payload_field_name" in ui:
                 self._set_payload_key(payload, "field_name", ui["payload_field_name"])
             if "payload_field_type" in ui:
@@ -613,7 +620,7 @@ class CustomizationOperation(models.Model):
             self._check_add_field_operation()
         elif self.type in MENU_TYPES:
             self._check_menu_operation()
-        elif self.type in ("place_field",) + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
+        elif self.type in PLACEMENT_TYPES + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
             self._check_view_operation()
 
     def _check_add_field_operation(self):
@@ -654,7 +661,7 @@ class CustomizationOperation(models.Model):
             other = view_write_conflicts(self)
             if other:
                 raise ValidationError(view_write_conflict_message(self, other))
-        elif self.type == "place_field":
+        elif self.type in PLACEMENT_TYPES:
             other = place_field_conflicts(self)
             if other:
                 raise ValidationError(place_field_conflict_message(self, other))

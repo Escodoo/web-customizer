@@ -385,13 +385,13 @@ version in git.</p>
 and click a field, page tab, group title, or named button on a form, a
 list column header, a kanban card field or button, a kanban header
 button or progressbar, or a search field to add a field, place an
-existing field, add a notebook page or group, hide it, change its label,
-set a widget, restrict it to groups, or set modifiers. Click a navbar
-menu to hide it, rename it, restrict it to groups, add a sibling or
-submenu (bound to a window action with an XML ID), or move it after
-another menu or as a submenu. Duplicate names (for example two <tt class="docutils literal">email</tt>
-fields) are chosen in the dialog. That writes the same operations as the
-backend form.</p>
+existing field, move a field the view already declares, add a notebook
+page or group, hide it, change its label, set a widget, restrict it to
+groups, or set modifiers. Click a navbar menu to hide it, rename it,
+restrict it to groups, add a sibling or submenu (bound to a window
+action with an XML ID), or move it after another menu or as a submenu.
+Duplicate names (for example two <tt class="docutils literal">email</tt> fields) are chosen in the
+dialog. That writes the same operations as the backend form.</p>
 <p>On module update (<tt class="docutils literal"><span class="pre">-u</span></tt>), a health check re-resolves anchors
 automatically. Missing anchors are marked <tt class="docutils literal">broken</tt> with a reason;
 other operations are left intact. Customizations never disappear
@@ -401,9 +401,15 @@ menus. Git still needs the exported addon. A hide, rename, groups or
 move write on a standard menu is exclusive per type: a second bundle
 cannot overwrite the same snapshot. The same rule applies to hide,
 label, widget, groups and modifier operations on a view node: two live
-inherits of the same type on the same anchor are refused. Placing the
-same field twice on one view is also refused. Company on a bundle is
-only a filter tag; compiled records stay global.</p>
+inherits of the same type on the same anchor are refused. Two operations
+positioning the same field on one view are also refused. Company on a
+bundle is only a filter tag; compiled records stay global.</p>
+<p>Moving a field relocates the node the view already declares instead of
+adding a second copy, so it arrives with the widget, label and modifiers
+the base view gave it, and it returns to its original spot once the
+operation is dropped. A source that is missing, or that the view
+declares more than once, is reported as broken rather than compiled into
+an inherit the renderer would choke on.</p>
 <p>What sets this apart from Odoo Studio is the storage model. Studio
 mutates the database and keeps the result, so when a core view moves on
 upgrade the only recovery path is to discard the customizations on that
@@ -499,15 +505,18 @@ name), or set modifiers (invisible / readonly / required). Click a
 <strong>sibling menu</strong> after it, add a <strong>submenu</strong>, or <strong>move</strong> it after
 another menu or as a submenu. New menus need a window action that
 already has an XML ID. The destination of a move must also have an
-XML ID. The clicked node is the semantic anchor. To mirror another
-field, fill <strong>Related path</strong> (for example <tt class="docutils literal">parent_id.email</tt>)
-instead of a field type. Pages and groups without a technical
-<tt class="docutils literal">name</tt> are anchored by their title (stored on the operation; the
-generated inherit xpath uses a unique field inside the node or the
-node position, because Odoo forbids <tt class="docutils literal">&#64;string</tt> selectors). If the
-same name appears more than once, choose the node in the dialog. A
-new page after a field is wrapped in a notebook; a new page after an
-existing tab is a sibling.</li>
+XML ID. The clicked node is the semantic anchor. <strong>Move an existing
+field</strong> relocates a field the view already declares instead of adding
+a second copy of it, so the field keeps its widget, label and
+modifiers; the field must appear exactly once in the view. To mirror
+another field, fill <strong>Related path</strong> (for example
+<tt class="docutils literal">parent_id.email</tt>) instead of a field type. Pages and groups
+without a technical <tt class="docutils literal">name</tt> are anchored by their title (stored on
+the operation; the generated inherit xpath uses a unique field inside
+the node or the node position, because Odoo forbids <tt class="docutils literal">&#64;string</tt>
+selectors). If the same name appears more than once, choose the node
+in the dialog. A new page after a field is wrapped in a notebook; a
+new page after an existing tab is a sibling.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
 the selected type. The <strong>Raw JSON</strong> tab shows the stored intent.</li>
 <li>Click <strong>Apply</strong> to compile fields and inherited views.</li>
@@ -531,16 +540,16 @@ cannot overwrite each other. Unlink restores that snapshot. Hide,
 label, widget, groups and modifier operations on a view node are
 exclusive the same way: only one live operation of each type may
 target the same anchor, so two bundles cannot compile two inherits
-for the same hide. Placing the same field twice on the same view is
-refused the same way.</li>
+for the same hide. Placing or moving the same field twice on the same
+view is refused the same way.</li>
 </ol>
 <div class="section" id="single-company-pilot">
 <h2><a class="toc-backref" href="#toc-entry-4">Single-company pilot</a></h2>
 <p>Use one company. Cover the surfaces below, then ship the ZIP — do not
 leave this module as the production runtime.</p>
 <ol class="arabic simple">
-<li><strong>Form</strong> — add or place a field; hide or rename a page, group or
-button.</li>
+<li><strong>Form</strong> — add, place or move a field; hide or rename a page, group
+or button.</li>
 <li><strong>List</strong> — add, hide, relabel a column, or make it optional so users
 can turn it on from the column picker.</li>
 <li><strong>Search</strong> — add, hide or relabel a search chip, or add a filter with
@@ -616,6 +625,8 @@ mode.</li>
 instead of being pinned or hidden outright.</li>
 <li>Search filters and groupings are semantic anchors, and a filter can be
 added with a validated domain or a group by.</li>
+<li>A field already declared in a view can be moved to another spot,
+keeping the attributes the base view gave it.</li>
 </ul>
 </div>
 </div>

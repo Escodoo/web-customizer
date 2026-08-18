@@ -25,6 +25,7 @@ from .compiler import (
 UI_ACTIONS = (
     "add_after",
     "place_after",
+    "move_after",
     "hide",
     "rename",
     "set_widget",
@@ -270,7 +271,7 @@ class CustomizationBundle(models.Model):
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
             )
-        elif action == "place_after":
+        elif action in ("place_after", "move_after"):
             field_name = self._ui_existing_field_name(
                 model_name, payload.get("field_name"), anchor_name
             )
@@ -289,6 +290,7 @@ class CustomizationBundle(models.Model):
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
                 field_type=payload.get("field_type"),
+                op_type="move_field" if action == "move_after" else "place_field",
             )
         elif action == "add_filter":
             operations = self._ui_action_add_filter(
@@ -592,7 +594,7 @@ class CustomizationBundle(models.Model):
             raise UserError(self.env._("Widgets can only be set on fields."))
         if action != "hide" and anchor_kind == "progressbar":
             raise UserError(self.env._("A progressbar can only be hidden."))
-        if action in ("add_after", "place_after") and anchor_kind in (
+        if action in ("add_after", "place_after", "move_after") and anchor_kind in (
             "button",
             "progressbar",
         ):
@@ -861,17 +863,19 @@ class CustomizationBundle(models.Model):
         anchor_page=False,
         anchor_string=False,
         field_type=False,
+        op_type="place_field",
     ):
-        """Create a place_field operation and optionally compile it."""
+        """Create a place_field or move_field operation and optionally compile it."""
         payload = {"field_name": field_name}
-        if view_type in AGGREGATE_VIEW_TYPES:
+        if view_type in AGGREGATE_VIEW_TYPES and op_type == "place_field":
             # The in-place UI only ever anchors on a measure, so that is the
             # role a placed field takes unless the caller asked for another.
+            # A moved node keeps the role it already carries.
             payload["field_type"] = field_type or "measure"
         vals = {
             "bundle_id": bundle.id,
             "sequence": sequence,
-            "type": "place_field",
+            "type": op_type,
             "model_id": model.id,
             "view_id": view.id,
             "view_type": view_type,

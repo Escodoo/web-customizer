@@ -19,7 +19,10 @@
    **move** it after another menu or as a submenu. New menus need a
    window action that already has an XML ID. The destination of a move
    must also have an XML ID. The clicked
-   node is the semantic anchor. To
+   node is the semantic anchor. **Move an existing field** relocates a
+   field the view already declares instead of adding a second copy of it,
+   so the field keeps its widget, label and modifiers; the field must
+   appear exactly once in the view. To
    mirror another field, fill **Related path** (for example
    `parent_id.email`) instead of a field type. Pages and groups without
    a technical ``name`` are anchored by their title (stored on the
@@ -50,15 +53,16 @@
    other. Unlink restores that snapshot. Hide, label, widget, groups and
    modifier operations on a view node are exclusive the same way: only
    one live operation of each type may target the same anchor, so two
-   bundles cannot compile two inherits for the same hide. Placing the
-   same field twice on the same view is refused the same way.
+   bundles cannot compile two inherits for the same hide. Placing or
+   moving the same field twice on the same view is refused the same way.
 
 ## Single-company pilot
 
 Use one company. Cover the surfaces below, then ship the ZIP — do not
 leave this module as the production runtime.
 
-1. **Form** — add or place a field; hide or rename a page, group or button.
+1. **Form** — add, place or move a field; hide or rename a page, group or
+   button.
 2. **List** — add, hide, relabel a column, or make it optional so users
    can turn it on from the column picker.
 3. **Search** — add, hide or relabel a search chip, or add a filter with a

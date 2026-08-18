@@ -40,13 +40,13 @@ Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
 list column header, a kanban card field or button, a kanban header
 button or progressbar, or a search field to add a field, place an
-existing field, add a notebook page or group, hide it, change its label,
-set a widget, restrict it to groups, or set modifiers. Click a navbar
-menu to hide it, rename it, restrict it to groups, add a sibling or
-submenu (bound to a window action with an XML ID), or move it after
-another menu or as a submenu. Duplicate names (for example two ``email``
-fields) are chosen in the dialog. That writes the same operations as the
-backend form.
+existing field, move a field the view already declares, add a notebook
+page or group, hide it, change its label, set a widget, restrict it to
+groups, or set modifiers. Click a navbar menu to hide it, rename it,
+restrict it to groups, add a sibling or submenu (bound to a window
+action with an XML ID), or move it after another menu or as a submenu.
+Duplicate names (for example two ``email`` fields) are chosen in the
+dialog. That writes the same operations as the backend form.
 
 On module update (``-u``), a health check re-resolves anchors
 automatically. Missing anchors are marked ``broken`` with a reason;
@@ -57,9 +57,16 @@ menus. Git still needs the exported addon. A hide, rename, groups or
 move write on a standard menu is exclusive per type: a second bundle
 cannot overwrite the same snapshot. The same rule applies to hide,
 label, widget, groups and modifier operations on a view node: two live
-inherits of the same type on the same anchor are refused. Placing the
-same field twice on one view is also refused. Company on a bundle is
-only a filter tag; compiled records stay global.
+inherits of the same type on the same anchor are refused. Two operations
+positioning the same field on one view are also refused. Company on a
+bundle is only a filter tag; compiled records stay global.
+
+Moving a field relocates the node the view already declares instead of
+adding a second copy, so it arrives with the widget, label and modifiers
+the base view gave it, and it returns to its original spot once the
+operation is dropped. A source that is missing, or that the view
+declares more than once, is reported as broken rather than compiled into
+an inherit the renderer would choke on.
 
 What sets this apart from Odoo Studio is the storage model. Studio
 mutates the database and keeps the result, so when a core view moves on
@@ -147,15 +154,18 @@ Usage
    **sibling menu** after it, add a **submenu**, or **move** it after
    another menu or as a submenu. New menus need a window action that
    already has an XML ID. The destination of a move must also have an
-   XML ID. The clicked node is the semantic anchor. To mirror another
-   field, fill **Related path** (for example ``parent_id.email``)
-   instead of a field type. Pages and groups without a technical
-   ``name`` are anchored by their title (stored on the operation; the
-   generated inherit xpath uses a unique field inside the node or the
-   node position, because Odoo forbids ``@string`` selectors). If the
-   same name appears more than once, choose the node in the dialog. A
-   new page after a field is wrapped in a notebook; a new page after an
-   existing tab is a sibling.
+   XML ID. The clicked node is the semantic anchor. **Move an existing
+   field** relocates a field the view already declares instead of adding
+   a second copy of it, so the field keeps its widget, label and
+   modifiers; the field must appear exactly once in the view. To mirror
+   another field, fill **Related path** (for example
+   ``parent_id.email``) instead of a field type. Pages and groups
+   without a technical ``name`` are anchored by their title (stored on
+   the operation; the generated inherit xpath uses a unique field inside
+   the node or the node position, because Odoo forbids ``@string``
+   selectors). If the same name appears more than once, choose the node
+   in the dialog. A new page after a field is wrapped in a notebook; a
+   new page after an existing tab is a sibling.
 3. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent.
 4. Click **Apply** to compile fields and inherited views.
@@ -179,8 +189,8 @@ Usage
    label, widget, groups and modifier operations on a view node are
    exclusive the same way: only one live operation of each type may
    target the same anchor, so two bundles cannot compile two inherits
-   for the same hide. Placing the same field twice on the same view is
-   refused the same way.
+   for the same hide. Placing or moving the same field twice on the same
+   view is refused the same way.
 
 Single-company pilot
 --------------------
@@ -188,8 +198,8 @@ Single-company pilot
 Use one company. Cover the surfaces below, then ship the ZIP — do not
 leave this module as the production runtime.
 
-1. **Form** — add or place a field; hide or rename a page, group or
-   button.
+1. **Form** — add, place or move a field; hide or rename a page, group
+   or button.
 2. **List** — add, hide, relabel a column, or make it optional so users
    can turn it on from the column picker.
 3. **Search** — add, hide or relabel a search chip, or add a filter with
@@ -268,6 +278,8 @@ First public Beta.
   instead of being pinned or hidden outright.
 - Search filters and groupings are semantic anchors, and a filter can be
   added with a validated domain or a group by.
+- A field already declared in a view can be moved to another spot,
+  keeping the attributes the base view gave it.
 
 Bug Tracker
 ===========

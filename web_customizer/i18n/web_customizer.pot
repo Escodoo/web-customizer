@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-18 22:13+0000\n"
-"PO-Revision-Date: 2026-08-18 22:13+0000\n"
+"POT-Creation-Date: 2026-08-18 22:36+0000\n"
+"PO-Revision-Date: 2026-08-18 22:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,6 +19,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "\" matches"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "%s requires payload.field_name."
 msgstr ""
 
 #. module: web_customizer
@@ -495,6 +501,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid ""
+"Bundle '%(bundle)s' already has a %(type)s operation for '%(field)s' in view"
+" '%(view)s'."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
 "Bundle '%(bundle)s' already has a %(type)s operation on '%(anchor)s' in view"
 " '%(view)s'."
 msgstr ""
@@ -504,14 +518,6 @@ msgstr ""
 #: code:addons/web_customizer/models/compiler.py:0
 msgid ""
 "Bundle '%(bundle)s' already has a %(type)s operation on menu '%(menu)s'."
-msgstr ""
-
-#. module: web_customizer
-#. odoo-python
-#: code:addons/web_customizer/models/compiler.py:0
-msgid ""
-"Bundle '%(bundle)s' already has a Place Field operation for '%(field)s' in "
-"view '%(view)s'."
 msgstr ""
 
 #. module: web_customizer
@@ -920,13 +926,33 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Field '%(field)s' appears %(count)s times in the target view, so the node to"
+" move is ambiguous."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Field '%(field)s' does not exist on %(model)s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' cannot be moved next to itself."
 msgstr ""
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Field '%s' does not exist on %s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' is not in the target view, so it cannot be moved."
 msgstr ""
 
 #. module: web_customizer
@@ -950,7 +976,7 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Field name '%s' is not valid for placing a field."
+msgid "Field name '%s' is not valid."
 msgstr ""
 
 #. module: web_customizer
@@ -1389,7 +1415,31 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move an existing field here"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move an existing measure here"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Move as submenu of another menu"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move existing field to this group"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move existing field to this page"
 msgstr ""
 
 #. module: web_customizer
@@ -1602,6 +1652,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%s' is not valid for adding a filter."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Position '%s' is not valid for moving a field."
 msgstr ""
 
 #. module: web_customizer
@@ -1983,6 +2039,14 @@ msgid "The destination menu must have an XML ID."
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"The field must already be in this view. It is\n"
+"                            relocated, not duplicated."
+msgstr ""
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "The filter domain is malformed: %s"
@@ -2210,6 +2274,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "move_field requires payload.field_name."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "move_menu requires a destination menu with an XML ID."
 msgstr ""
 
@@ -2238,12 +2308,6 @@ msgstr ""
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "parent_id.email"
-msgstr ""
-
-#. module: web_customizer
-#. odoo-python
-#: code:addons/web_customizer/models/compiler.py:0
-msgid "place_field requires payload.field_name."
 msgstr ""
 
 #. module: web_customizer

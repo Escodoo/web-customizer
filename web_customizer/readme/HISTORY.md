@@ -18,3 +18,5 @@ First public Beta.
   instead of being pinned or hidden outright.
 - Search filters and groupings are semantic anchors, and a filter can be
   added with a validated domain or a group by.
+- A field already declared in a view can be moved to another spot, keeping
+  the attributes the base view gave it.

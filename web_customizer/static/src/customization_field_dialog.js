@@ -178,6 +178,7 @@ export class CustomizationFieldDialog extends Component {
             return [
                 {value: "add_after", label: _t("Add field in this page")},
                 {value: "place_after", label: _t("Place existing field in this page")},
+                {value: "move_after", label: _t("Move existing field to this page")},
                 {value: "add_page", label: _t("Add page after this one")},
                 {value: "add_group", label: _t("Add group in this page")},
                 {value: "hide", label: _t("Hide this page")},
@@ -191,6 +192,7 @@ export class CustomizationFieldDialog extends Component {
                     value: "place_after",
                     label: _t("Place existing field in this group"),
                 },
+                {value: "move_after", label: _t("Move existing field to this group")},
                 {value: "add_group", label: _t("Add group after this one")},
                 {value: "hide", label: _t("Hide this group")},
                 {value: "rename", label: _t("Change group title")},
@@ -235,6 +237,7 @@ export class CustomizationFieldDialog extends Component {
             return [
                 {value: "add_after", label: _t("Add measure after this one")},
                 {value: "place_after", label: _t("Place existing field as measure")},
+                {value: "move_after", label: _t("Move an existing measure here")},
                 {value: "hide", label: _t("Hide this measure")},
                 {value: "rename", label: _t("Change label")},
                 {value: "set_widget", label: _t("Set widget")},
@@ -244,6 +247,7 @@ export class CustomizationFieldDialog extends Component {
         const fieldActions = [
             {value: "add_after", label: _t("Add field after this one")},
             {value: "place_after", label: _t("Place existing field after this one")},
+            {value: "move_after", label: _t("Move an existing field here")},
             {value: "hide", label: _t("Hide this field")},
             {value: "rename", label: _t("Change label")},
             {value: "set_widget", label: _t("Set widget")},
@@ -251,23 +255,23 @@ export class CustomizationFieldDialog extends Component {
             {value: "set_modifier", label: _t("Set modifiers")},
         ];
         if ((this.props.viewType || "form") === "form") {
-            fieldActions.splice(2, 0, {
+            fieldActions.splice(3, 0, {
                 value: "add_group",
                 label: _t("Add group after this one"),
             });
-            fieldActions.splice(3, 0, {
+            fieldActions.splice(4, 0, {
                 value: "add_page",
                 label: _t("Add page after this one"),
             });
         }
         if (this.props.viewType === "list") {
-            fieldActions.splice(2, 0, {
+            fieldActions.splice(3, 0, {
                 value: "set_optional",
                 label: _t("Make column optional"),
             });
         }
         if (this.props.viewType === "search") {
-            fieldActions.splice(2, 0, {
+            fieldActions.splice(3, 0, {
                 value: "add_filter",
                 label: _t("Add filter after this one"),
             });
@@ -413,7 +417,7 @@ export class CustomizationFieldDialog extends Component {
         if (action === "add_after") {
             return this.payloadForAddAfter();
         }
-        if (action === "place_after") {
+        if (action === "place_after" || action === "move_after") {
             if (!this.state.existingFieldName) {
                 this.notifyError(_t("Select an existing field to place."));
                 return false;
