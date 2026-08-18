@@ -4,7 +4,7 @@
 {
     "name": "Web Customizer",
     "version": "18.0.1.0.0",
-    "summary": "Upgrade-safe visual UI customization, open source Studio alternative",
+    "summary": "Upgrade-safe UI customization, exportable as a real addon",
     "category": "Tools",
     "license": "AGPL-3",
     "author": "Escodoo",

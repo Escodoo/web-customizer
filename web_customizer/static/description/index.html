@@ -404,8 +404,14 @@ label, widget, groups and modifier operations on a view node: two live
 inherits of the same type on the same anchor are refused. Placing the
 same field twice on one view is also refused. Company on a bundle is
 only a filter tag; compiled records stay global.</p>
-<p>Scope stops at the user interface, so this is not a feature-by-feature
-clone of Odoo Studio. Approvals stay in <tt class="docutils literal">base_tier_validation</tt>.
+<p>What sets this apart from Odoo Studio is the storage model. Studio
+mutates the database and keeps the result, so when a core view moves on
+upgrade the only recovery path is to discard the customizations on that
+view. Here the intent outlives the artifact: a moved anchor is
+re-resolved and only a genuinely missing one is reported.</p>
+<p>Scope stops at the user interface, and not at all of it. Pivot, graph,
+calendar and gantt views, creating a model, and report editing are not
+covered; see the roadmap. Approvals stay in <tt class="docutils literal">base_tier_validation</tt>.
 Automations stay in <tt class="docutils literal">base.automation</tt> / <tt class="docutils literal">automation_oca</tt>.</p>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
@@ -546,11 +552,30 @@ or a currency field name in the payload.</p>
 </div>
 <div class="section" id="known-issues-roadmap">
 <h1><a class="toc-backref" href="#toc-entry-5">Known issues / Roadmap</a></h1>
-<p>Known gaps. Proposals are welcome.</p>
+<p>Known gaps, ordered by what is worth closing first. Proposals are
+welcome.</p>
+<p>Next:</p>
 <ul class="simple">
-<li>Calendar, graph, pivot and gantt views are not outlined or compiled.</li>
+<li>Pivot and graph anchors. Both views are described by measures and
+groupings rather than by a tree of nodes, so they fit the existing
+anchor model at a low cost.</li>
 <li>Free XPath anchors stay in the model for export compatibility but are
 not offered in the systray dialog.</li>
+</ul>
+<p>Later:</p>
+<ul class="simple">
+<li>Calendar and gantt anchors, which need the date field pairs those
+views depend on to be resolved before a node can be targeted.</li>
+<li>Creating a model together with its menu and window action, so a bundle
+can add an entity instead of only extending an existing one.</li>
+</ul>
+<p>Deliberately out of this addon:</p>
+<ul class="simple">
+<li>Report editing. It is a large surface with anchor semantics of its own
+and belongs in a separate <tt class="docutils literal">web_customizer_report</tt> addon rather than
+in this one.</li>
+<li>Approvals and automations, which already have community answers in
+<tt class="docutils literal">base_tier_validation</tt> and <tt class="docutils literal">base.automation</tt> / <tt class="docutils literal">automation_oca</tt>.</li>
 </ul>
 </div>
 <div class="section" id="changelog">

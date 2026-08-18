@@ -36,6 +36,13 @@ same anchor are refused. Placing the same field twice on one view is
 also refused. Company on a bundle is only a filter tag; compiled
 records stay global.
 
-Scope stops at the user interface, so this is not a feature-by-feature
-clone of Odoo Studio. Approvals stay in `base_tier_validation`.
+What sets this apart from Odoo Studio is the storage model. Studio mutates
+the database and keeps the result, so when a core view moves on upgrade the
+only recovery path is to discard the customizations on that view. Here the
+intent outlives the artifact: a moved anchor is re-resolved and only a
+genuinely missing one is reported.
+
+Scope stops at the user interface, and not at all of it. Pivot, graph,
+calendar and gantt views, creating a model, and report editing are not
+covered; see the roadmap. Approvals stay in `base_tier_validation`.
 Automations stay in `base.automation` / `automation_oca`.
