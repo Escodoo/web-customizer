@@ -1,8 +1,3 @@
-import {expect, test} from "@odoo/hoot";
-import {animationFrame} from "@odoo/hoot-mock";
-import {CustomizationFieldDialog} from "@web_customizer/customization_field_dialog";
-import {customizationService} from "@web_customizer/customization_service";
-import {user} from "@web/core/user";
 import {
     contains,
     defineMenus,
@@ -17,9 +12,14 @@ import {
     onRpc,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import {MainComponentsContainer} from "@web/core/main_components_container";
+import {expect, test} from "@odoo/hoot";
+import {CustomizationFieldDialog} from "@web_customizer/customization_field_dialog";
 import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
+import {MainComponentsContainer} from "@web/core/main_components_container";
 import {NavBar} from "@web/webclient/navbar/navbar";
+import {animationFrame} from "@odoo/hoot-mock";
+import {customizationService} from "@web_customizer/customization_service";
+import {user} from "@web/core/user";
 
 class Partner extends models.Model {
     _name = "partner";

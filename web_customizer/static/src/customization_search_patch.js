@@ -1,6 +1,6 @@
-import {patch} from "@web/core/utils/patch";
-import {SearchBar} from "@web/search/search_bar/search_bar";
 import {openCustomizationFor, useCustomizationService} from "./customization_service";
+import {SearchBar} from "@web/search/search_bar/search_bar";
+import {patch} from "@web/core/utils/patch";
 
 patch(SearchBar.prototype, {
     setup() {

@@ -1,14 +1,14 @@
-import {useEffect} from "@odoo/owl";
-import {combineAttributes} from "@web/core/utils/xml";
-import {patch} from "@web/core/utils/patch";
-import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
-import {KanbanHeader} from "@web/views/kanban/kanban_header";
-import {KanbanRecord} from "@web/views/kanban/kanban_record";
 import {
     isKanbanRoot,
     openCustomizationFor,
     useCustomizationService,
 } from "./customization_service";
+import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
+import {KanbanHeader} from "@web/views/kanban/kanban_header";
+import {KanbanRecord} from "@web/views/kanban/kanban_record";
+import {combineAttributes} from "@web/core/utils/xml";
+import {patch} from "@web/core/utils/patch";
+import {useEffect} from "@odoo/owl";
 
 patch(KanbanCompiler.prototype, {
     compileField(el, params) {

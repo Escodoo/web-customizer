@@ -1,10 +1,10 @@
-import {patch} from "@web/core/utils/patch";
-import {ListRenderer} from "@web/views/list/list_renderer";
 import {
     isListRoot,
     openCustomizationFor,
     useCustomizationService,
 } from "./customization_service";
+import {ListRenderer} from "@web/views/list/list_renderer";
+import {patch} from "@web/core/utils/patch";
 
 patch(ListRenderer.prototype, {
     setup() {

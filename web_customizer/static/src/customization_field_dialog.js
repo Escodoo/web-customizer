@@ -1,9 +1,9 @@
 import {Component, onWillStart, useState} from "@odoo/owl";
-import {browser} from "@web/core/browser/browser";
 import {Dialog} from "@web/core/dialog/dialog";
-import {_t} from "@web/core/l10n/translation";
-import {RecordSelector} from "@web/core/record_selectors/record_selector";
 import {MultiRecordSelector} from "@web/core/record_selectors/multi_record_selector";
+import {RecordSelector} from "@web/core/record_selectors/record_selector";
+import {_t} from "@web/core/l10n/translation";
+import {browser} from "@web/core/browser/browser";
 import {useService} from "@web/core/utils/hooks";
 
 const FIELD_TYPES = [

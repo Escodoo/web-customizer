@@ -1,6 +1,6 @@
-import {patch} from "@web/core/utils/patch";
-import {PivotRenderer} from "@web/views/pivot/pivot_renderer";
 import {openCustomizationFor, useCustomizationService} from "./customization_service";
+import {PivotRenderer} from "@web/views/pivot/pivot_renderer";
+import {patch} from "@web/core/utils/patch";
 
 patch(PivotRenderer.prototype, {
     setup() {

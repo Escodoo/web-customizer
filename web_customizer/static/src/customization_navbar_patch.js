@@ -1,7 +1,7 @@
-import {useEffect} from "@odoo/owl";
-import {patch} from "@web/core/utils/patch";
 import {NavBar} from "@web/webclient/navbar/navbar";
+import {patch} from "@web/core/utils/patch";
 import {useCustomizationService} from "./customization_service";
+import {useEffect} from "@odoo/owl";
 
 patch(NavBar.prototype, {
     setup() {

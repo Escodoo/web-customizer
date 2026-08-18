@@ -8,8 +8,8 @@ import "./customization_service";
 import {Component, onWillStart, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
-import {user} from "@web/core/user";
 import {useService} from "@web/core/utils/hooks";
+import {user} from "@web/core/user";
 
 export class CustomizationSystray extends Component {
     static template = "web_customizer.Systray";

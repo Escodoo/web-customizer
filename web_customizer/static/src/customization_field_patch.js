@@ -1,12 +1,4 @@
-import {Notebook} from "@web/core/notebook/notebook";
-import {patch} from "@web/core/utils/patch";
-import {Field} from "@web/views/fields/field";
-import {FormCompiler} from "@web/views/form/form_compiler";
 import {InnerGroup, OuterGroup} from "@web/views/form/form_group/form_group";
-import {FormLabel} from "@web/views/form/form_label";
-import {toStringExpression} from "@web/views/utils";
-import {MultiRecordViewButton} from "@web/views/view_button/multi_record_view_button";
-import {ViewButton} from "@web/views/view_button/view_button";
 import {
     isFormRootField,
     isKanbanRoot,
@@ -14,6 +6,14 @@ import {
     useCustomizationService,
     viewButtonAnchor,
 } from "./customization_service";
+import {Field} from "@web/views/fields/field";
+import {FormCompiler} from "@web/views/form/form_compiler";
+import {FormLabel} from "@web/views/form/form_label";
+import {MultiRecordViewButton} from "@web/views/view_button/multi_record_view_button";
+import {Notebook} from "@web/core/notebook/notebook";
+import {ViewButton} from "@web/views/view_button/view_button";
+import {patch} from "@web/core/utils/patch";
+import {toStringExpression} from "@web/views/utils";
 
 patch(Field.prototype, {
     setup() {
