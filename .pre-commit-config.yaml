@@ -53,13 +53,13 @@ repos:
       # update the NOT INSTALLABLE ADDONS section above
       - id: oca-update-pre-commit-excluded-addons
       - id: oca-fix-manifest-website
-        args: ["https://github.com/Escodoo/escodoo-customization"]
+        args: ["https://github.com/Escodoo/web-customizer"]
       - id: oca-gen-addon-readme
         args:
           - --addons-dir=.
           - --branch=18.0
           - --org-name=Escodoo
-          - --repo-name=escodoo-customization
+          - --repo-name=web-customizer
           - --if-source-changed
           - --keep-source-digest
           - --convert-fragments-to-markdown

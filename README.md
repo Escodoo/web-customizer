@@ -1,15 +1,15 @@
 
 
-# Escodoo Odoo Customization
+# Web Customizer
 <!-- /!\ Non OCA Context : Set here the badge of your runbot / runboat instance. -->
-[![Pre-commit Status](https://github.com/Escodoo/escodoo-customization/actions/workflows/pre-commit.yml/badge.svg?branch=18.0)](https://github.com/Escodoo/escodoo-customization/actions/workflows/pre-commit.yml?query=branch%3A18.0)
-[![Build Status](https://github.com/Escodoo/escodoo-customization/actions/workflows/test.yml/badge.svg?branch=18.0)](https://github.com/Escodoo/escodoo-customization/actions/workflows/test.yml?query=branch%3A18.0)
-[![codecov](https://codecov.io/gh/Escodoo/escodoo-customization/branch/18.0/graph/badge.svg)](https://codecov.io/gh/Escodoo/escodoo-customization)
+[![Pre-commit Status](https://github.com/Escodoo/web-customizer/actions/workflows/pre-commit.yml/badge.svg?branch=18.0)](https://github.com/Escodoo/web-customizer/actions/workflows/pre-commit.yml?query=branch%3A18.0)
+[![Build Status](https://github.com/Escodoo/web-customizer/actions/workflows/test.yml/badge.svg?branch=18.0)](https://github.com/Escodoo/web-customizer/actions/workflows/test.yml?query=branch%3A18.0)
+[![codecov](https://codecov.io/gh/Escodoo/web-customizer/branch/18.0/graph/badge.svg)](https://codecov.io/gh/Escodoo/web-customizer)
 <!-- /!\ Non OCA Context : Set here the badge of your translation instance. -->
 
 <!-- /!\ do not modify above this line -->
 
-Escodoo Odoo Customization
+Open source visual UI customization for Odoo
 
 <!-- /!\ do not modify below this line -->
 

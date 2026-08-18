@@ -18,10 +18,10 @@ org_name: Escodoo
 org_slug: Escodoo
 postgres_image: ''
 rebel_module_groups: []
-repo_description: Escodoo Odoo Customization
-repo_name: Escodoo Odoo Customization
-repo_slug: escodoo-customization
-repo_website: https://github.com/Escodoo/escodoo-customization
+repo_description: Open source visual UI customization for Odoo
+repo_name: Web Customizer
+repo_slug: web-customizer
+repo_website: https://github.com/Escodoo/web-customizer
 use_pyproject_toml: true
 use_ruff: true
 
