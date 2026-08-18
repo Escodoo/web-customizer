@@ -6,7 +6,7 @@ from odoo.exceptions import AccessError
 from odoo.tests import tagged
 from odoo.tests.common import new_test_user
 
-from odoo.addons.escodoo_customization.hooks import health_check_on_upgrade
+from odoo.addons.web_customizer.hooks import health_check_on_upgrade
 
 from .common import CustomizationCase
 
@@ -19,7 +19,7 @@ class TestCustomizationSecurity(CustomizationCase):
         cls.cust_user = new_test_user(
             cls.env,
             login="esc_cust_user",
-            groups="escodoo_customization.group_customization_user",
+            groups="web_customizer.group_customization_user",
         )
         cls.settings_user = new_test_user(
             cls.env,
@@ -29,7 +29,7 @@ class TestCustomizationSecurity(CustomizationCase):
         cls.manager_user = new_test_user(
             cls.env,
             login="esc_cust_manager",
-            groups="escodoo_customization.group_customization_manager,base.group_system",
+            groups="web_customizer.group_customization_manager,base.group_system",
         )
 
     def _hide_email_bundle(self, code):
@@ -54,7 +54,7 @@ class TestCustomizationSecurity(CustomizationCase):
         user_a = new_test_user(
             self.env,
             login="esc_cust_co_a",
-            groups="escodoo_customization.group_customization_user",
+            groups="web_customizer.group_customization_user",
             company_id=self.env.company.id,
             company_ids=[Command.set(self.env.company.ids)],
         )

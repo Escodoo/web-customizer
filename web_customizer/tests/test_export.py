@@ -9,7 +9,7 @@ from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tests import tagged
 
-from odoo.addons.escodoo_customization.models.exporter import (
+from odoo.addons.web_customizer.models.exporter import (
     export_bundle_files,
     export_bundle_zip,
 )
@@ -25,7 +25,7 @@ class TestCustomizationExport(CustomizationCase):
         cls.env["ir.model.data"].create(
             {
                 "name": "tester_partner_form",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.view",
                 "res_id": cls.form_view.id,
                 "noupdate": True,
@@ -44,7 +44,7 @@ class TestCustomizationExport(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Site Reference",
-                            "name": "x_esc_export_ref",
+                            "name": "x_cust_export_ref",
                             "help": "Exported site code.",
                         },
                     }
@@ -58,7 +58,7 @@ class TestCustomizationExport(CustomizationCase):
                         "view_type": "form",
                         "anchor_name": "email",
                         "position": "after",
-                        "payload": {"field_name": "x_esc_export_ref"},
+                        "payload": {"field_name": "x_cust_export_ref"},
                     }
                 ),
             ],
@@ -88,14 +88,14 @@ class TestCustomizationExport(CustomizationCase):
             views_xml = zf.read("client_export/views/inherited_views.xml").decode()
         self.assertEqual(manifest["name"], "Test bundle")
         self.assertIn("base", manifest["depends"])
-        self.assertIn("x_esc_export_ref", fields_xml)
-        self.assertIn('id="field_res_partner_x_esc_export_ref"', fields_xml)
+        self.assertIn("x_cust_export_ref", fields_xml)
+        self.assertIn('id="field_res_partner_x_cust_export_ref"', fields_xml)
         self.assertIn("Site Reference", fields_xml)
         self.assertIn("base.model_res_partner", fields_xml)
         self.assertIn('<field name="state">manual</field>', fields_xml)
-        self.assertIn("escodoo_customization.tester_partner_form", views_xml)
+        self.assertIn("web_customizer.tester_partner_form", views_xml)
         self.assertIn('id="view_operation_', views_xml)
-        self.assertIn('name="x_esc_export_ref"', views_xml)
+        self.assertIn('name="x_cust_export_ref"', views_xml)
         self.assertIn('position="after"', views_xml)
         self.assertIn('<field name="priority">120</field>', views_xml)
 
@@ -120,7 +120,7 @@ class TestCustomizationExport(CustomizationCase):
         files = export_bundle_files(bundle)
         views_xml = files["views/inherited_views.xml"]
         self.assertNotIn("missing_anchor", views_xml)
-        self.assertIn("x_esc_export_ref", views_xml)
+        self.assertIn("x_cust_export_ref", views_xml)
 
     def test_export_without_applied_operations_raises(self):
         bundle = self._create_bundle(code="client_export_empty")
@@ -151,7 +151,7 @@ class TestCustomizationExport(CustomizationCase):
                         "model_id": self.partner_model.id,
                         "payload": {
                             "string": "Parent Email",
-                            "name": "x_esc_export_parent_email",
+                            "name": "x_cust_export_parent_email",
                             "related": "parent_id.email",
                         },
                     }
@@ -175,7 +175,7 @@ class TestCustomizationExport(CustomizationCase):
         self.env["ir.model.data"].create(
             {
                 "name": "tester_export_menu",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": menu.id,
                 "noupdate": True,
@@ -190,7 +190,7 @@ class TestCustomizationExport(CustomizationCase):
                         "sequence": 10,
                         "menu_id": menu.id,
                         "anchor_kind": "menu",
-                        "anchor_name": "escodoo_customization.tester_export_menu",
+                        "anchor_name": "web_customizer.tester_export_menu",
                         "payload": {},
                     }
                 ),
@@ -200,7 +200,7 @@ class TestCustomizationExport(CustomizationCase):
         files = export_bundle_files(bundle)
         self.assertIn("data/ir_ui_menu.xml", files)
         menus_xml = files["data/ir_ui_menu.xml"]
-        self.assertIn("escodoo_customization.tester_export_menu", menus_xml)
+        self.assertIn("web_customizer.tester_export_menu", menus_xml)
         self.assertIn('name="active"', menus_xml)
         manifest = ast.literal_eval(
             "\n".join(
@@ -209,7 +209,7 @@ class TestCustomizationExport(CustomizationCase):
                 if line and not line.startswith("#")
             )
         )
-        self.assertIn("escodoo_customization", manifest["depends"])
+        self.assertIn("web_customizer", manifest["depends"])
         self.assertIn("data/ir_ui_menu.xml", manifest["data"])
 
     def test_export_includes_new_menu_record(self):
@@ -222,7 +222,7 @@ class TestCustomizationExport(CustomizationCase):
         self.env["ir.model.data"].create(
             {
                 "name": "tester_export_add_menu",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": menu.id,
                 "noupdate": True,
@@ -237,7 +237,7 @@ class TestCustomizationExport(CustomizationCase):
                         "sequence": 10,
                         "menu_id": menu.id,
                         "anchor_kind": "menu",
-                        "anchor_name": "escodoo_customization.tester_export_add_menu",
+                        "anchor_name": "web_customizer.tester_export_add_menu",
                         "position": "after",
                         "payload": {
                             "string": "People",
@@ -255,7 +255,7 @@ class TestCustomizationExport(CustomizationCase):
         self.assertIn("People", menus_xml)
         self.assertIn("base.action_partner_form", menus_xml)
         self.assertIn("base.menu_administration", menus_xml)
-        self.assertNotIn("escodoo_customization.tester_export_add_menu", menus_xml)
+        self.assertNotIn("web_customizer.tester_export_add_menu", menus_xml)
         manifest = ast.literal_eval(
             "\n".join(
                 line
@@ -264,7 +264,7 @@ class TestCustomizationExport(CustomizationCase):
             )
         )
         self.assertIn("base", manifest["depends"])
-        self.assertNotIn("escodoo_customization", manifest["depends"])
+        self.assertNotIn("web_customizer", manifest["depends"])
 
     def test_export_includes_moved_menu(self):
         menu = self.env["ir.ui.menu"].create(
@@ -284,7 +284,7 @@ class TestCustomizationExport(CustomizationCase):
         self.env["ir.model.data"].create(
             {
                 "name": "tester_export_move_menu",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": menu.id,
                 "noupdate": True,
@@ -293,7 +293,7 @@ class TestCustomizationExport(CustomizationCase):
         self.env["ir.model.data"].create(
             {
                 "name": "tester_export_move_dest",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": dest.id,
                 "noupdate": True,
@@ -308,12 +308,10 @@ class TestCustomizationExport(CustomizationCase):
                         "sequence": 10,
                         "menu_id": menu.id,
                         "anchor_kind": "menu",
-                        "anchor_name": "escodoo_customization.tester_export_move_menu",
+                        "anchor_name": "web_customizer.tester_export_move_menu",
                         "position": "inside",
                         "payload": {
-                            "target_xmlid": (
-                                "escodoo_customization.tester_export_move_dest"
-                            ),
+                            "target_xmlid": ("web_customizer.tester_export_move_dest"),
                         },
                     }
                 ),
@@ -322,7 +320,7 @@ class TestCustomizationExport(CustomizationCase):
         bundle.action_apply()
         files = export_bundle_files(bundle)
         menus_xml = files["data/ir_ui_menu.xml"]
-        self.assertIn("escodoo_customization.tester_export_move_menu", menus_xml)
-        self.assertIn("escodoo_customization.tester_export_move_dest", menus_xml)
+        self.assertIn("web_customizer.tester_export_move_menu", menus_xml)
+        self.assertIn("web_customizer.tester_export_move_dest", menus_xml)
         self.assertIn('name="parent_id"', menus_xml)
         self.assertIn('name="sequence"', menus_xml)

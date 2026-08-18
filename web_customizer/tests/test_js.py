@@ -14,7 +14,7 @@ class TestCustomizationHoot(HttpCase):
         """Run HOOT coverage of the OWL patches (form, list, search, kanban)."""
         self.browser_js(
             "/web/tests?headless&loglevel=2&preset=desktop&timeout=15000"
-            "&filter=@escodoo_customization",
+            "&filter=@web_customizer",
             "",
             "",
             login="admin",

@@ -1,6 +1,6 @@
-=====================
-Escodoo Customization
-=====================
+==============
+Web Customizer
+==============
 
 .. 
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -16,20 +16,23 @@ Escodoo Customization
 .. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
-.. |badge3| image:: https://img.shields.io/badge/github-Escodoo%2Fescodoo--customization-lightgray.png?logo=github
-    :target: https://github.com/Escodoo/escodoo-customization/tree/18.0/escodoo_customization
-    :alt: Escodoo/escodoo-customization
+.. |badge3| image:: https://img.shields.io/badge/github-Escodoo%2Fweb--customizer-lightgray.png?logo=github
+    :target: https://github.com/Escodoo/web-customizer/tree/18.0/web_customizer
+    :alt: Escodoo/web-customizer
 
 |badge1| |badge2| |badge3|
 
-Upgrade-safe UI customizations stored as a **ledger of intentions**, not
-as fragile XPath blobs in the database.
+An open source, upgrade-safe alternative to Odoo Studio: customize the
+backend UI by clicking, then ship the result as a real addon in git.
+
+Customizations are stored as a **ledger of intentions**, not as fragile
+XPath blobs in the database.
 
 Each *bundle* groups operations for a client or project. Each
 *operation* declares an intent (``add_field``, ``place_field``, hide a
 field, set a modifier) anchored on a **semantic target** (for example
 “after field ``partner_id``\ ” on a named view). A compiler turns those
-operations into regular ``ir.model.fields`` (``x_esc_*``) and inherited
+operations into regular ``ir.model.fields`` (``x_cust_*``) and inherited
 views. Applied bundles can be **exported** as a plain Odoo addon to
 version in git.
 
@@ -42,14 +45,14 @@ set a widget, restrict it to groups, or set modifiers. Click a navbar
 menu to hide it, rename it, restrict it to groups, add a sibling or
 submenu (bound to a window action with an XML ID), or move it after
 another menu or as a submenu. Duplicate names (for example two ``email``
-fields) are chosen in the dialog. That writes the same ledger operations
-as the backend form.
+fields) are chosen in the dialog. That writes the same operations as the
+backend form.
 
 On module update (``-u``), a health check re-resolves anchors
 automatically. Missing anchors are marked ``broken`` with a reason;
 other operations are left intact. Customizations never disappear
 silently. Compiled artifacts own XML IDs under the bundle code, so
-uninstalling this ledger does not delete unexported fields, views or
+uninstalling this module does not delete unexported fields, views or
 menus. Git still needs the exported addon. A hide, rename, groups or
 move write on a standard menu is exclusive per type: a second bundle
 cannot overwrite the same snapshot. The same rule applies to hide,
@@ -58,9 +61,9 @@ inherits of the same type on the same anchor are refused. Placing the
 same field twice on one view is also refused. Company on a bundle is
 only a filter tag; compiled records stay global.
 
-This module is **not** a clone of Odoo Studio. Approvals stay in
-``base_tier_validation``. Automations stay in ``base.automation`` /
-``automation_oca``.
+Scope stops at the user interface, so this is not a feature-by-feature
+clone of Odoo Studio. Approvals stay in ``base_tier_validation``.
+Automations stay in ``base.automation`` / ``automation_oca``.
 
 **Table of contents**
 
@@ -71,7 +74,7 @@ Installation
 ============
 
 Install this module on a database that already has ``web``. In a Doodba
-project, add ``escodoo_customization`` to ``addons.yaml`` and update the
+project, add ``web_customizer`` to ``addons.yaml`` and update the
 database (``-i`` on a new database, ``-u`` afterwards).
 
 Developer mode is required to open **Settings → Technical →
@@ -84,8 +87,8 @@ Configuration
 
 Assign groups under **Settings → Users**:
 
-- **Customization / User** — read the ledger (bundles and operations).
-  Settings (``Administration / Settings``) implies this group.
+- **Customization / User** — read bundles and operations. Settings
+  (``Administration / Settings``) implies this group.
 - **Customization / Manager** — create and apply operations, use the
   systray wand, export an addon, and unlink a bundle. Apply, re-apply
   and health-check are refused in Python even if called over RPC.
@@ -148,12 +151,12 @@ Usage
    that column (label, help and required update in place).
 6. When the bundle is applied, click **Export Addon**. In the dialog,
    click **Download ZIP** and put that module in git; it does not depend
-   on this ledger at runtime. Compiled fields, views and menus store
+   on this module at runtime. Compiled fields, views and menus store
    their XML IDs under the bundle ``code`` (the future addon name).
-   Uninstalling this ledger leaves those records in the database. Unlink
-   a bundle or operation to undo a customization. Hide, rename, groups
-   and move write the standard ``ir.ui.menu`` record; only one live
-   operation of each type may target the same menu, so two bundles
+   Uninstalling ``web_customizer`` leaves those records in the database.
+   Unlink a bundle or operation to undo a customization. Hide, rename,
+   groups and move write the standard ``ir.ui.menu`` record; only one
+   live operation of each type may target the same menu, so two bundles
    cannot overwrite each other. Unlink restores that snapshot. Hide,
    label, widget, groups and modifier operations on a view node are
    exclusive the same way: only one live operation of each type may
@@ -165,7 +168,7 @@ Single-company pilot
 --------------------
 
 Use one company. Cover the surfaces below, then ship the ZIP — do not
-leave this ledger as the production runtime.
+leave this module as the production runtime.
 
 1. **Form** — add or place a field; hide or rename a page, group or
    button.
@@ -178,11 +181,11 @@ leave this ledger as the production runtime.
    anchor and run **Health Check** (or **Re-apply**).
 7. Click **Export Addon** → **Download ZIP**.
 8. Install that module on staging (``-i <bundle.code>``). Do not install
-   ``escodoo_customization`` there unless the wand is still needed.
+   ``web_customizer`` there unless the wand is still needed.
 
 Calendar, graph, pivot and gantt stay out of this pilot.
 
-Generated field names always start with ``x_esc_`` and cannot contain
+Generated field names always start with ``x_cust_`` and cannot contain
 ``__``. Selection fields take one option per line as ``value:Label``.
 Monetary fields need ``currency_id`` or ``x_currency_id`` on the model,
 or a currency field name in the payload.
@@ -204,7 +207,7 @@ Changelog
 
 First public Beta.
 
-- Ledger of semantic operations compiled to ``x_esc_*`` fields,
+- Ledger of semantic operations compiled to ``x_cust_*`` fields,
   inherited views and writes on standard ``ir.ui.menu`` records.
 - Systray customization mode for form, list, kanban, search and navbar
   menus.
@@ -212,16 +215,16 @@ First public Beta.
   ``code``.
 - Exclusive live writes per menu type, view-anchor attribute type and
   place of the same field on one view.
-- Export as a standalone addon ZIP that does not depend on this ledger.
+- Export as a standalone addon ZIP that does not depend on this module.
 - Kanban header buttons and column progressbars are semantic anchors.
 
 Bug Tracker
 ===========
 
-Bugs are tracked on `GitHub Issues <https://github.com/Escodoo/escodoo-customization/issues>`_.
+Bugs are tracked on `GitHub Issues <https://github.com/Escodoo/web-customizer/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/Escodoo/escodoo-customization/issues/new?body=module:%20escodoo_customization%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/Escodoo/web-customizer/issues/new?body=module:%20web_customizer%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -251,6 +254,6 @@ Current maintainer:
 
 |maintainer-marcelsavegnago| 
 
-This module is part of the `Escodoo/escodoo-customization <https://github.com/Escodoo/escodoo-customization/tree/18.0/escodoo_customization>`_ project on GitHub.
+This module is part of the `Escodoo/web-customizer <https://github.com/Escodoo/web-customizer/tree/18.0/web_customizer>`_ project on GitHub.
 
 You are welcome to contribute.

@@ -29,14 +29,14 @@
                         type="object"
                         string="Apply"
                         class="btn-primary"
-                        groups="escodoo_customization.group_customization_manager"
+                        groups="web_customizer.group_customization_manager"
                         invisible="state == 'archived'"
                     />
                     <button
                         name="action_health_check"
                         type="object"
                         string="Health Check"
-                        groups="escodoo_customization.group_customization_manager"
+                        groups="web_customizer.group_customization_manager"
                         invisible="state in ('draft', 'archived')"
                     />
                     <field

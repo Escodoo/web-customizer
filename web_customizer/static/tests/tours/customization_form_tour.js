@@ -1,6 +1,6 @@
 import {registry} from "@web/core/registry";
 
-registry.category("web_tour.tours").add("escodoo_customization_wand_form", {
+registry.category("web_tour.tours").add("web_customizer_wand_form", {
     url: "/odoo/res.partner/1",
     steps: () => [
         {

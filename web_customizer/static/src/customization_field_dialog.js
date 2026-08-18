@@ -43,7 +43,7 @@ const FIELD_WIDGETS = [
 ];
 
 export class CustomizationFieldDialog extends Component {
-    static template = "escodoo_customization.FieldDialog";
+    static template = "web_customizer.FieldDialog";
     static components = {Dialog, RecordSelector, MultiRecordSelector};
     static props = {
         close: Function,

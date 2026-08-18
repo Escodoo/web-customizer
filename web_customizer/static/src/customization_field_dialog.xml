@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
-    <t t-name="escodoo_customization.FieldDialog">
+    <t t-name="web_customizer.FieldDialog">
         <Dialog title="title" size="'md'">
             <div class="o_esc_customization_dialog">
                 <p class="text-muted" t-if="state.candidates.length > 1">
@@ -90,7 +90,7 @@
                         <input
                             type="text"
                             class="form-control"
-                            placeholder="x_esc_..."
+                            placeholder="x_cust_..."
                             t-att-value="state.name"
                             t-on-input="(ev) => state.name = ev.target.value"
                         />
@@ -182,7 +182,7 @@
                         <input
                             type="text"
                             class="form-control"
-                            placeholder="x_esc_..."
+                            placeholder="x_cust_..."
                             t-att-value="state.name"
                             t-on-input="(ev) => state.name = ev.target.value"
                         />

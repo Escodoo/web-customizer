@@ -1,6 +1,6 @@
 Assign groups under **Settings → Users**:
 
-* **Customization / User** — read the ledger (bundles and operations).
+* **Customization / User** — read bundles and operations.
   Settings (`Administration / Settings`) implies this group.
 * **Customization / Manager** — create and apply operations, use the
   systray wand, export an addon, and unlink a bundle. Apply, re-apply

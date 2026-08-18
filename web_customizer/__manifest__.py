@@ -2,13 +2,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Escodoo Customization",
+    "name": "Web Customizer",
     "version": "18.0.1.0.0",
-    "summary": "Upgrade-safe UI customization ledger with semantic view anchors",
+    "summary": "Upgrade-safe visual UI customization, open source Studio alternative",
     "category": "Tools",
     "license": "AGPL-3",
     "author": "Escodoo",
-    "website": "https://github.com/Escodoo/escodoo-customization",
+    "website": "https://github.com/Escodoo/web-customizer",
     "development_status": "Beta",
     "maintainers": ["marcelsavegnago"],
     "depends": ["web"],
@@ -23,13 +23,13 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "escodoo_customization/static/src/**/*",
+            "web_customizer/static/src/**/*",
         ],
         "web.assets_unit_tests": [
-            "escodoo_customization/static/tests/customization_patches.test.js",
+            "web_customizer/static/tests/customization_patches.test.js",
         ],
         "web.assets_tests": [
-            "escodoo_customization/static/tests/tours/**/*",
+            "web_customizer/static/tests/tours/**/*",
         ],
     },
     "uninstall_hook": "uninstall_hook",

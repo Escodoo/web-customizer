@@ -22,15 +22,15 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "Site Reference",
-                    "name": "x_esc_ui_ref",
+                    "name": "x_cust_ui_ref",
                 },
                 "apply": True,
             }
         )
         self.assertFalse(result["broken"])
         self.assertTrue(result["reload"])
-        self.assertIn("x_esc_ui_ref", self.form_view.get_combined_arch())
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_ref")
+        self.assertIn("x_cust_ui_ref", self.form_view.get_combined_arch())
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_ui_ref")
         self.assertTrue(field)
 
     def test_create_from_ui_add_after_custom_field(self):
@@ -46,7 +46,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "boolean",
                     "string": "VIP Customer",
-                    "name": "x_esc_vip_ui",
+                    "name": "x_cust_vip_ui",
                 },
                 "apply": True,
             }
@@ -59,19 +59,19 @@ class TestCustomizationUiApi(CustomizationCase):
                 "model": "res.partner",
                 "view_id": self.form_view.id,
                 "view_type": "form",
-                "anchor_name": "x_esc_vip_ui",
+                "anchor_name": "x_cust_vip_ui",
                 "payload": {
                     "ttype": "char",
                     "string": "Juvenal",
-                    "name": "x_esc_juvenal_ui",
+                    "name": "x_cust_juvenal_ui",
                 },
                 "apply": True,
             }
         )
         self.assertFalse(second["broken"])
         arch = self.form_view.get_combined_arch()
-        self.assertIn("x_esc_vip_ui", arch)
-        self.assertIn("x_esc_juvenal_ui", arch)
+        self.assertIn("x_cust_vip_ui", arch)
+        self.assertIn("x_cust_juvenal_ui", arch)
 
     def test_create_from_ui_add_related_field(self):
         bundle = self._create_bundle(code="client_ui_related")
@@ -85,23 +85,25 @@ class TestCustomizationUiApi(CustomizationCase):
                 "anchor_name": "email",
                 "payload": {
                     "string": "Parent Email",
-                    "name": "x_esc_ui_parent_email",
+                    "name": "x_cust_ui_parent_email",
                     "related": "parent_id.email",
                 },
                 "apply": True,
             }
         )
         self.assertFalse(result["broken"])
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_parent_email")
+        field = self.env["ir.model.fields"]._get(
+            "res.partner", "x_cust_ui_parent_email"
+        )
         self.assertEqual(field.related, "parent_id.email")
         self.assertEqual(field.ttype, "char")
-        self.assertIn("x_esc_ui_parent_email", self.form_view.get_combined_arch())
+        self.assertIn("x_cust_ui_parent_email", self.form_view.get_combined_arch())
 
     def test_create_from_ui_place_after_existing_field(self):
         bundle = self._create_bundle(code="client_ui_place")
         Field = self.env["ir.model.fields"]
         count_before = Field.search_count(
-            [("model", "=", "res.partner"), ("name", "like", "x_esc_")]
+            [("model", "=", "res.partner"), ("name", "like", "x_cust_")]
         )
         result = self.env["customization.bundle"].create_from_ui(
             {
@@ -121,7 +123,7 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertLess(arch.index('name="email"'), arch.index('name="vat"'))
         self.assertEqual(
             Field.search_count(
-                [("model", "=", "res.partner"), ("name", "like", "x_esc_")]
+                [("model", "=", "res.partner"), ("name", "like", "x_cust_")]
             ),
             count_before,
         )
@@ -407,7 +409,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "Page Note",
-                    "name": "x_esc_ui_page_note",
+                    "name": "x_cust_ui_page_note",
                 },
                 "apply": True,
             }
@@ -416,7 +418,7 @@ class TestCustomizationUiApi(CustomizationCase):
         place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
         self.assertEqual(place.anchor_kind, "page")
         self.assertEqual(place.position, "inside")
-        self.assertIn("x_esc_ui_page_note", view.get_combined_arch())
+        self.assertIn("x_cust_ui_page_note", view.get_combined_arch())
 
     def test_create_from_ui_hide_button(self):
         bundle = self._create_bundle(code="client_ui_button")
@@ -454,13 +456,13 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "List Reference",
-                    "name": "x_esc_ui_list_ref",
+                    "name": "x_cust_ui_list_ref",
                 },
                 "apply": True,
             }
         )
         self.assertFalse(result["broken"])
-        self.assertIn("x_esc_ui_list_ref", self.list_view.get_combined_arch())
+        self.assertIn("x_cust_ui_list_ref", self.list_view.get_combined_arch())
 
     def test_create_from_ui_hide_on_list(self):
         bundle = self._create_bundle(code="client_ui_list_hide")
@@ -493,13 +495,13 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "Kanban Reference",
-                    "name": "x_esc_ui_kanban_ref",
+                    "name": "x_cust_ui_kanban_ref",
                 },
                 "apply": True,
             }
         )
         self.assertFalse(result["broken"])
-        self.assertIn("x_esc_ui_kanban_ref", self.kanban_view.get_combined_arch())
+        self.assertIn("x_cust_ui_kanban_ref", self.kanban_view.get_combined_arch())
 
     def test_create_from_ui_hide_on_kanban(self):
         bundle = self._create_bundle(code="client_ui_kanban_hide")
@@ -638,13 +640,13 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "Search Reference",
-                    "name": "x_esc_ui_search_ref",
+                    "name": "x_cust_ui_search_ref",
                 },
                 "apply": True,
             }
         )
         self.assertFalse(result["broken"])
-        self.assertIn("x_esc_ui_search_ref", self.search_view.get_combined_arch())
+        self.assertIn("x_cust_ui_search_ref", self.search_view.get_combined_arch())
 
     def test_create_from_ui_requires_manager(self):
         bundle = self._create_bundle(code="client_ui_acl")
@@ -689,7 +691,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "view_type": "form",
                 "anchor_name": "extra_info",
                 "anchor_kind": "page",
-                "payload": {"string": "UI Page", "name": "x_esc_ui_page"},
+                "payload": {"string": "UI Page", "name": "x_cust_ui_page"},
                 "apply": True,
             }
         )
@@ -697,7 +699,7 @@ class TestCustomizationUiApi(CustomizationCase):
         page = bundle.operation_ids
         self.assertEqual(page.type, "add_page")
         self.assertEqual(page.position, "after")
-        self.assertIn("x_esc_ui_page", view.get_combined_arch())
+        self.assertIn("x_cust_ui_page", view.get_combined_arch())
 
     def test_create_from_ui_add_group_inside_page(self):
         bundle = self._create_bundle(code="client_ui_add_group")
@@ -711,7 +713,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "view_type": "form",
                 "anchor_name": "extra_info",
                 "anchor_kind": "page",
-                "payload": {"string": "UI Group", "name": "x_esc_ui_group"},
+                "payload": {"string": "UI Group", "name": "x_cust_ui_group"},
                 "apply": True,
             }
         )
@@ -719,7 +721,7 @@ class TestCustomizationUiApi(CustomizationCase):
         group = bundle.operation_ids
         self.assertEqual(group.type, "add_group")
         self.assertEqual(group.position, "inside")
-        self.assertIn("x_esc_ui_group", view.get_combined_arch())
+        self.assertIn("x_cust_ui_group", view.get_combined_arch())
 
     def test_get_ui_context_unnamed_page(self):
         view = self._form_with_unnamed_page()
@@ -743,7 +745,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "anchor_name": False,
                 "anchor_kind": "page",
                 "anchor_string": "Field Service",
-                "payload": {"string": "UI FSM Group", "name": "x_esc_ui_fsm_group"},
+                "payload": {"string": "UI FSM Group", "name": "x_cust_ui_fsm_group"},
                 "apply": True,
             }
         )
@@ -756,7 +758,7 @@ class TestCustomizationUiApi(CustomizationCase):
             "//page[not(@name)][.//field[@name='phone']]",
             group.generated_view_id.arch,
         )
-        self.assertIn("x_esc_ui_fsm_group", view.get_combined_arch())
+        self.assertIn("x_cust_ui_fsm_group", view.get_combined_arch())
 
     def test_create_from_ui_add_selection_field(self):
         bundle = self._create_bundle(code="client_ui_selection")
@@ -771,16 +773,16 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "selection",
                     "string": "UI Status",
-                    "name": "x_esc_ui_status",
+                    "name": "x_cust_ui_status",
                     "selection": [["open", "Open"], ["closed", "Closed"]],
                 },
                 "apply": True,
             }
         )
         self.assertFalse(result["broken"])
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_ui_status")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_ui_status")
         self.assertEqual(field.ttype, "selection")
-        self.assertIn("x_esc_ui_status", self.form_view.get_combined_arch())
+        self.assertIn("x_cust_ui_status", self.form_view.get_combined_arch())
 
     def test_create_from_ui_add_field_inside_named_group(self):
         bundle = self._create_bundle(code="client_ui_inside_group")
@@ -797,7 +799,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "UI Group Note",
-                    "name": "x_esc_ui_group_note",
+                    "name": "x_cust_ui_group_note",
                 },
                 "apply": True,
             }
@@ -810,7 +812,7 @@ class TestCustomizationUiApi(CustomizationCase):
             '<group name="site_block" position="inside">',
             place.generated_view_id.arch,
         )
-        self.assertIn("x_esc_ui_group_note", view.get_combined_arch())
+        self.assertIn("x_cust_ui_group_note", view.get_combined_arch())
 
     def test_create_from_ui_add_field_inside_unnamed_group(self):
         bundle = self._create_bundle(code="client_ui_unnamed_group")
@@ -828,7 +830,7 @@ class TestCustomizationUiApi(CustomizationCase):
                 "payload": {
                     "ttype": "char",
                     "string": "UI Notes Extra",
-                    "name": "x_esc_ui_notes_extra",
+                    "name": "x_cust_ui_notes_extra",
                 },
                 "apply": True,
             }
@@ -838,7 +840,7 @@ class TestCustomizationUiApi(CustomizationCase):
         self.assertFalse(place.anchor_name)
         self.assertEqual(place.anchor_string, "Notes")
         self.assertEqual(place.position, "inside")
-        self.assertIn("x_esc_ui_notes_extra", view.get_combined_arch())
+        self.assertIn("x_cust_ui_notes_extra", view.get_combined_arch())
 
     def test_create_from_ui_refuses_second_hide_on_same_field(self):
         bundle = self._create_bundle(code="client_ui_hide_owner")

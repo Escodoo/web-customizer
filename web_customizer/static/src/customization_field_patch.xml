@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
-    <t
-        t-name="escodoo_customization.Field"
-        t-inherit="web.Field"
-        t-inherit-mode="extension"
-    >
+    <t t-name="web_customizer.Field" t-inherit="web.Field" t-inherit-mode="extension">
         <xpath expr="//div" position="attributes">
             <attribute name="t-on-click.capture">onCustomizationClick</attribute>
         </xpath>
     </t>
     <t
-        t-name="escodoo_customization.ViewButton"
+        t-name="web_customizer.ViewButton"
         t-inherit="web.views.ViewButton"
         t-inherit-mode="extension"
     >
@@ -19,7 +15,7 @@
         </xpath>
     </t>
     <t
-        t-name="escodoo_customization.FormLabel"
+        t-name="web_customizer.FormLabel"
         t-inherit="web.FormLabel"
         t-inherit-mode="extension"
     >
@@ -28,7 +24,7 @@
         </xpath>
     </t>
     <t
-        t-name="escodoo_customization.Notebook"
+        t-name="web_customizer.Notebook"
         t-inherit="web.Notebook"
         t-inherit-mode="extension"
     >
@@ -39,7 +35,7 @@
         </xpath>
     </t>
     <t
-        t-name="escodoo_customization.InnerGroup"
+        t-name="web_customizer.InnerGroup"
         t-inherit="web.Form.InnerGroup"
         t-inherit-mode="extension"
     >
@@ -54,7 +50,7 @@
         </xpath>
     </t>
     <t
-        t-name="escodoo_customization.OuterGroup"
+        t-name="web_customizer.OuterGroup"
         t-inherit="web.Form.OuterGroup"
         t-inherit-mode="extension"
     >

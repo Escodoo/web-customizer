@@ -35,11 +35,11 @@ def uninstall_hook(env):
     """Leave compiled fields, views and menus in the database.
 
     Their XML IDs belong to the bundle code (the future exported addon),
-    not to this ledger. Uninstalling the authoring tool must not wipe
+    not to this module. Uninstalling the authoring tool must not wipe
     unexported customizations. Unlink a bundle or operation to undo.
     """
     rebind_generated_xmlids(env)
     _logger.info(
-        "Uninstalling escodoo_customization: compiled customizations stay "
+        "Uninstalling web_customizer: compiled customizations stay "
         "in the database (XML IDs belong to each bundle code)"
     )

@@ -27,26 +27,26 @@
                         type="object"
                         string="Apply"
                         class="btn-primary"
-                        groups="escodoo_customization.group_customization_manager"
+                        groups="web_customizer.group_customization_manager"
                     />
                     <button
                         name="action_reapply"
                         type="object"
                         string="Re-apply"
                         confirm="Re-apply recreates a field if its type or relation changed. Existing values in that column are deleted."
-                        groups="escodoo_customization.group_customization_manager"
+                        groups="web_customizer.group_customization_manager"
                     />
                     <button
                         name="action_health_check"
                         type="object"
                         string="Health Check"
-                        groups="escodoo_customization.group_customization_manager"
+                        groups="web_customizer.group_customization_manager"
                     />
                     <button
                         name="action_export"
                         type="object"
                         string="Export Addon"
-                        groups="escodoo_customization.group_customization_manager"
+                        groups="web_customizer.group_customization_manager"
                     />
                     <field
                         name="state"

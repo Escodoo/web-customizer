@@ -7,8 +7,8 @@ from odoo import Command
 from odoo.exceptions import ValidationError
 from odoo.tests import tagged
 
-from odoo.addons.escodoo_customization.hooks import uninstall_hook
-from odoo.addons.escodoo_customization.models.compiler import (
+from odoo.addons.web_customizer.hooks import uninstall_hook
+from odoo.addons.web_customizer.models.compiler import (
     LEGACY_XMLID_MODULE,
     rebind_generated_xmlids,
 )
@@ -49,15 +49,15 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_add_and_place_field_on_form(self):
         bundle = self._create_bundle(
             code="client_place_form",
-            operations=self._ops_add_and_place("x_esc_site_ref", self.form_view),
+            operations=self._ops_add_and_place("x_cust_site_ref", self.form_view),
         )
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_ref")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_site_ref")
         self.assertTrue(field)
         self.assertEqual(field.ttype, "char")
         arch = self.form_view.get_combined_arch()
-        self.assertIn('name="x_esc_site_ref"', arch)
+        self.assertIn('name="x_cust_site_ref"', arch)
         self.assertIn('name="email"', arch)
 
     def test_add_related_field_infers_type(self):
@@ -71,7 +71,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "model_id": self.partner_model.id,
                         "payload": {
                             "string": "Parent Email",
-                            "name": "x_esc_parent_email",
+                            "name": "x_cust_parent_email",
                             "related": "parent_id.email",
                         },
                     }
@@ -80,7 +80,7 @@ class TestCustomizationCompiler(CustomizationCase):
         )
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_parent_email")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_parent_email")
         self.assertTrue(field)
         self.assertEqual(field.ttype, "char")
         self.assertEqual(field.related, "parent_id.email")
@@ -98,7 +98,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "model_id": self.partner_model.id,
                         "payload": {
                             "string": "Parent Country",
-                            "name": "x_esc_parent_country",
+                            "name": "x_cust_parent_country",
                             "related": "parent_id.country_id",
                             "store": True,
                         },
@@ -107,7 +107,7 @@ class TestCustomizationCompiler(CustomizationCase):
             ],
         )
         bundle.action_apply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_parent_country")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_parent_country")
         self.assertEqual(field.ttype, "many2one")
         self.assertEqual(field.relation, "res.country")
         self.assertTrue(field.store)
@@ -122,7 +122,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "model_id": self.partner_model.id,
                         "payload": {
                             "string": "Broken Related",
-                            "name": "x_esc_bad_related",
+                            "name": "x_cust_bad_related",
                             "related": "parent_id.no_such_field",
                         },
                     }
@@ -146,7 +146,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "selection",
                             "string": "Site Status",
-                            "name": "x_esc_site_status",
+                            "name": "x_cust_site_status",
                             "selection": [["draft", "Draft"], ["done", "Done"]],
                         },
                     }
@@ -159,7 +159,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "binary",
                             "string": "Site Photo",
-                            "name": "x_esc_site_photo",
+                            "name": "x_cust_site_photo",
                         },
                     }
                 ),
@@ -167,13 +167,15 @@ class TestCustomizationCompiler(CustomizationCase):
         )
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
-        selection = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_status")
+        selection = self.env["ir.model.fields"]._get(
+            "res.partner", "x_cust_site_status"
+        )
         self.assertEqual(selection.ttype, "selection")
         self.assertEqual(
             selection.selection_ids.mapped("value"),
             ["draft", "done"],
         )
-        binary = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_photo")
+        binary = self.env["ir.model.fields"]._get("res.partner", "x_cust_site_photo")
         self.assertEqual(binary.ttype, "binary")
 
     def test_reapply_syncs_selection_options(self):
@@ -188,7 +190,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "selection",
                             "string": "Site Status",
-                            "name": "x_esc_sel_sync",
+                            "name": "x_cust_sel_sync",
                             "selection": [["draft", "Draft"], ["done", "Done"]],
                         },
                     }
@@ -196,10 +198,10 @@ class TestCustomizationCompiler(CustomizationCase):
             ],
         )
         bundle.action_apply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_sel_sync")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_sel_sync")
         field_id = field.id
         partner = self.env["res.partner"].create(
-            {"name": "Sel Sync", "x_esc_sel_sync": "draft"}
+            {"name": "Sel Sync", "x_cust_sel_sync": "draft"}
         )
         operation = bundle.operation_ids
         operation.payload = {
@@ -211,13 +213,13 @@ class TestCustomizationCompiler(CustomizationCase):
             ],
         }
         bundle.action_reapply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_sel_sync")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_sel_sync")
         self.assertEqual(field.id, field_id)
         self.assertEqual(
             [(opt.value, opt.name) for opt in field.selection_ids.sorted("sequence")],
             [("draft", "To Do"), ("done", "Done"), ("cancel", "Cancelled")],
         )
-        self.assertEqual(partner.x_esc_sel_sync, "draft")
+        self.assertEqual(partner.x_cust_sel_sync, "draft")
         self.assertEqual(operation.state, "applied")
 
     def test_add_monetary_without_currency_is_broken(self):
@@ -231,7 +233,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "monetary",
                             "string": "Site Amount",
-                            "name": "x_esc_site_amount",
+                            "name": "x_cust_site_amount",
                         },
                     }
                 ),
@@ -245,7 +247,7 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_place_field_after_custom_field_same_bundle(self):
         bundle = self._create_bundle(
             code="client_chain",
-            operations=self._ops_add_and_place("x_esc_vip_flag", self.form_view)
+            operations=self._ops_add_and_place("x_cust_vip_flag", self.form_view)
             + [
                 Command.create(
                     {
@@ -255,7 +257,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Site Code",
-                            "name": "x_esc_site_code",
+                            "name": "x_cust_site_code",
                         },
                     }
                 ),
@@ -266,9 +268,9 @@ class TestCustomizationCompiler(CustomizationCase):
                         "model_id": self.partner_model.id,
                         "view_id": self.form_view.id,
                         "view_type": "form",
-                        "anchor_name": "x_esc_vip_flag",
+                        "anchor_name": "x_cust_vip_flag",
                         "position": "after",
-                        "payload": {"field_name": "x_esc_site_code"},
+                        "payload": {"field_name": "x_cust_site_code"},
                     }
                 ),
             ],
@@ -276,17 +278,17 @@ class TestCustomizationCompiler(CustomizationCase):
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
         arch = self.form_view.get_combined_arch()
-        self.assertIn('name="x_esc_vip_flag"', arch)
-        self.assertIn('name="x_esc_site_code"', arch)
+        self.assertIn('name="x_cust_vip_flag"', arch)
+        self.assertIn('name="x_cust_site_code"', arch)
         self.assertLess(
-            arch.index('name="x_esc_vip_flag"'),
-            arch.index('name="x_esc_site_code"'),
+            arch.index('name="x_cust_vip_flag"'),
+            arch.index('name="x_cust_site_code"'),
         )
 
     def test_health_check_marks_missing_anchor_broken(self):
         bundle = self._create_bundle(
             code="client_health",
-            operations=self._ops_add_and_place("x_esc_health_ref", self.form_view)
+            operations=self._ops_add_and_place("x_cust_health_ref", self.form_view)
             + [
                 Command.create(
                     {
@@ -320,7 +322,7 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_reapply_restores_fixed_anchor(self):
         bundle = self._create_bundle(
             code="client_reapply",
-            operations=self._ops_add_and_place("x_esc_reapply_ref", self.form_view),
+            operations=self._ops_add_and_place("x_cust_reapply_ref", self.form_view),
         )
         bundle.action_apply()
         place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
@@ -334,12 +336,12 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertTrue(place.generated_view_id.active)
         self.assertEqual(bundle.state, "applied")
         arch = self.form_view.get_combined_arch()
-        self.assertIn('name="x_esc_reapply_ref"', arch)
+        self.assertIn('name="x_cust_reapply_ref"', arch)
 
     def test_health_check_heals_restored_anchor(self):
         bundle = self._create_bundle(
             code="client_health_heal",
-            operations=self._ops_add_and_place("x_esc_heal_ref", self.form_view),
+            operations=self._ops_add_and_place("x_cust_heal_ref", self.form_view),
         )
         bundle.action_apply()
         place = bundle.operation_ids.filtered(lambda o: o.type == "place_field")
@@ -353,7 +355,7 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertTrue(place.generated_view_id.active)
         self.assertEqual(bundle.state, "applied")
         arch = self.form_view.get_combined_arch()
-        self.assertIn('name="x_esc_heal_ref"', arch)
+        self.assertIn('name="x_cust_heal_ref"', arch)
 
     def test_reapply_updates_add_field_metadata(self):
         bundle = self._create_bundle(
@@ -367,7 +369,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Old Label",
-                            "name": "x_esc_meta_ref",
+                            "name": "x_cust_meta_ref",
                             "help": "Old help",
                         },
                     }
@@ -375,7 +377,7 @@ class TestCustomizationCompiler(CustomizationCase):
             ],
         )
         bundle.action_apply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_meta_ref")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_meta_ref")
         field_id = field.id
         operation = bundle.operation_ids
         operation.payload = {
@@ -384,7 +386,7 @@ class TestCustomizationCompiler(CustomizationCase):
             "help": "New help",
         }
         bundle.action_reapply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_meta_ref")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_meta_ref")
         self.assertEqual(field.id, field_id)
         self.assertEqual(field.ttype, "char")
         self.assertEqual(field.field_description, "New Label")
@@ -402,14 +404,14 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Site Flag",
-                            "name": "x_esc_site_flag",
+                            "name": "x_cust_site_flag",
                         },
                     }
                 ),
             ],
         )
         bundle.action_apply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_flag")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_site_flag")
         self.assertEqual(field.ttype, "char")
         field_id = field.id
         operation = bundle.operation_ids
@@ -417,10 +419,10 @@ class TestCustomizationCompiler(CustomizationCase):
             **operation.payload,
             "ttype": "boolean",
             "string": "Site Flag",
-            "name": "x_esc_site_flag",
+            "name": "x_cust_site_flag",
         }
         bundle.action_reapply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_site_flag")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_site_flag")
         self.assertTrue(field)
         self.assertEqual(field.ttype, "boolean")
         self.assertNotEqual(field.id, field_id)
@@ -648,7 +650,7 @@ class TestCustomizationCompiler(CustomizationCase):
         bundle = self._create_bundle(
             code="client_kanban",
             operations=self._ops_add_and_place(
-                "x_esc_kanban_ref",
+                "x_cust_kanban_ref",
                 self.kanban_view,
                 view_type="kanban",
             ),
@@ -656,7 +658,7 @@ class TestCustomizationCompiler(CustomizationCase):
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
         arch = self.kanban_view.get_combined_arch()
-        self.assertIn('name="x_esc_kanban_ref"', arch)
+        self.assertIn('name="x_cust_kanban_ref"', arch)
 
     def test_hide_field_on_kanban_uses_invisible(self):
         bundle = self._create_bundle(
@@ -789,7 +791,7 @@ class TestCustomizationCompiler(CustomizationCase):
         bundle = self._create_bundle(
             code="client_search",
             operations=self._ops_add_and_place(
-                "x_esc_search_ref",
+                "x_cust_search_ref",
                 self.search_view,
                 view_type="search",
             ),
@@ -797,20 +799,20 @@ class TestCustomizationCompiler(CustomizationCase):
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
         arch = self.search_view.get_combined_arch()
-        self.assertIn('name="x_esc_search_ref"', arch)
+        self.assertIn('name="x_cust_search_ref"', arch)
 
     def test_generated_xmlids_belong_to_bundle_code(self):
         bundle = self._create_bundle(
             code="client_xmlid_owner",
-            operations=self._ops_add_and_place("x_esc_xmlid_ref", self.form_view),
+            operations=self._ops_add_and_place("x_cust_xmlid_ref", self.form_view),
         )
         bundle.action_apply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_xmlid_ref")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_xmlid_ref")
         place = bundle.operation_ids.filtered("generated_view_id")
         view = place.generated_view_id
         self.assertEqual(
             field.get_external_id().get(field.id),
-            "client_xmlid_owner.field_res_partner_x_esc_xmlid_ref",
+            "client_xmlid_owner.field_res_partner_x_cust_xmlid_ref",
         )
         self.assertEqual(
             view.get_external_id().get(view.id),
@@ -820,7 +822,7 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_rebind_migrates_legacy_ledger_xmlids(self):
         bundle = self._create_bundle(
             code="client_xmlid_rebind",
-            operations=self._ops_add_and_place("x_esc_rebind_ref", self.form_view),
+            operations=self._ops_add_and_place("x_cust_rebind_ref", self.form_view),
         )
         bundle.action_apply()
         place = bundle.operation_ids.filtered("generated_view_id")
@@ -842,10 +844,10 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_uninstall_hook_keeps_generated_artifacts(self):
         bundle = self._create_bundle(
             code="client_uninstall",
-            operations=self._ops_add_and_place("x_esc_uninstall_ref", self.form_view),
+            operations=self._ops_add_and_place("x_cust_uninstall_ref", self.form_view),
         )
         bundle.action_apply()
-        field = self.env["ir.model.fields"]._get("res.partner", "x_esc_uninstall_ref")
+        field = self.env["ir.model.fields"]._get("res.partner", "x_cust_uninstall_ref")
         view = bundle.operation_ids.filtered("generated_view_id").generated_view_id
         field_id, view_id = field.id, view.id
         uninstall_hook(self.env)
@@ -869,7 +871,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Page Note",
-                            "name": "x_esc_page_note",
+                            "name": "x_cust_page_note",
                         },
                     }
                 ),
@@ -883,7 +885,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "anchor_kind": "page",
                         "anchor_name": "extra_info",
                         "position": "inside",
-                        "payload": {"field_name": "x_esc_page_note"},
+                        "payload": {"field_name": "x_cust_page_note"},
                     }
                 ),
             ],
@@ -895,7 +897,7 @@ class TestCustomizationCompiler(CustomizationCase):
             '<page name="extra_info" position="inside">',
             place.generated_view_id.arch,
         )
-        self.assertIn("x_esc_page_note", view.get_combined_arch())
+        self.assertIn("x_cust_page_note", view.get_combined_arch())
 
     def test_hide_named_page_and_button(self):
         view = self._form_with_page()
@@ -959,7 +961,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "position": "after",
                         "payload": {
                             "string": "Site Notes",
-                            "name": "x_esc_site_notes",
+                            "name": "x_cust_site_notes",
                         },
                     }
                 ),
@@ -969,10 +971,10 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertEqual(bundle.state, "applied")
         generated = bundle.operation_ids.generated_view_id.arch
         self.assertIn('<page name="extra_info" position="after">', generated)
-        self.assertIn('name="x_esc_site_notes"', generated)
+        self.assertIn('name="x_cust_site_notes"', generated)
         self.assertNotIn("<notebook>", generated)
         arch = view.get_combined_arch()
-        self.assertIn("x_esc_site_notes", arch)
+        self.assertIn("x_cust_site_notes", arch)
         self.assertIn("Site Notes", arch)
 
     def test_add_page_after_field_wraps_notebook(self):
@@ -987,7 +989,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "view_type": "form",
                         "anchor_name": "email",
                         "position": "after",
-                        "payload": {"string": "Extra Tab", "name": "x_esc_extra_tab"},
+                        "payload": {"string": "Extra Tab", "name": "x_cust_extra_tab"},
                     }
                 ),
             ],
@@ -996,8 +998,8 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertEqual(bundle.state, "applied")
         generated = bundle.operation_ids.generated_view_id.arch
         self.assertIn("<notebook>", generated)
-        self.assertIn('name="x_esc_extra_tab"', generated)
-        self.assertIn("x_esc_extra_tab", self.form_view.get_combined_arch())
+        self.assertIn('name="x_cust_extra_tab"', generated)
+        self.assertIn("x_cust_extra_tab", self.form_view.get_combined_arch())
 
     def test_add_group_after_field_and_inside_page(self):
         view = self._form_with_page()
@@ -1015,7 +1017,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "position": "after",
                         "payload": {
                             "string": "Site Group",
-                            "name": "x_esc_site_group",
+                            "name": "x_cust_site_group",
                         },
                     }
                 ),
@@ -1031,7 +1033,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "position": "inside",
                         "payload": {
                             "string": "Page Group",
-                            "name": "x_esc_page_group",
+                            "name": "x_cust_page_group",
                         },
                     }
                 ),
@@ -1049,8 +1051,8 @@ class TestCustomizationCompiler(CustomizationCase):
             ops[1].generated_view_id.arch,
         )
         arch = view.get_combined_arch()
-        self.assertIn("x_esc_site_group", arch)
-        self.assertIn("x_esc_page_group", arch)
+        self.assertIn("x_cust_site_group", arch)
+        self.assertIn("x_cust_page_group", arch)
 
     def test_add_group_inside_unnamed_page(self):
         view = self._form_with_unnamed_page()
@@ -1069,7 +1071,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "position": "inside",
                         "payload": {
                             "string": "Site Notes",
-                            "name": "x_esc_fsm_group",
+                            "name": "x_cust_fsm_group",
                         },
                     }
                 ),
@@ -1082,7 +1084,7 @@ class TestCustomizationCompiler(CustomizationCase):
             "//page[not(@name)][.//field[@name='phone']]",
             op.generated_view_id.arch,
         )
-        self.assertIn("x_esc_fsm_group", view.get_combined_arch())
+        self.assertIn("x_cust_fsm_group", view.get_combined_arch())
 
     def test_place_field_inside_named_group(self):
         view = self._form_with_group()
@@ -1097,7 +1099,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Site Note",
-                            "name": "x_esc_site_note",
+                            "name": "x_cust_site_note",
                         },
                     }
                 ),
@@ -1111,7 +1113,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "anchor_kind": "group",
                         "anchor_name": "site_block",
                         "position": "inside",
-                        "payload": {"field_name": "x_esc_site_note"},
+                        "payload": {"field_name": "x_cust_site_note"},
                     }
                 ),
             ],
@@ -1123,7 +1125,7 @@ class TestCustomizationCompiler(CustomizationCase):
             '<group name="site_block" position="inside">',
             place.generated_view_id.arch,
         )
-        self.assertIn("x_esc_site_note", view.get_combined_arch())
+        self.assertIn("x_cust_site_note", view.get_combined_arch())
 
     def test_place_field_inside_unnamed_group(self):
         view = self._form_with_group()
@@ -1138,7 +1140,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "payload": {
                             "ttype": "char",
                             "string": "Extra Note",
-                            "name": "x_esc_extra_note",
+                            "name": "x_cust_extra_note",
                         },
                     }
                 ),
@@ -1152,7 +1154,7 @@ class TestCustomizationCompiler(CustomizationCase):
                         "anchor_kind": "group",
                         "anchor_string": "Notes",
                         "position": "inside",
-                        "payload": {"field_name": "x_esc_extra_note"},
+                        "payload": {"field_name": "x_cust_extra_note"},
                     }
                 ),
             ],
@@ -1164,7 +1166,7 @@ class TestCustomizationCompiler(CustomizationCase):
             "//group[not(@name)][.//field[@name='email']]",
             place.generated_view_id.arch,
         )
-        self.assertIn("x_esc_extra_note", view.get_combined_arch())
+        self.assertIn("x_cust_extra_note", view.get_combined_arch())
 
     def test_second_bundle_cannot_hide_the_same_field(self):
         first = self._create_bundle(
@@ -1382,7 +1384,7 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_second_bundle_cannot_place_the_same_field(self):
         first = self._create_bundle(
             code="client_place_owner",
-            operations=self._ops_add_and_place("x_esc_place_once", self.form_view),
+            operations=self._ops_add_and_place("x_cust_place_once", self.form_view),
         )
         first.action_apply()
         with self.assertRaises(ValidationError) as error:
@@ -1397,7 +1399,7 @@ class TestCustomizationCompiler(CustomizationCase):
                             "view_type": "form",
                             "anchor_name": "phone",
                             "position": "after",
-                            "payload": {"field_name": "x_esc_place_once"},
+                            "payload": {"field_name": "x_cust_place_once"},
                         }
                     )
                 ],
@@ -1408,7 +1410,7 @@ class TestCustomizationCompiler(CustomizationCase):
     def test_place_same_field_on_form_and_list_can_coexist(self):
         form = self._create_bundle(
             code="client_place_form_ok",
-            operations=self._ops_add_and_place("x_esc_place_both", self.form_view),
+            operations=self._ops_add_and_place("x_cust_place_both", self.form_view),
         )
         form.action_apply()
         listing = self._create_bundle(
@@ -1422,11 +1424,11 @@ class TestCustomizationCompiler(CustomizationCase):
                         "view_type": "list",
                         "anchor_name": "email",
                         "position": "after",
-                        "payload": {"field_name": "x_esc_place_both"},
+                        "payload": {"field_name": "x_cust_place_both"},
                     }
                 )
             ],
         )
         listing.action_apply()
         self.assertEqual(listing.operation_ids.state, "applied")
-        self.assertIn("x_esc_place_both", self.list_view.get_combined_arch())
+        self.assertIn("x_cust_place_both", self.list_view.get_combined_arch())

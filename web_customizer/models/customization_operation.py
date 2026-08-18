@@ -178,7 +178,7 @@ class CustomizationOperation(models.Model):
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
         string="Technical Name",
-        help="Must start with x_esc_. Leave empty to slugify from the label.",
+        help="Must start with x_cust_. Leave empty to slugify from the label.",
     )
     payload_help = fields.Text(
         compute="_compute_payload_ui",

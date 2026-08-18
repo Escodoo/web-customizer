@@ -823,9 +823,7 @@ class CustomizationBundle(models.Model):
 
     @api.model
     def _check_manager_access(self, message=None):
-        if not self.env.user.has_group(
-            "escodoo_customization.group_customization_manager"
-        ):
+        if not self.env.user.has_group("web_customizer.group_customization_manager"):
             raise AccessError(
                 message
                 or self.env._("Only customization managers can change customizations.")

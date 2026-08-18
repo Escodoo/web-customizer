@@ -5,7 +5,7 @@ from odoo import Command
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
 
-from odoo.addons.escodoo_customization.hooks import uninstall_hook
+from odoo.addons.web_customizer.hooks import uninstall_hook
 
 from .common import CustomizationCase
 
@@ -24,13 +24,13 @@ class TestCustomizationMenu(CustomizationCase):
         cls.env["ir.model.data"].create(
             {
                 "name": "tester_menu",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": cls.test_menu.id,
                 "noupdate": True,
             }
         )
-        cls.menu_xmlid = "escodoo_customization.tester_menu"
+        cls.menu_xmlid = "web_customizer.tester_menu"
         cls.dest_menu = cls.env["ir.ui.menu"].create(
             {
                 "name": "Customization Dest Menu",
@@ -41,13 +41,13 @@ class TestCustomizationMenu(CustomizationCase):
         cls.env["ir.model.data"].create(
             {
                 "name": "tester_dest_menu",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": cls.dest_menu.id,
                 "noupdate": True,
             }
         )
-        cls.dest_xmlid = "escodoo_customization.tester_dest_menu"
+        cls.dest_xmlid = "web_customizer.tester_dest_menu"
 
     def test_hide_menu_deactivates_and_restores(self):
         bundle = self._create_bundle(
@@ -380,7 +380,7 @@ class TestCustomizationMenu(CustomizationCase):
         self.env["ir.model.data"].create(
             {
                 "name": "tester_child_menu",
-                "module": "escodoo_customization",
+                "module": "web_customizer",
                 "model": "ir.ui.menu",
                 "res_id": child.id,
                 "noupdate": True,
@@ -398,7 +398,7 @@ class TestCustomizationMenu(CustomizationCase):
                         "anchor_name": self.menu_xmlid,
                         "position": "inside",
                         "payload": {
-                            "target_xmlid": "escodoo_customization.tester_child_menu",
+                            "target_xmlid": "web_customizer.tester_child_menu",
                         },
                     }
                 ),

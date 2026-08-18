@@ -41,9 +41,9 @@
    column (label, help and required update in place).
 6. When the bundle is applied, click **Export Addon**. In the dialog, click
    **Download ZIP** and put that module in git; it does not depend on this
-   ledger at runtime. Compiled fields, views and menus store their XML IDs
-   under the bundle ``code`` (the future addon name). Uninstalling this
-   ledger leaves those records in the database. Unlink a bundle or
+   module at runtime. Compiled fields, views and menus store their XML IDs
+   under the bundle ``code`` (the future addon name). Uninstalling
+   ``web_customizer`` leaves those records in the database. Unlink a bundle or
    operation to undo a customization. Hide, rename, groups and move write
    the standard ``ir.ui.menu`` record; only one live operation of each
    type may target the same menu, so two bundles cannot overwrite each
@@ -56,7 +56,7 @@
 ## Single-company pilot
 
 Use one company. Cover the surfaces below, then ship the ZIP — do not
-leave this ledger as the production runtime.
+leave this module as the production runtime.
 
 1. **Form** — add or place a field; hide or rename a page, group or button.
 2. **List** — add, hide or relabel a column.
@@ -67,11 +67,11 @@ leave this ledger as the production runtime.
    anchor and run **Health Check** (or **Re-apply**).
 7. Click **Export Addon** → **Download ZIP**.
 8. Install that module on staging (`-i <bundle.code>`). Do not install
-   `escodoo_customization` there unless the wand is still needed.
+   `web_customizer` there unless the wand is still needed.
 
 Calendar, graph, pivot and gantt stay out of this pilot.
 
-Generated field names always start with `x_esc_` and cannot contain `__`.
+Generated field names always start with `x_cust_` and cannot contain `__`.
 Selection fields take one option per line as `value:Label`. Monetary
 fields need `currency_id` or `x_currency_id` on the model, or a
 currency field name in the payload.

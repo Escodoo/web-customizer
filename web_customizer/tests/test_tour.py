@@ -9,6 +9,6 @@ class TestCustomizationTour(HttpCase):
     def test_wand_opens_form_dialog(self):
         self.start_tour(
             "/odoo/res.partner/1",
-            "escodoo_customization_wand_form",
+            "web_customizer_wand_form",
             login="admin",
         )

@@ -23,7 +23,7 @@ def export_bundle_zip(bundle):
     """Return ``(zip_bytes, filename)`` for an installable addon.
 
     Only applied operations are exported. The zip is the source of truth for
-    git; it does not depend on escodoo_customization at runtime.
+    git; it does not depend on web_customizer at runtime.
     """
     bundle.ensure_one()
     files = export_bundle_files(bundle)

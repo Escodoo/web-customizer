@@ -1,7 +1,7 @@
 import {expect, test} from "@odoo/hoot";
 import {animationFrame} from "@odoo/hoot-mock";
-import {CustomizationFieldDialog} from "@escodoo_customization/customization_field_dialog";
-import {customizationService} from "@escodoo_customization/customization_service";
+import {CustomizationFieldDialog} from "@web_customizer/customization_field_dialog";
+import {customizationService} from "@web_customizer/customization_service";
 import {user} from "@web/core/user";
 import {
     contains,
@@ -69,7 +69,7 @@ class Users extends models.Model {
 defineModels([Partner, Users]);
 
 function enableCustomization() {
-    mockService("escodoo_customization", (env, {dialog, notification}) => {
+    mockService("web_customizer", (env, {dialog, notification}) => {
         const service = customizationService.start(env, {dialog, notification});
         service.state.enabled = true;
         service.openFieldDialog = (info) => {
@@ -87,7 +87,7 @@ function compileKanban(arch) {
 }
 
 test("form fields become targets after the wand is turned on", async () => {
-    mockService("escodoo_customization", (env, {dialog, notification}) =>
+    mockService("web_customizer", (env, {dialog, notification}) =>
         customizationService.start(env, {dialog, notification})
     );
     await mountView({
@@ -105,7 +105,7 @@ test("form fields become targets after the wand is turned on", async () => {
             </form>`,
     });
     expect(".o_esc_customization_target").toHaveCount(0);
-    getService("escodoo_customization").toggle();
+    getService("web_customizer").toggle();
     await animationFrame();
     expect(".o_field_widget[name=email]").toHaveClass("o_esc_customization_target");
 });
@@ -378,22 +378,22 @@ test("NavBar patch opens the dialog for a menu with an XML ID", async () => {
         {
             id: 1,
             name: "App",
-            xmlid: "escodoo_customization.tester_app",
+            xmlid: "web_customizer.tester_app",
             children: [2],
         },
         {
             id: 2,
             name: "Users",
-            xmlid: "escodoo_customization.tester_users",
+            xmlid: "web_customizer.tester_users",
         },
     ]);
     await mountWithCleanup(NavBar);
     getService("menu").setCurrentMenu(1);
     await animationFrame();
     await contains(
-        ".o_menu_sections [data-menu-xmlid='escodoo_customization.tester_users']"
+        ".o_menu_sections [data-menu-xmlid='web_customizer.tester_users']"
     ).click();
-    expect.verifySteps(["menu:escodoo_customization.tester_users"]);
+    expect.verifySteps(["menu:web_customizer.tester_users"]);
 });
 
 test("banner appears in customization mode and Exit turns it off", async () => {

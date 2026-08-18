@@ -25,10 +25,10 @@ export const customizationService = {
     },
 };
 
-registry.category("services").add("escodoo_customization", customizationService);
+registry.category("services").add("web_customizer", customizationService);
 
 export function useCustomizationService() {
-    const customization = useService("escodoo_customization");
+    const customization = useService("web_customizer");
     const state = useState(customization.state);
     return {
         state,

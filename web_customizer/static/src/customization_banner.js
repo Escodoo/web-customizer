@@ -4,7 +4,7 @@ import {registry} from "@web/core/registry";
 import {useCustomizationService} from "./customization_service";
 
 export class CustomizationBanner extends Component {
-    static template = "escodoo_customization.Banner";
+    static template = "web_customizer.Banner";
     static props = {};
 
     setup() {
@@ -28,6 +28,6 @@ export class CustomizationBanner extends Component {
     }
 }
 
-registry.category("main_components").add("escodoo_customization.Banner", {
+registry.category("main_components").add("web_customizer.Banner", {
     Component: CustomizationBanner,
 });

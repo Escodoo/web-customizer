@@ -12,16 +12,16 @@ import {user} from "@web/core/user";
 import {useService} from "@web/core/utils/hooks";
 
 export class CustomizationSystray extends Component {
-    static template = "escodoo_customization.Systray";
+    static template = "web_customizer.Systray";
     static props = {};
 
     setup() {
-        this.customization = useService("escodoo_customization");
+        this.customization = useService("web_customizer");
         this.state = useState(this.customization.state);
         this.isManager = false;
         onWillStart(async () => {
             this.isManager = await user.hasGroup(
-                "escodoo_customization.group_customization_manager"
+                "web_customizer.group_customization_manager"
             );
         });
     }
@@ -43,4 +43,4 @@ export class CustomizationSystray extends Component {
 
 registry
     .category("systray")
-    .add("escodoo_customization", {Component: CustomizationSystray}, {sequence: 16});
+    .add("web_customizer", {Component: CustomizationSystray}, {sequence: 16});

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
-    <t t-name="escodoo_customization.Banner">
+    <t t-name="web_customizer.Banner">
         <div
             t-if="customization.state.enabled"
             class="o_esc_customization_banner"

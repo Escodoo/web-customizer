@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
-    <t t-name="escodoo_customization.Systray">
+    <t t-name="web_customizer.Systray">
         <div
             t-if="isManager"
             class="o-dropdown dropdown o-dropdown--no-caret o_esc_customization_systray"

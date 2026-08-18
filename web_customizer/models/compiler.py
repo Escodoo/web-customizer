@@ -14,7 +14,7 @@ from odoo.tools import sql
 
 _logger = logging.getLogger(__name__)
 
-FIELD_PREFIX = "x_esc_"
+FIELD_PREFIX = "x_cust_"
 SUPPORTED_TTYPES = (
     "char",
     "text",
@@ -82,7 +82,7 @@ BUTTON_TYPE_ANCHORS = (
     "archive",
     "unarchive",
 )
-LEGACY_XMLID_MODULE = "escodoo_customization"
+LEGACY_XMLID_MODULE = "web_customizer"
 
 
 class AnchorError(Exception):
@@ -122,11 +122,11 @@ def ensure_field_name(name):
         raise ValidationError(
             _("Generated field names must start with '%s'.") % FIELD_PREFIX
         )
-    if not re.match(r"^x_esc_[a-z0-9_]+$", name):
+    if not re.match(rf"^{re.escape(FIELD_PREFIX)}[a-z0-9_]+$", name):
         raise ValidationError(
             _(
                 "Field name '%s' is invalid. Use lowercase letters, digits and "
-                "single underscores after the x_esc_ prefix."
+                "single underscores after the x_cust_ prefix."
             )
             % name
         )
@@ -285,7 +285,7 @@ def combined_arch_for_operation(view, operation):
     """Combined arch as seen when compiling ``operation``.
 
     Earlier operations of the same bundle stay active so a field can be
-    anchored on another custom field (for example place after ``x_esc_vip``).
+    anchored on another custom field (for example place after ``x_cust_vip``).
     This operation and later ones are excluded so re-apply does not see
     its own inherit.
     """
@@ -512,7 +512,7 @@ def ensure_generated_xmlid(env, module, name, record):
     """Point ``module.name`` at ``record``, migrating a legacy xmlid if needed.
 
     Generated artifacts belong to the bundle code (the future exported
-    addon), not to ``escodoo_customization``. Uninstalling the ledger
+    addon), not to ``web_customizer``. Uninstalling this module
     must not cascade-delete compiled fields, views or menus.
     """
     Imd = env["ir.model.data"].sudo()

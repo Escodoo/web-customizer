@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* escodoo_customization
+# 	* web_customizer
 #
 msgid ""
 msgstr ""
@@ -16,509 +16,509 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "\" matches"
 msgstr "\" corresponde a"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "(empty)"
 msgstr "(vazio)"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "(missing)"
 msgstr "(ausente)"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__anchor_occurrence
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__anchor_occurrence
 msgid "1-based occurrence when the name is not unique. 0 means the name must be unique."
 msgstr "Ocorrência a partir de 1 quando o nome não é único. 0 exige que o nome seja único."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A field type or a related path is required."
 msgstr "É necessário um tipo de campo ou um caminho related."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "A label is required."
 msgstr "Um rótulo é obrigatório."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A menu XML ID is required."
 msgstr "É necessário um XML ID de menu."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A menu cannot be moved under itself."
 msgstr "Um menu não pode ser movido para dentro de si mesmo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-#: code:addons/escodoo_customization/models/customization_operation.py:0
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
 msgid "A menu is required."
 msgstr "Um menu é obrigatório."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_operation.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
 msgid "A model is required to add a field."
 msgstr "É necessário um modelo para adicionar um campo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A model is required to create a field."
 msgstr "É necessário um modelo para criar um campo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A model is required."
 msgstr "Um modelo é obrigatório."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A new label is required."
 msgstr "Um novo rótulo é obrigatório."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A page cannot be placed inside another page."
 msgstr "Uma página não pode ser colocada dentro de outra página."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A page title is required."
 msgstr "Um título de página é obrigatório."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A relation model is required for %s fields."
 msgstr "É necessário um modelo relacionado para campos %s."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_operation.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
 msgid "A target view is required for this operation."
 msgstr "Esta operação exige uma view de destino."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "A target view is required."
 msgstr "Uma view de destino é obrigatória."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A widget name is required."
 msgstr "Um nome de widget é obrigatório."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Action"
 msgstr "Ação"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Action '%s' has no XML ID and cannot be used."
 msgstr "A ação '%s' não tem XML ID e não pode ser usada."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Action '%s' is missing."
 msgstr "A ação '%s' não existe."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__add_field
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_field
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Add Field"
 msgstr "Adicionar campo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__add_group
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_group
 msgid "Add Group"
 msgstr "Adicionar grupo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__add_menu
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_menu
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Add Menu"
 msgstr "Adicionar menu"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__add_page
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_page
 msgid "Add Page"
 msgstr "Adicionar página"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Add Page or Group"
 msgstr "Adicionar página ou grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add at least one selection option."
 msgstr "Adicione pelo menos uma opção de seleção."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add field after this one"
 msgstr "Adicionar campo depois deste"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add field in this group"
 msgstr "Adicionar campo neste grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add field in this page"
 msgstr "Adicionar campo nesta página"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add group after this one"
 msgstr "Adicionar grupo depois deste"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add group in this page"
 msgstr "Adicionar grupo nesta página"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add menu after this one"
 msgstr "Adicionar menu depois deste"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add page after this one"
 msgstr "Adicionar página depois desta"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add submenu"
 msgstr "Adicionar submenu"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__position__after
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__after
 msgid "After"
 msgstr "Depois"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_operation.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
 msgid "An anchor name or title is required."
 msgstr "É necessário um nome ou título de âncora."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Anchor \""
 msgstr "Âncora \""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor %(kind)s '%(name)s' has no occurrence %(index)s."
 msgstr "A âncora %(kind)s '%(name)s' não tem a ocorrência %(index)s."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor %(kind)s '%(name)s' is ambiguous (%(count)s matches in the target view)."
 msgstr "A âncora %(kind)s '%(name)s' é ambígua (%(count)s ocorrências na view de destino)."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor %(kind)s '%(name)s' occurrence %(index)s is not on page '%(page)s'."
 msgstr "A âncora %(kind)s '%(name)s' ocorrência %(index)s não está na página '%(page)s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor %(kind)s '%(name)s' was not found in the target view."
 msgstr "A âncora %(kind)s '%(name)s' não foi encontrada na view de destino."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor %(kind)s '%(name)s' was not found on page '%(page)s'."
 msgstr "A âncora %(kind)s '%(name)s' não foi encontrada na página '%(page)s'."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__anchor_kind
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__anchor_kind
 msgid "Anchor Kind"
 msgstr "Tipo de âncora"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__anchor_name
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__anchor_name
 msgid "Anchor Name"
 msgstr "Nome da âncora"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__anchor_occurrence
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__anchor_occurrence
 msgid "Anchor Occurrence"
 msgstr "Ocorrência da âncora"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__anchor_page
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__anchor_page
 msgid "Anchor Page"
 msgstr "Página da âncora"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__anchor_string
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__anchor_string
 msgid "Anchor String"
 msgstr "Título da âncora"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor kind '%s' is not supported yet."
 msgstr "O tipo de âncora '%s' ainda não é suportado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Anchor kind '%s' is not supported."
 msgstr "O tipo de âncora '%s' não é suportado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor name '%s' is invalid."
 msgstr "O nome de âncora '%s' é inválido."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor name is missing."
 msgstr "O nome da âncora está ausente."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_bundle__state__applied
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__state__applied
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_bundle__state__applied
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__applied
 msgid "Applied"
 msgstr "Aplicado"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Applied operations in bundle '%s' did not generate fields, views or menus."
 msgstr "As operações aplicadas no pacote '%s' não geraram campos, views ou menus."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Apply"
 msgstr "Aplicar"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Apply immediately"
 msgstr "Aplicar imediatamente"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__state__archived
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__archived
 msgid "Archived"
 msgstr "Arquivado"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__position__attributes
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__attributes
 msgid "Attributes"
 msgstr "Atributos"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__position__before
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__before
 msgid "Before"
 msgstr "Antes"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__binary
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__binary
 msgid "Binary"
 msgstr "Binário"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__boolean
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__boolean
 msgid "Boolean"
 msgstr "Booleano"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__state__broken
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__broken
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Broken"
 msgstr "Quebrado"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__broken_count
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__broken_count
 msgid "Broken Count"
 msgstr "Quantidade quebrada"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__broken_reason
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__broken_reason
 msgid "Broken Reason"
 msgstr "Motivo da quebra"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Broken reason"
 msgstr "Motivo da quebra"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__bundle_id
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__bundle_id
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__bundle_id
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__bundle_id
 msgid "Bundle"
 msgstr "Pacote"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Bundle '%(bundle)s' already has a %(type)s operation on '%(anchor)s' in view '%(view)s'."
 msgstr "O pacote '%(bundle)s' já tem uma operação %(type)s em '%(anchor)s' na view '%(view)s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Bundle '%(bundle)s' already has a %(type)s operation on menu '%(menu)s'."
 msgstr "O pacote '%(bundle)s' já tem uma operação %(type)s no menu '%(menu)s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Bundle code must start with a letter and contain only lowercase letters, digits and underscores."
 msgstr "O código do pacote deve começar com uma letra e conter apenas letras minúsculas, dígitos e sublinhados."
 
-#. module: escodoo_customization
-#: model:ir.actions.act_window,name:escodoo_customization.action_customization_bundle
-#: model:ir.ui.menu,name:escodoo_customization.menu_customization_bundle
+#. module: web_customizer
+#: model:ir.actions.act_window,name:web_customizer.action_customization_bundle
+#: model:ir.ui.menu,name:web_customizer.menu_customization_bundle
 msgid "Bundles"
 msgstr "Pacotes"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__button
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__button
 msgid "Button"
 msgstr "Botão"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Cancel"
 msgstr "Cancelar"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Change group title"
 msgstr "Alterar título do grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Change label"
 msgstr "Alterar rótulo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Change page title"
 msgstr "Alterar título da página"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__char
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__char
 msgid "Char"
 msgstr "Char"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Choose a different menu as the destination."
 msgstr "Escolha outro menu como destino."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Choose a field other than the one you clicked."
 msgstr "Escolha um campo diferente do que você clicou."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Click a field, page, group or button to set the anchor."
 msgstr "Clique em um campo, página, grupo ou botão para definir a âncora."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+#: code:addons/web_customizer/static/src/customization_banner.js:0
 msgid "Click an outlined item"
 msgstr "Clique em um item destacado"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_export_wizard_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_export_wizard_form
 msgid "Close"
 msgstr "Fechar"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__code
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__code
 msgid "Code"
 msgstr "Código"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_mod_column_invisible
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_column_invisible
 msgid "Column Invisible"
 msgstr "Coluna invisível"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_groups
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_groups
 msgid "Comma-separated XML IDs, for example base.group_user."
 msgstr "XML IDs separados por vírgula, por exemplo base.group_user."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__company_id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__company_id
 msgid "Company"
 msgstr "Empresa"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid ""
 "Create a bundle under Settings → Technical → Customization\n"
 "                    before customizing this form."
@@ -526,265 +526,265 @@ msgstr ""
 "Crie um pacote em Definições → Técnico → Personalização\n"
 "                    antes de personalizar este formulário."
 
-#. module: escodoo_customization
-#: model_terms:ir.actions.act_window,help:escodoo_customization.action_customization_bundle
+#. module: web_customizer
+#: model_terms:ir.actions.act_window,help:web_customizer.action_customization_bundle
 msgid "Create a customization bundle"
 msgstr "Criar um pacote de personalização"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Could not apply customization."
 msgstr "Não foi possível aplicar a personalização."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Could not load customization context."
 msgstr "Não foi possível carregar o contexto de personalização."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Create a customization bundle first."
 msgstr "Crie primeiro um pacote de personalização."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__create_uid
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__create_uid
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__create_uid
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__create_uid
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__create_uid
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__create_uid
 msgid "Created by"
 msgstr "Criado por"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__create_date
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__create_date
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__create_date
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__create_date
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__create_date
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__create_date
 msgid "Created on"
 msgstr "Criado em"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_currency_field
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_currency_field
 msgid "Currency Field"
 msgstr "Campo de moeda"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Currency field (optional)"
 msgstr "Campo de moeda (opcional)"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Custom field names cannot contain double underscores."
 msgstr "Nomes de campos personalizados não podem conter sublinhado duplo."
 
-#. module: escodoo_customization
-#: model:ir.module.category,name:escodoo_customization.module_category_customization
-#: model:ir.ui.menu,name:escodoo_customization.menu_customization_root
+#. module: web_customizer
+#: model:ir.module.category,name:web_customizer.module_category_customization
+#: model:ir.ui.menu,name:web_customizer.menu_customization_root
 msgid "Customization"
 msgstr "Personalização"
 
-#. module: escodoo_customization
-#: model:ir.model,name:escodoo_customization.model_customization_bundle
+#. module: web_customizer
+#: model:ir.model,name:web_customizer.model_customization_bundle
 msgid "Customization Bundle"
 msgstr "Pacote de personalização"
 
-#. module: escodoo_customization
-#: model:ir.model,name:escodoo_customization.model_customization_operation
+#. module: web_customizer
+#: model:ir.model,name:web_customizer.model_customization_operation
 msgid "Customization Operation"
 msgstr "Operação de personalização"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customization applied."
 msgstr "Personalização aplicada."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+#: code:addons/web_customizer/static/src/customization_banner.js:0
 msgid "Customization mode"
 msgstr "Modo de personalização"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize button %s"
 msgstr "Personalizar botão %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize field %s"
 msgstr "Personalizar campo %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize group %s"
 msgstr "Personalizar grupo %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize kanban button %s"
 msgstr "Personalizar botão kanban %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize kanban field %s"
 msgstr "Personalizar campo kanban %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize list field %s"
 msgstr "Personalizar campo da lista %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize menu %s"
 msgstr "Personalizar menu %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize page %s"
 msgstr "Personalizar página %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize search field %s"
 msgstr "Personalizar campo de pesquisa %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_systray.js:0
+#: code:addons/web_customizer/static/src/customization_systray.js:0
 msgid "Customize this view"
 msgstr "Personalizar esta view"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__data
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__data
 msgid "Data"
 msgstr "Dados"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__date
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__date
 msgid "Date"
 msgstr "Data"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__datetime
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__datetime
 msgid "Datetime"
 msgstr "Data e hora"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Destination '%s' is not a menu."
 msgstr "O destino '%s' não é um menu."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_target_xmlid
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_target_xmlid
 msgid "Destination Menu"
 msgstr "Menu de destino"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Destination menu"
 msgstr "Menu de destino"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__display_name
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__display_name
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__display_name
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__display_name
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__display_name
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__display_name
 msgid "Display Name"
 msgstr "Nome de exibição"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_related
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_related
 msgid "Dotted path to an existing field, for example parent_id.email."
 msgstr "Caminho pontilhado até um campo existente, por exemplo parent_id.email."
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_export_wizard_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_export_wizard_form
 msgid "Download ZIP"
 msgstr "Baixar ZIP"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_bundle__state__draft
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__state__draft
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_bundle__state__draft
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__draft
 msgid "Draft"
 msgstr "Rascunho"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Enter a widget name."
 msgstr "Informe um nome de widget."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Existing field"
 msgstr "Campo existente"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_banner.js:0
+#: code:addons/web_customizer/static/src/customization_banner.js:0
 msgid "Exit"
 msgstr "Sair"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_systray.js:0
+#: code:addons/web_customizer/static/src/customization_systray.js:0
 msgid "Exit customization mode"
 msgstr "Sair do modo de personalização"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: model:ir.actions.act_window,name:escodoo_customization.action_customization_export_wizard
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_export_wizard_form
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: model:ir.actions.act_window,name:web_customizer.action_customization_export_wizard
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_export_wizard_form
 msgid "Export Addon"
 msgstr "Exportar addon"
 
-#. module: escodoo_customization
-#: model:ir.model,name:escodoo_customization.model_customization_export_wizard
+#. module: web_customizer
+#: model:ir.model,name:web_customizer.model_customization_export_wizard
 msgid "Export Customization Bundle"
 msgstr "Exportar pacote de personalização"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__field
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__field
 msgid "Field"
 msgstr "Campo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Field '%s' does not exist on %s."
 msgstr "O campo '%s' não existe em %s."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_field_name
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_field_name
 msgid "Field To Place"
 msgstr "Campo a posicionar"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_ttype
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_ttype
 msgid "Field Type"
 msgstr "Tipo de campo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_ttype
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_ttype
 msgid ""
 "Changing the type and clicking Re-apply deletes values already stored in "
 "this field."
@@ -792,9 +792,9 @@ msgstr ""
 "Alterar o tipo e clicar em Reaplicar apaga os valores já gravados neste "
 "campo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid ""
 "Changing this type later and clicking Re-apply deletes values already stored "
 "in the field."
@@ -802,85 +802,85 @@ msgstr ""
 "Alterar este tipo depois e clicar em Reaplicar apaga os valores já gravados "
 "no campo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-msgid "Field name '%s' is invalid. Use lowercase letters, digits and single underscores after the x_esc_ prefix."
-msgstr "O nome de campo '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado após o prefixo x_esc_."
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field name '%s' is invalid. Use lowercase letters, digits and single underscores after the x_cust_ prefix."
+msgstr "O nome de campo '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado após o prefixo x_cust_."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Field name '%s' is not valid for placing a field."
 msgstr "O nome de campo '%s' não é válido para posicionar um campo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Field type"
 msgstr "Tipo de campo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Field type '%s' is not supported."
 msgstr "O tipo de campo '%s' não é suportado."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__filename
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__filename
 msgid "Filename"
 msgstr "Nome do arquivo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__float
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__float
 msgid "Float"
 msgstr "Float"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__view_type__form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__form
 msgid "Form"
 msgstr "Formulário"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__generated_field_id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__generated_field_id
 msgid "Generated Field"
 msgstr "Campo gerado"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__generated_menu_id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__generated_menu_id
 msgid "Generated Menu"
 msgstr "Menu gerado"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__generated_view_id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__generated_view_id
 msgid "Generated View"
 msgstr "View gerada"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Generated field names must start with '%s'."
 msgstr "Nomes de campos gerados devem começar com '%s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Generated view '%s' has an empty arch."
 msgstr "A view gerada '%s' tem um arch vazio."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__group
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__group
 msgid "Group"
 msgstr "Grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Group '%s' has no XML ID and cannot be used in a view."
 msgstr "O grupo '%s' não tem XML ID e não pode ser usado em uma view."
 
-#. module: escodoo_customization
-#: model_terms:ir.actions.act_window,help:escodoo_customization.action_customization_bundle
+#. module: web_customizer
+#: model_terms:ir.actions.act_window,help:web_customizer.action_customization_bundle
 msgid ""
 "Group field and view operations for a client or project, then apply\n"
 "                them as upgrade-safe inherited views."
@@ -888,42 +888,42 @@ msgstr ""
 "Agrupe operações de campo e view para um cliente ou projeto e aplique-\n"
 "                as como views herdadas seguras em upgrade."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Group label"
 msgstr "Rótulo do grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_groups
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_groups
 msgid "Groups"
 msgstr "Grupos"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Health Check"
 msgstr "Verificação de saúde"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_help
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_help
 msgid "Help"
 msgstr "Ajuda"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__hide_field
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__hide_field
 msgid "Hide Field"
 msgstr "Ocultar campo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__hide_menu
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__hide_menu
 msgid "Hide Menu"
 msgstr "Ocultar menu"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid ""
 "Hide has no extra payload. The compiler uses the\n"
 "                                anchor, the view type, or the menu."
@@ -931,413 +931,413 @@ msgstr ""
 "Ocultar não tem payload extra. O compilador usa a\n"
 "                                âncora, o tipo de view ou o menu."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this button"
 msgstr "Ocultar este botão"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this field"
 msgstr "Ocultar este campo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this progressbar"
 msgstr "Ocultar esta barra de progresso"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this group"
 msgstr "Ocultar este grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this menu"
 msgstr "Ocultar este menu"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this page"
 msgstr "Ocultar esta página"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__id
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__id
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__id
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__id
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__id
 msgid "ID"
 msgstr "ID"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__position__inside
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__inside
 msgid "Inside"
 msgstr "Dentro"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__integer
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__integer
 msgid "Integer"
 msgstr "Inteiro"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Intermediate field '%(name)s' on %(model)s must be a many2one."
 msgstr "O campo intermediário '%(name)s' em %(model)s deve ser many2one."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Invalid group id '%s'."
 msgstr "ID de grupo inválido '%s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_mod_invisible
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_invisible
 msgid "Invisible"
 msgstr "Invisível"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__view_type__kanban
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__kanban
 msgid "Kanban"
 msgstr "Kanban"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_string
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_string
 msgid "Label"
 msgstr "Rótulo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__write_uid
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__write_uid
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__write_uid
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__write_uid
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__write_uid
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__write_uid
 msgid "Last Updated by"
 msgstr "Última atualização por"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__write_date
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_export_wizard__write_date
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__write_date
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__write_date
+#: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__write_date
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__write_date
 msgid "Last Updated on"
 msgstr "Última atualização em"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__view_type__list
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__list
 msgid "List"
 msgstr "Lista"
 
-#. module: escodoo_customization
-#: model:res.groups,name:escodoo_customization.group_customization_manager
+#. module: web_customizer
+#: model:res.groups,name:web_customizer.group_customization_manager
 msgid "Manager"
 msgstr "Gerente"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__many2many
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__many2many
 msgid "Many2many"
 msgstr "Many2many"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__many2one
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__many2one
 msgid "Many2one"
 msgstr "Many2one"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__menu_id
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__menu
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__menu_id
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__menu
 msgid "Menu"
 msgstr "Menu"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Menu '%s' has no XML ID and cannot be customized."
 msgstr "O menu '%s' não tem XML ID e não pode ser personalizado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Menu '%s' has no XML ID and cannot be exported."
 msgstr "O menu '%s' não tem XML ID e não pode ser exportado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Menu '%s' has no XML ID and cannot be used."
 msgstr "O menu '%s' não tem XML ID e não pode ser usado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Menu '%s' has no XML ID."
 msgstr "O menu '%s' não tem XML ID."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Menu '%s' has no window action XML ID."
 msgstr "O menu '%s' não tem XML ID de ação de janela."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Menu '%s' is missing."
 msgstr "O menu '%s' não existe."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Menu XML ID '%s' is invalid. Use lowercase letters, digits and single underscores, starting with a letter."
 msgstr "O XML ID de menu '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado, começando com uma letra."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Menu groups operation '%s' has no group XML IDs."
 msgstr "A operação de grupos do menu '%s' não tem XML IDs de grupo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Menu label"
 msgstr "Rótulo do menu"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Menus can only be hidden, renamed, restricted, added or moved."
 msgstr "Menus só podem ser ocultados, renomeados, restringidos, adicionados ou movidos."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__model_id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__model_id
 msgid "Model"
 msgstr "Modelo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Model %s has no XML ID; it cannot be exported."
 msgstr "O modelo %s não tem XML ID; não pode ser exportado."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__model
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__model
 msgid "Model Name"
 msgstr "Nome do modelo"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Modifiers"
 msgstr "Modificadores"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__monetary
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__monetary
 msgid "Monetary"
 msgstr "Monetário"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Monetary fields need a currency field on the model (currency_id or x_currency_id)."
 msgstr "Campos monetários precisam de um campo de moeda no modelo (currency_id ou x_currency_id)."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__move_menu
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__move_menu
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Move Menu"
 msgstr "Mover menu"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Move after another menu"
 msgstr "Mover para depois de outro menu"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Move as submenu of another menu"
 msgstr "Mover como submenu de outro menu"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_name
-msgid "Must start with x_esc_. Leave empty to slugify from the label."
-msgstr "Deve começar com x_esc_. Deixe vazio para gerar a partir do rótulo."
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_name
+msgid "Must start with x_cust_. Leave empty to slugify from the label."
+msgstr "Deve começar com x_cust_. Deixe vazio para gerar a partir do rótulo."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__name
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__name
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__name
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__name
 msgid "Name"
 msgstr "Nome"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_bundle__state__needs_reapply
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_bundle__state__needs_reapply
 msgid "Needs Re-apply"
 msgstr "Precisa reaplicar"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "New label"
 msgstr "Novo rótulo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "One of the selected groups does not exist."
 msgstr "Um dos grupos selecionados não existe."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_selection
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_selection
 msgid "One option per line as value:Label."
 msgstr "Uma opção por linha no formato valor:Rótulo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Only customization managers can change customizations."
 msgstr "Somente gerentes de personalização podem alterar personalizações."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Only customization managers can edit forms in place."
 msgstr "Somente gerentes de personalização podem editar formulários no lugar."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_systray.js:0
+#: code:addons/web_customizer/static/src/customization_systray.js:0
 msgid "On"
 msgstr "Ativo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__operation_count
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__operation_count
 msgid "Operation Count"
 msgstr "Quantidade de operações"
 
-#. module: escodoo_customization
-#: model:ir.actions.act_window,name:escodoo_customization.action_customization_operation
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__operation_ids
-#: model:ir.ui.menu,name:escodoo_customization.menu_customization_operation
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
+#. module: web_customizer
+#: model:ir.actions.act_window,name:web_customizer.action_customization_operation
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__operation_ids
+#: model:ir.ui.menu,name:web_customizer.menu_customization_operation
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Operations"
 msgstr "Operações"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__page
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__page
 msgid "Page"
 msgstr "Página"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Page title"
 msgstr "Título da página"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Pages and groups can only be added on forms."
 msgstr "Páginas e grupos só podem ser adicionados em formulários."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Parent menu '%s' has no XML ID and cannot be exported."
 msgstr "O menu pai '%s' não tem XML ID e não pode ser exportado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Parent menu '%s' has no XML ID."
 msgstr "O menu pai '%s' não tem XML ID."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__anchor_page
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__anchor_page
 msgid "Parent notebook page name, used to disambiguate the anchor."
 msgstr "Nome da página do notebook pai, usado para desambiguar a âncora."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Payload"
 msgstr "Payload"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__place_field
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__place_field
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Place Field"
 msgstr "Posicionar campo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Place a field on a page or after another field."
 msgstr "Posicione um campo em uma página ou depois de outro campo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Place a page or group on a field, page or group."
 msgstr "Posicione uma página ou grupo em um campo, página ou grupo."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Place existing field after this one"
 msgstr "Posicionar campo existente depois deste"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Place existing field in this group"
 msgstr "Posicionar campo existente neste grupo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Place existing field in this page"
 msgstr "Posicionar campo existente nesta página"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__position
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__position
 msgid "Position"
 msgstr "Posição"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%(position)s' is not valid for placing a %(tag)s."
 msgstr "A posição '%(position)s' não é válida para posicionar um %(tag)s."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%s' is not valid for placing a field."
 msgstr "A posição '%s' não é válida para posicionar um campo."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_json
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_json
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Raw JSON"
 msgstr "JSON bruto"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Re-apply"
 msgstr "Reaplicar"
 
-#. module: escodoo_customization
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_bundle_form
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid ""
 "Re-apply recreates a field if its type or relation changed. Existing values "
 "in that column are deleted."
@@ -1345,73 +1345,73 @@ msgstr ""
 "Reaplicar recria o campo se o tipo ou a relação mudou. Os valores já "
 "gravados nessa coluna são apagados."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_mod_readonly
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_readonly
 msgid "Readonly"
 msgstr "Somente leitura"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_related
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_related
 msgid "Related Path"
 msgstr "Caminho related"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Related field '%(name)s' was not found on %(model)s."
 msgstr "O campo related '%(name)s' não foi encontrado em %(model)s."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Related field type '%s' is not supported."
 msgstr "O tipo de campo related '%s' não é suportado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Related path '%s' is invalid. Use dotted field names, for example parent_id.email."
 msgstr "O caminho related '%s' é inválido. Use nomes de campo pontilhados, por exemplo parent_id.email."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Related path (optional)"
 msgstr "Caminho related (opcional)"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_relation
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_relation
 msgid "Relation Model"
 msgstr "Modelo relacionado"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Relation model"
 msgstr "Modelo relacionado"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__position__replace
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__replace
 msgid "Replace"
 msgstr "Substituir"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_required
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_required
 msgid "Required"
 msgstr "Obrigatório"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_mod_required
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_required
 msgid "Required Expr"
 msgstr "Expressão obrigatória"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid ""
 "Required unless the model already has currency_id\n"
 "                            or x_currency_id."
@@ -1419,325 +1419,325 @@ msgstr ""
 "Obrigatório, a menos que o modelo já tenha currency_id\n"
 "                            ou x_currency_id."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Restrict to groups"
 msgstr "Restringir a grupos"
 
-#. module: escodoo_customization
-#: model:customization.bundle,name:escodoo_customization.bundle_sandbox
+#. module: web_customizer
+#: model:customization.bundle,name:web_customizer.bundle_sandbox
 msgid "Sandbox"
 msgstr "Sandbox"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__view_type__search
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__search
 msgid "Search"
 msgstr "Pesquisa"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Search a field..."
 msgstr "Buscar um campo..."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Search a group..."
 msgstr "Buscar um grupo..."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Search a menu..."
 msgstr "Buscar um menu..."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Search a window action..."
 msgstr "Buscar uma ação de janela..."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Select a customization bundle first."
 msgstr "Selecione primeiro um pacote de personalização."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select a destination menu with an XML ID."
 msgstr "Selecione um menu de destino com XML ID."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select a window action with an XML ID."
 msgstr "Selecione uma ação de janela com XML ID."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select an existing field to place."
 msgstr "Selecione um campo existente para posicionar."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select at least one group."
 msgstr "Selecione pelo menos um grupo."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__selection
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__selection
 msgid "Selection"
 msgstr "Seleção"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_selection
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_selection
 msgid "Selection Options"
 msgstr "Opções de seleção"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Selection fields need at least one option."
 msgstr "Campos de seleção precisam de pelo menos uma opção."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Selection options"
 msgstr "Opções de seleção"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__anchor_name
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__anchor_name
 msgid "Semantic anchor, for example the field name partner_id."
 msgstr "Âncora semântica, por exemplo o nome do campo partner_id."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__sequence
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__sequence
 msgid "Sequence"
 msgstr "Sequência"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__set_groups
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_groups
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Set Groups"
 msgstr "Definir grupos"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__set_string
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_string
 msgid "Set Label"
 msgstr "Definir rótulo"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__set_menu_groups
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_menu_groups
 msgid "Set Menu Groups"
 msgstr "Definir grupos do menu"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__set_menu_string
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_menu_string
 msgid "Set Menu Label"
 msgstr "Definir rótulo do menu"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__set_modifier
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_modifier
 msgid "Set Modifier"
 msgstr "Definir modificador"
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__type__set_widget
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_widget
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Set Widget"
 msgstr "Definir widget"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set at least one modifier."
 msgstr "Defina pelo menos um modificador."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set modifiers"
 msgstr "Definir modificadores"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set widget"
 msgstr "Definir widget"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_bundle__state
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__state
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__state
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__state
 msgid "State"
 msgstr "Estado"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_store
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_store
 msgid "Store Related"
 msgstr "Armazenar related"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Store related value"
 msgstr "Armazenar valor related"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_store
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_store
 msgid "Store the related value in the database. Leave off for a computed-only related field."
 msgstr "Armazene o valor related no banco. Deixe desligado para um campo related apenas calculado."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "Target view '%s' has no XML ID. Export needs a stable inherit_id."
 msgstr "A view de destino '%s' não tem XML ID. A exportação precisa de um inherit_id estável."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_name
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_name
 msgid "Technical Name"
 msgstr "Nome técnico"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_relation
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_relation
 msgid "Technical model name, for example res.partner."
 msgstr "Nome técnico do modelo, por exemplo res.partner."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Technical name (optional)"
 msgstr "Nome técnico (opcional)"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_bundle__code
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_bundle__code
 msgid "Technical slug used later as the exported addon name (for example client_acme)."
 msgstr "Slug técnico usado depois como nome do addon exportado (por exemplo client_acme)."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__payload_ttype__text
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__text
 msgid "Text"
 msgstr "Texto"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "The action must have an XML ID."
 msgstr "A ação precisa ter um XML ID."
 
-#. module: escodoo_customization
-#: model:ir.model.constraint,message:escodoo_customization.constraint_customization_bundle_code_unique
+#. module: web_customizer
+#: model:ir.model.constraint,message:web_customizer.constraint_customization_bundle_code_unique
 msgid "The bundle code must be unique."
 msgstr "O código do pacote deve ser único."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "The destination menu is missing."
 msgstr "O menu de destino não existe."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "The destination menu must have an XML ID."
 msgstr "O menu de destino precisa ter um XML ID."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "The model %s does not support adding fields."
 msgstr "O modelo %s não permite adicionar campos."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "The node is shown only to users in those groups."
 msgstr "O nó é exibido apenas para usuários desses grupos."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.js:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "The operation is broken."
 msgstr "A operação está quebrada."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "The target menu is missing."
 msgstr "O menu de destino não existe."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "The target view is missing."
 msgstr "A view de destino não existe."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "The window action is missing."
 msgstr "A ação de janela não existe."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/exporter.py:0
+#: code:addons/web_customizer/models/exporter.py:0
 msgid "There are no applied operations to export in bundle '%s'."
 msgstr "Não há operações aplicadas para exportar no pacote '%s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "True"
 msgstr ""
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__type
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__type
 msgid "Type"
 msgstr "Tipo"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Unknown customization action '%s'."
 msgstr "Ação de personalização desconhecida '%s'."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Unnamed %s anchor was not found."
 msgstr "A âncora %s sem nome não foi encontrada."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Unsupported operation type '%s'."
 msgstr "Tipo de operação não suportado '%s'."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__anchor_string
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__anchor_string
 msgid "Untranslated page or group title when the node has no name."
 msgstr "Título não traduzido da página ou grupo quando o nó não tem nome."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid ""
 "Use True to always apply, or an expression such as\n"
 "                        not is_company."
@@ -1745,125 +1745,125 @@ msgstr ""
 "Use True para aplicar sempre, ou uma expressão como\n"
 "                        not is_company."
 
-#. module: escodoo_customization
-#: model:res.groups,name:escodoo_customization.group_customization_user
+#. module: web_customizer
+#: model:res.groups,name:web_customizer.group_customization_user
 msgid "User"
 msgstr "Usuário"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__view_id
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__view_id
 msgid "View"
 msgstr "View"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__view_type
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__view_type
 msgid "View Type"
 msgstr "Tipo de view"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Which node"
 msgstr "Qual nó"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_widget
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_widget
 msgid "Widget"
 msgstr "Widget"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Widgets can only be set on fields."
 msgstr "Widgets só podem ser definidos em campos."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,field_description:escodoo_customization.field_customization_operation__payload_action_xmlid
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_action_xmlid
 msgid "Window Action"
 msgstr "Ação de janela"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Window action"
 msgstr "Ação de janela"
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_target_xmlid
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_target_xmlid
 msgid "XML ID of the destination menu, for example base.menu_administration."
 msgstr "XML ID do menu de destino, por exemplo base.menu_administration."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_operation__payload_action_xmlid
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_action_xmlid
 msgid "XML ID of the window action, for example base.action_partner_form."
 msgstr "XML ID da ação de janela, por exemplo base.action_partner_form."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__xpath
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__xpath
 msgid "XPath"
 msgstr "XPath"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_operation.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
 msgid "add_field requires a field type or a related path."
 msgstr "add_field exige um tipo de campo ou um caminho related."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "add_menu requires a window action with an XML ID."
 msgstr "add_menu exige uma ação de janela com XML ID."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "add_menu requires payload.string."
 msgstr "add_menu exige payload.string."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "after %s"
 msgstr "depois de %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "currency_id"
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "draft:Draft"
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "many2many_tags"
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "menu_people"
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "move_menu requires a destination menu with an XML ID."
 msgstr "move_menu exige um menu de destino com XML ID."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid ""
 "nodes. Choose which one\n"
 "                    to customize."
@@ -1871,76 +1871,76 @@ msgstr ""
 "nós. Escolha qual\n"
 "                    personalizar."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "page %s"
 msgstr "página %s"
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:escodoo_customization.view_customization_operation_form
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "parent_id.email"
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "place_field requires payload.field_name."
 msgstr "place_field exige payload.field_name."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "res.partner"
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_groups requires payload.groups."
 msgstr "set_groups exige payload.groups."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_menu_groups requires payload.groups."
 msgstr "set_menu_groups exige payload.groups."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_menu_string requires payload.string."
 msgstr "set_menu_string exige payload.string."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_modifier requires payload.modifiers."
 msgstr "set_modifier exige payload.modifiers."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_string requires payload.string."
 msgstr "set_string exige payload.string."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_widget requires payload.widget."
 msgstr "set_widget exige payload.widget."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/escodoo_customization/static/src/customization_field_dialog.xml:0
-msgid "x_esc_..."
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "x_cust_..."
 msgstr ""
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/compiler.py:0
+#: code:addons/web_customizer/models/compiler.py:0
 msgid ""
 "Bundle '%(bundle)s' already has a Place Field operation for "
 "'%(field)s' in view '%(view)s'."
@@ -1948,8 +1948,8 @@ msgstr ""
 "O pacote '%(bundle)s' já tem uma operação Place Field para "
 "'%(field)s' na view '%(view)s'."
 
-#. module: escodoo_customization
-#: model:ir.model.fields,help:escodoo_customization.field_customization_bundle__company_id
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_bundle__company_id
 msgid ""
 "Optional tag to filter this bundle. Compiled fields, views "
 "and menus stay global; they are not scoped by company."
@@ -1957,13 +1957,13 @@ msgstr ""
 "Etiqueta opcional para filtrar este pacote. Campos, views e "
 "menus compilados continuam globais; não são isolados por empresa."
 
-#. module: escodoo_customization
+#. module: web_customizer
 #. odoo-python
-#: code:addons/escodoo_customization/models/customization_bundle.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A progressbar can only be hidden."
 msgstr "Uma barra de progresso só pode ser ocultada."
 
-#. module: escodoo_customization
-#: model:ir.model.fields.selection,name:escodoo_customization.selection__customization_operation__anchor_kind__progressbar
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__progressbar
 msgid "Progressbar"
 msgstr "Barra de progresso"
