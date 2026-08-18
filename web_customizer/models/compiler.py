@@ -31,7 +31,15 @@ SUPPORTED_TTYPES = (
     "binary",
     "monetary",
 )
-SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group", "progressbar", "filter")
+SUPPORTED_ANCHOR_KINDS = (
+    "field",
+    "page",
+    "button",
+    "group",
+    "progressbar",
+    "filter",
+    "view",
+)
 # Mirrors GROUPABLE_TYPES in @web/search/utils/misc: grouping by anything else
 # is refused by the client, so a filter built on it would never work.
 GROUPABLE_TTYPES = (
@@ -106,6 +114,7 @@ ATTRIBUTE_TYPES = (
     "set_groups",
     "set_modifier",
     "set_optional",
+    "set_view_attribute",
     "hide_field",
 )
 VIEW_WRITE_LABELS = {
@@ -114,8 +123,30 @@ VIEW_WRITE_LABELS = {
     "set_groups": "Set Groups",
     "set_modifier": "Set Modifier",
     "set_optional": "Set Optional Column",
+    "set_view_attribute": "Set View Options",
     "hide_field": "Hide Field",
 }
+# Attributes the arch parsers read off the view root. getActiveActions covers
+# form, list and kanban; the rest are read by one parser only, so offering
+# them elsewhere would write an attribute nothing looks at.
+ROOT_ACTION_ATTRIBUTES = ("create", "edit", "delete", "duplicate")
+ROOT_DECORATIONS = (
+    "bf",
+    "it",
+    "danger",
+    "info",
+    "muted",
+    "primary",
+    "success",
+    "warning",
+)
+ROOT_ATTRIBUTES = {
+    "form": ROOT_ACTION_ATTRIBUTES,
+    "list": ROOT_ACTION_ATTRIBUTES + ("editable", "default_order", "multi_edit"),
+    "kanban": ROOT_ACTION_ATTRIBUTES + ("default_order", "quick_create"),
+}
+ROOT_BOOLEAN_ATTRIBUTES = ROOT_ACTION_ATTRIBUTES + ("multi_edit", "quick_create")
+ROOT_EDITABLE_VALUES = ("top", "bottom")
 OPTIONAL_VALUES = ("show", "hide")
 MODIFIER_KEYS = ("invisible", "readonly", "required", "column_invisible")
 BUTTON_TYPE_ANCHORS = (
@@ -421,6 +452,10 @@ def resolve_anchor(
     Pages and groups without a technical name are matched by ``anchor_string``.
     """
     kind = anchor_kind or "field"
+    if kind == "view":
+        # The root is the anchor: every view has exactly one, and it carries
+        # no name to disambiguate.
+        return arch_tree
     tag = ANCHOR_TAGS.get(kind)
     if not tag:
         raise AnchorError(_("Anchor kind '%s' is not supported yet.") % kind)
@@ -842,7 +877,9 @@ def view_write_conflicts(operation):
 
 def view_write_conflict_message(operation, other):
     """Explain which bundle already owns this view attribute write."""
-    anchor = operation.anchor_name or operation.anchor_string or ""
+    anchor = operation.anchor_name or operation.anchor_string
+    if not anchor:
+        anchor = operation.env._("the view root")
     return operation.env._(
         "Bundle '%(bundle)s' already has a %(type)s operation on "
         "'%(anchor)s' in view '%(view)s'."
@@ -1288,6 +1325,13 @@ def _button_type_expr(operation, arch_tree, tag, anchor, page, occurrence):
 
 def _inherit_arch(operation, inner_xml, position, arch_tree=None):
     kind = operation.anchor_kind or "field"
+    if kind == "view":
+        if arch_tree is None:
+            arch_tree = combined_arch_for_operation(operation.view_id, operation)
+        # Read the tag off the arch instead of deriving it from the view type,
+        # so a renamed root tag cannot silently produce a dangling inherit.
+        root = arch_tree.tag
+        return f'<{root} position="{position}">{inner_xml}</{root}>'
     tag = ANCHOR_TAGS.get(kind, "field")
     anchor = (operation.anchor_name or "").strip()
     title = (operation.anchor_string or "").strip()
@@ -1618,6 +1662,117 @@ def _set_optional_parts(operation):
     return [_attribute_xml("optional", optional)]
 
 
+def _assert_root_attribute_name(operation, name):
+    """Refuse an option the arch parser of this view type never reads."""
+    view_type = operation.view_type or ""
+    if name.startswith("decoration-"):
+        if view_type != "list":
+            raise UserError(_("Row decorations are only read on a list view."))
+        decoration = name[len("decoration-") :]
+        if decoration not in ROOT_DECORATIONS:
+            raise UserError(
+                _(
+                    "'%(name)s' is not a decoration. Use one of: %(allowed)s.",
+                    name=name,
+                    allowed=", ".join(ROOT_DECORATIONS),
+                )
+            )
+        return
+    allowed = ROOT_ATTRIBUTES.get(view_type)
+    if not allowed:
+        raise UserError(_("A %s view has no root options to set.") % (view_type or "?"))
+    if name not in allowed:
+        raise UserError(
+            _(
+                "Option '%(name)s' is not available on a %(view)s view. "
+                "Use one of: %(allowed)s.",
+                name=name,
+                view=view_type,
+                allowed=", ".join(allowed),
+            )
+        )
+
+
+def _validated_root_default_order(operation, value):
+    """Refuse an order the server would reject when it reads the records."""
+    for part in value.split(","):
+        tokens = part.split()
+        if not tokens or len(tokens) > 2:
+            raise UserError(_("'%s' is not a valid default order.") % part.strip())
+        field = operation.env["ir.model.fields"]._get(operation.model, tokens[0])
+        if not field:
+            raise UserError(
+                _(
+                    "Field '%(field)s' does not exist on %(model)s.",
+                    field=tokens[0],
+                    model=operation.model,
+                )
+            )
+        if not field.store:
+            raise UserError(
+                _("Field '%s' is not stored, so records cannot be ordered by it.")
+                % tokens[0]
+            )
+        if len(tokens) == 2 and tokens[1].lower() not in ("asc", "desc"):
+            raise UserError(_("'%s' is not a sort direction.") % tokens[1])
+    return value
+
+
+def _validated_root_value(operation, name, value):
+    """Check the value against what the parser of this option accepts."""
+    if name.startswith("decoration-"):
+        # The condition is evaluated against a record, so only its syntax can
+        # be checked here.
+        try:
+            ast.parse(value, mode="eval")
+        except SyntaxError as err:
+            raise UserError(
+                _("The condition of '%(name)s' is not valid Python: %(error)s")
+                % {"name": name, "error": err}
+            ) from err
+        return value
+    if name in ROOT_BOOLEAN_ATTRIBUTES:
+        if value not in ("0", "1"):
+            raise UserError(
+                _(
+                    "Option '%(name)s' takes 0 or 1, not '%(value)s'.",
+                    name=name,
+                    value=value,
+                )
+            )
+        return value
+    if name == "editable":
+        if value not in ROOT_EDITABLE_VALUES:
+            raise UserError(
+                _(
+                    "Option 'editable' takes %(allowed)s, not '%(value)s'.",
+                    allowed=" or ".join(ROOT_EDITABLE_VALUES),
+                    value=value,
+                )
+            )
+        return value
+    if name == "default_order":
+        return _validated_root_default_order(operation, value)
+    return value
+
+
+def _set_view_attribute_parts(operation):
+    attributes = _payload(operation).get("attributes") or {}
+    if not attributes:
+        raise UserError(_("set_view_attribute requires payload.attributes."))
+    parts = []
+    for name in sorted(attributes):
+        raw = attributes[name]
+        value = "" if raw is None else str(raw).strip()
+        _assert_root_attribute_name(operation, name)
+        # An empty value drops the attribute, which is how an option the base
+        # view already sets is turned back off.
+        if value:
+            value = _validated_root_value(operation, name, value)
+        parts.append(_attribute_xml(name, value))
+    return parts
+
+
 def _hide_field_parts(operation):
     attr = "column_invisible" if operation.view_type == "list" else "invisible"
     return [_attribute_xml(attr, "True")]
@@ -1629,6 +1784,7 @@ ATTRIBUTE_PARTS = {
     "set_groups": _set_groups_parts,
     "set_modifier": _set_modifier_parts,
     "set_optional": _set_optional_parts,
+    "set_view_attribute": _set_view_attribute_parts,
     "hide_field": _hide_field_parts,
 }
 

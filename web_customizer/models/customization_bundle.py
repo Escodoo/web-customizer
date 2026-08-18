@@ -32,6 +32,7 @@ UI_ACTIONS = (
     "set_groups",
     "set_modifier",
     "set_optional",
+    "set_view_attribute",
     "add_page",
     "add_group",
     "add_filter",
@@ -236,7 +237,7 @@ class CustomizationBundle(models.Model):
         anchor_name = (params.get("anchor_name") or "").strip() or False
         raw_string = (params.get("anchor_string") or "").strip()
         anchor_string = False
-        if not anchor_name:
+        if not anchor_name and anchor_kind != "view":
             if anchor_kind not in ("page", "group") or not raw_string:
                 raise UserError(
                     self.env._(
@@ -590,6 +591,10 @@ class CustomizationBundle(models.Model):
 
     def _assert_ui_action_fits_anchor(self, action, anchor_kind, params):
         """Reject a click the target node could never carry."""
+        if (action == "set_view_attribute") != (anchor_kind == "view"):
+            raise UserError(
+                self.env._("View options are set on the view itself, not on a node.")
+            )
         if action == "set_widget" and anchor_kind != "field":
             raise UserError(self.env._("Widgets can only be set on fields."))
         if action != "hide" and anchor_kind == "progressbar":
@@ -729,6 +734,17 @@ class CustomizationBundle(models.Model):
         vals.update(self._ui_anchor_extra(occurrence, anchor_page, anchor_string))
         if action == "hide":
             vals.update({"type": "hide_field", "payload": {}})
+        elif action == "set_view_attribute":
+            attributes = payload.get("attributes") or {}
+            if not attributes:
+                raise UserError(self.env._("Set at least one view option."))
+            vals.update(
+                {
+                    "type": "set_view_attribute",
+                    "position": "attributes",
+                    "payload": {"attributes": attributes},
+                }
+            )
         elif action == "rename":
             string = (payload.get("string") or "").strip()
             if not string:

@@ -41,6 +41,19 @@ TTYPE_SELECTION = [
     ("binary", "Binary"),
     ("monetary", "Monetary"),
 ]
+# Types whose form edits are a plain rename of one UI field into one payload
+# key. Anything with cross-field logic keeps its own helper below.
+PLACEMENT_PAYLOAD_UI = (
+    ("payload_field_name", "field_name"),
+    ("payload_field_type", "field_type"),
+)
+SIMPLE_PAYLOAD_UI = {
+    "move_menu": (("payload_target_xmlid", "target_xmlid"),),
+    "set_widget": (("payload_widget", "widget"),),
+    "set_optional": (("payload_optional", "optional"),),
+    "set_groups": (("payload_groups", "groups"),),
+    "set_menu_groups": (("payload_groups", "groups"),),
+}
 PAYLOAD_UI_FIELDS = (
     "payload_ttype",
     "payload_string",
@@ -57,6 +70,7 @@ PAYLOAD_UI_FIELDS = (
     "payload_domain",
     "payload_group_by",
     "payload_optional",
+    "payload_attributes",
     "payload_widget",
     "payload_groups",
     "payload_mod_invisible",
@@ -94,6 +108,7 @@ class CustomizationOperation(models.Model):
             ("set_groups", "Set Groups"),
             ("set_modifier", "Set Modifier"),
             ("set_optional", "Set Optional Column"),
+            ("set_view_attribute", "Set View Options"),
             ("hide_field", "Hide Field"),
             ("hide_menu", "Hide Menu"),
             ("set_menu_string", "Set Menu Label"),
@@ -137,6 +152,7 @@ class CustomizationOperation(models.Model):
             ("group", "Group"),
             ("progressbar", "Progressbar"),
             ("filter", "Filter"),
+            ("view", "View Root"),
             ("menu", "Menu"),
             ("xpath", "XPath"),
         ],
@@ -271,6 +287,13 @@ class CustomizationOperation(models.Model):
         string="Optional Column",
         help="Put the column in the list column picker instead of pinning it.",
     )
+    payload_attributes = fields.Text(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="View Options",
+        help="One option per line as name=value, for example create=0. "
+        "An empty value drops the option from the view.",
+    )
     payload_widget = fields.Char(
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
@@ -359,6 +382,9 @@ class CustomizationOperation(models.Model):
                 rec.name = (
                     f"Add group {payload.get('string') or payload.get('name') or '?'}"
                 )
+            elif rec.type == "set_view_attribute":
+                options = ", ".join(sorted(payload.get("attributes") or {})) or "?"
+                rec.name = f"Set {options} on {rec.view_type or 'view'} root"
             elif rec.type == "hide_field":
                 rec.name = f"Hide {anchor}"
             elif rec.type == "hide_menu":
@@ -407,6 +433,7 @@ class CustomizationOperation(models.Model):
             rec.payload_domain = payload.get("domain") or False
             rec.payload_group_by = payload.get("group_by") or False
             rec.payload_optional = payload.get("optional") or False
+            rec.payload_attributes = self._attributes_to_text(payload.get("attributes"))
             rec.payload_widget = payload.get("widget") or False
             rec.payload_groups = payload.get("groups") or False
             rec.payload_mod_invisible = modifiers.get("invisible") or False
@@ -502,34 +529,56 @@ class CustomizationOperation(models.Model):
                 options.append([value, label])
         return options
 
+    @staticmethod
+    def _attributes_to_text(attributes):
+        if not isinstance(attributes, dict) or not attributes:
+            return False
+        lines = [f"{name}={attributes[name]}" for name in sorted(attributes)]
+        return "\n".join(lines) or False
+
+    @staticmethod
+    def _attributes_from_text(text):
+        attributes = {}
+        for raw_line in (text or "").splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            # A line without "=" would silently become an option with no name,
+            # so it is dropped instead.
+            if "=" not in line:
+                continue
+            name, value = line.split("=", 1)
+            name = name.strip()
+            if name:
+                attributes[name] = value.strip()
+        return attributes
+
     @api.model
     def _apply_ui_to_payload(self, payload, op_type, ui):
         payload = dict(payload or {})
+        simple = (
+            PLACEMENT_PAYLOAD_UI
+            if op_type in PLACEMENT_TYPES
+            else SIMPLE_PAYLOAD_UI.get(op_type)
+        )
+        if simple:
+            for ui_name, key in simple:
+                if ui_name in ui:
+                    self._set_payload_key(payload, key, ui[ui_name])
+            return payload
         if op_type == "add_field":
             self._apply_add_field_payload_ui(payload, ui)
-        elif op_type in PLACEMENT_TYPES:
-            if "payload_field_name" in ui:
-                self._set_payload_key(payload, "field_name", ui["payload_field_name"])
-            if "payload_field_type" in ui:
-                self._set_payload_key(payload, "field_type", ui["payload_field_type"])
         elif op_type in STRUCTURE_TYPES + ("set_string", "set_menu_string", "add_menu"):
             self._apply_label_payload_ui(payload, op_type, ui)
-        elif op_type == "move_menu":
-            if "payload_target_xmlid" in ui:
+        elif op_type == "set_view_attribute":
+            if "payload_attributes" in ui:
                 self._set_payload_key(
-                    payload, "target_xmlid", ui["payload_target_xmlid"]
+                    payload,
+                    "attributes",
+                    self._attributes_from_text(ui["payload_attributes"]),
                 )
-        elif op_type == "set_widget":
-            if "payload_widget" in ui:
-                self._set_payload_key(payload, "widget", ui["payload_widget"])
-        elif op_type == "set_optional":
-            if "payload_optional" in ui:
-                self._set_payload_key(payload, "optional", ui["payload_optional"])
         elif op_type == "add_filter":
             self._apply_filter_payload_ui(payload, ui)
-        elif op_type in ("set_groups", "set_menu_groups"):
-            if "payload_groups" in ui:
-                self._set_payload_key(payload, "groups", ui["payload_groups"])
         elif op_type == "set_modifier":
             self._apply_modifier_payload_ui(payload, ui)
         return payload
@@ -649,8 +698,10 @@ class CustomizationOperation(models.Model):
             raise ValidationError(
                 self.env._("A target view is required for this operation.")
             )
-        if not self.anchor_name and not (
-            self.anchor_kind in ("page", "group") and self.anchor_string
+        if (
+            not self.anchor_name
+            and self.anchor_kind != "view"
+            and not (self.anchor_kind in ("page", "group") and self.anchor_string)
         ):
             raise ValidationError(self.env._("An anchor name or title is required."))
         if self.type in STRUCTURE_TYPES and (self.payload or {}).get("name"):

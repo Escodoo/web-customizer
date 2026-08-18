@@ -44,7 +44,15 @@ const FIELD_WIDGETS = [
 
 // An action without a builder here sends an empty payload, which is what the
 // actions carrying their intent in the anchor alone (hide) need.
+const ROOT_ACTION_OPTIONS = [
+    ["rootCreate", "create"],
+    ["rootEdit", "edit"],
+    ["rootDelete", "delete"],
+    ["rootDuplicate", "duplicate"],
+];
+
 const PAYLOAD_BUILDERS = {
+    set_view_attribute: "payloadForViewOptions",
     add_after: "payloadForAddAfter",
     place_after: "payloadForExistingField",
     move_after: "payloadForExistingField",
@@ -86,10 +94,7 @@ export class CustomizationFieldDialog extends Component {
         this.state = useState({
             bundles: [],
             bundleId: false,
-            action:
-                this.anchorKind === "button" || this.anchorKind === "menu"
-                    ? "hide"
-                    : "add_after",
+            action: this.defaultAction,
             ttype: "char",
             string: "",
             name: "",
@@ -103,6 +108,14 @@ export class CustomizationFieldDialog extends Component {
             targetMenuId: false,
             widget: "",
             optional: "hide",
+            rootCreate: "",
+            rootEdit: "",
+            rootDelete: "",
+            rootDuplicate: "",
+            rootEditable: "",
+            rootDefaultOrder: "",
+            rootDecoration: "danger",
+            rootDecorationCondition: "",
             filterDomain: "",
             filterGroupBy: "",
             groupIds: [],
@@ -152,6 +165,34 @@ export class CustomizationFieldDialog extends Component {
         });
     }
 
+    get isListView() {
+        return this.props.viewType === "list";
+    }
+
+    get rootActionOptions() {
+        const labels = {
+            rootCreate: _t("Creating records"),
+            rootEdit: _t("Editing records"),
+            rootDelete: _t("Deleting records"),
+            rootDuplicate: _t("Duplicating records"),
+        };
+        return ROOT_ACTION_OPTIONS.map(([key, name]) => [key, name, labels[key]]);
+    }
+
+    get decorations() {
+        return ["bf", "it", "danger", "info", "muted", "primary", "success", "warning"];
+    }
+
+    get defaultAction() {
+        if (this.anchorKind === "view") {
+            return "set_view_attribute";
+        }
+        if (this.anchorKind === "button" || this.anchorKind === "menu") {
+            return "hide";
+        }
+        return "add_after";
+    }
+
     get ttypeDataLossHint() {
         return _t(
             "Changing this type later and clicking Re-apply deletes values already stored in the field."
@@ -160,6 +201,9 @@ export class CustomizationFieldDialog extends Component {
 
     get title() {
         const label = this.props.fieldLabel || this.props.fieldName;
+        if (this.anchorKind === "view") {
+            return _t("Options of this %s view", this.props.viewType || "");
+        }
         if (this.anchorKind === "page") {
             return _t("Customize page %s", label);
         }
@@ -194,6 +238,9 @@ export class CustomizationFieldDialog extends Component {
     }
 
     get actions() {
+        if (this.anchorKind === "view") {
+            return [{value: "set_view_attribute", label: _t("Set view options")}];
+        }
         if (this.anchorKind === "page") {
             return [
                 {value: "add_after", label: _t("Add field in this page")},
@@ -514,6 +561,34 @@ export class CustomizationFieldDialog extends Component {
 
     payloadForOptional() {
         return {optional: this.state.optional};
+    }
+
+    payloadForViewOptions() {
+        const attributes = {};
+        for (const [key, name] of ROOT_ACTION_OPTIONS) {
+            if (this.state[key]) {
+                attributes[name] = this.state[key];
+            }
+        }
+        if (this.isListView && this.state.rootEditable) {
+            // An empty value drops the attribute, turning inline editing off
+            // on a list the base view made editable.
+            attributes.editable =
+                this.state.rootEditable === "off" ? "" : this.state.rootEditable;
+        }
+        const order = this.state.rootDefaultOrder.trim();
+        if (order && this.props.viewType !== "form") {
+            attributes.default_order = order;
+        }
+        const condition = this.state.rootDecorationCondition.trim();
+        if (this.isListView && condition) {
+            attributes[`decoration-${this.state.rootDecoration}`] = condition;
+        }
+        if (!Object.keys(attributes).length) {
+            this.notifyError(_t("Set at least one view option."));
+            return false;
+        }
+        return {attributes};
     }
 
     payloadForGroups() {

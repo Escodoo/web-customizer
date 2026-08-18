@@ -6,7 +6,10 @@ import {useService} from "@web/core/utils/hooks";
 export const customizationService = {
     dependencies: ["dialog"],
     start(env, {dialog}) {
-        const state = reactive({enabled: false});
+        const state = reactive({enabled: false, view: null});
+        // A dialog mounts its own view over the one behind it, so the stack
+        // keeps the banner pointing at what the user is actually looking at.
+        const mounted = [];
         return {
             state,
             toggle() {
@@ -17,6 +20,17 @@ export const customizationService = {
                         state.enabled
                     );
                 }
+            },
+            registerView(view) {
+                mounted.push(view);
+                state.view = view;
+                return () => {
+                    const index = mounted.indexOf(view);
+                    if (index >= 0) {
+                        mounted.splice(index, 1);
+                    }
+                    state.view = mounted[mounted.length - 1] || null;
+                };
             },
             openFieldDialog(info) {
                 dialog.add(CustomizationFieldDialog, info);
@@ -33,9 +47,14 @@ export function useCustomizationService() {
     return {
         state,
         toggle: () => customization.toggle(),
+        registerView: (view) => customization.registerView(view),
         openFieldDialog: (info) => customization.openFieldDialog(info),
     };
 }
+
+// Only these read root options off the arch, so the banner stays quiet
+// everywhere else rather than offering an entry that compiles to nothing.
+export const ROOT_OPTION_VIEW_TYPES = ["form", "list", "kanban"];
 
 function formRecord(component) {
     return component.props.record || component.env.model?.root;

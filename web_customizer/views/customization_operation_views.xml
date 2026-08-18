@@ -193,6 +193,16 @@
                                 />
                             </group>
                             <group
+                                string="View Options"
+                                invisible="type != 'set_view_attribute'"
+                            >
+                                <field
+                                    name="payload_attributes"
+                                    required="type == 'set_view_attribute'"
+                                    placeholder="create=0&#10;default_order=name desc"
+                                />
+                            </group>
+                            <group
                                 string="Set Groups"
                                 invisible="type not in ('set_groups', 'set_menu_groups')"
                             >

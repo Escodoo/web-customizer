@@ -402,8 +402,9 @@ move write on a standard menu is exclusive per type: a second bundle
 cannot overwrite the same snapshot. The same rule applies to hide,
 label, widget, groups and modifier operations on a view node: two live
 inherits of the same type on the same anchor are refused. Two operations
-positioning the same field on one view are also refused. Company on a
-bundle is only a filter tag; compiled records stay global.</p>
+positioning the same field on one view are also refused, and so are two
+live sets of options on the same view root. Company on a bundle is only
+a filter tag; compiled records stay global.</p>
 <p>Moving a field relocates the node the view already declares instead of
 adding a second copy, so it arrives with the widget, label and modifiers
 the base view gave it, and it returns to its original spot once the
@@ -420,6 +421,14 @@ one to hide or relabel it, or add a filter next to it. A new filter
 either narrows records with a domain or groups them by a field. The
 domain is checked before it is written, so a typo becomes a broken
 operation with a reason instead of a search view nobody can open.</p>
+<p>Some settings live on the view root rather than on a node, and those are
+reached from the customization banner instead of a click. A form, list
+or kanban can drop its Create, Edit, Delete or Duplicate buttons; a list
+can also switch inline editing, set a default order and colour rows from
+a condition. Only options the arch parser of that view type actually
+reads are accepted, and a default order is checked against real stored
+fields, so an option that would be inert or that would break the list is
+refused up front.</p>
 <p>Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and
@@ -517,8 +526,20 @@ the node or the node position, because Odoo forbids <tt class="docutils literal"
 selectors). If the same name appears more than once, choose the node
 in the dialog. A new page after a field is wrapped in a notebook; a
 new page after an existing tab is a sibling.</li>
+<li>Some settings belong to the view itself rather than to a node, so
+they have no outline to click. On a form, list or kanban, use <strong>View
+options</strong> in the customization banner. There you can stop users from
+creating, editing, deleting or duplicating records; a list can also
+turn inline editing on or off, set a default order and colour its
+rows with a condition. Options left on <em>Leave as is</em> are not written,
+so a bundle only owns what it declares. An option set to an empty
+value drops it from the view, which is how an inline-editable list is
+turned back into a read-only one. Only options the arch parser of
+that view type reads are accepted: decorations exist on lists only,
+and pivot, graph and search views have none.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
-the selected type. The <strong>Raw JSON</strong> tab shows the stored intent.</li>
+the selected type. The <strong>Raw JSON</strong> tab shows the stored intent. View
+options are written there as one <tt class="docutils literal">name=value</tt> per line.</li>
 <li>Click <strong>Apply</strong> to compile fields and inherited views.</li>
 <li>After an Odoo upgrade (<tt class="docutils literal"><span class="pre">-u</span></tt>), a health check runs automatically and
 re-resolves anchors. You can still click <strong>Health Check</strong> on the
@@ -541,7 +562,8 @@ label, widget, groups and modifier operations on a view node are
 exclusive the same way: only one live operation of each type may
 target the same anchor, so two bundles cannot compile two inherits
 for the same hide. Placing or moving the same field twice on the same
-view is refused the same way.</li>
+view is refused the same way, and so is a second live set of view
+options on the same root.</li>
 </ol>
 <div class="section" id="single-company-pilot">
 <h2><a class="toc-backref" href="#toc-entry-4">Single-company pilot</a></h2>
@@ -552,17 +574,20 @@ leave this module as the production runtime.</p>
 or button.</li>
 <li><strong>List</strong> — add, hide, relabel a column, or make it optional so users
 can turn it on from the column picker.</li>
-<li><strong>Search</strong> — add, hide or relabel a search chip, or add a filter with
-a domain or a group by.</li>
+<li><strong>Search</strong> — add, hide or relabel a search chip, or add a filter
+with a domain or a group by.</li>
 <li><strong>Kanban</strong> — hide a card field, a header button or the column
 progressbar.</li>
-<li><strong>Pivot</strong> — click a measure header to relabel, hide or add a measure.</li>
+<li><strong>Pivot</strong> — click a measure header to relabel, hide or add a
+measure.</li>
 <li><strong>Menus</strong> — hide, rename or move one navbar item that has an XML ID.</li>
+<li><strong>View options</strong> — from the banner, drop the Create button on one
+list and colour its rows by a condition.</li>
 <li>Click <strong>Apply</strong>. Broken operations show <tt class="docutils literal">broken_reason</tt>; fix the
 anchor and run <strong>Health Check</strong> (or <strong>Re-apply</strong>).</li>
 <li>Click <strong>Export Addon</strong> → <strong>Download ZIP</strong>.</li>
-<li>Install that module on staging (<tt class="docutils literal"><span class="pre">-i</span> &lt;bundle.code&gt;</tt>). Do not install
-<tt class="docutils literal">web_customizer</tt> there unless the wand is still needed.</li>
+<li>Install that module on staging (<tt class="docutils literal"><span class="pre">-i</span> &lt;bundle.code&gt;</tt>). Do not
+install <tt class="docutils literal">web_customizer</tt> there unless the wand is still needed.</li>
 </ol>
 <p>Graph operations are written from the operation form rather than in
 place. Calendar and gantt stay out of this pilot.</p>
@@ -579,7 +604,13 @@ welcome.</p>
 <p>Next:</p>
 <ul class="simple">
 <li>A pivot or graph whose arch declares no field has nothing to anchor
-on, so those views cannot be customized until one field exists.</li>
+on, so those views cannot be customized until one field exists. The
+view root is an anchor now, but it only carries option writes; placing
+a first field inside it still has to be designed.</li>
+<li>List <tt class="docutils literal">multi_edit</tt> and kanban <tt class="docutils literal">quick_create</tt> compile from the
+operation form but have no control in the banner dialog yet. Kanban
+grouping flags (<tt class="docutils literal">group_create</tt>, <tt class="docutils literal">group_delete</tt>) are not
+whitelisted at all.</li>
 <li>Graph operations are written from the backend form only. The view
 draws on a canvas, so there is no field node to click; offering them
 in place needs a side panel listing the arch fields.</li>
@@ -627,6 +658,9 @@ instead of being pinned or hidden outright.</li>
 added with a validated domain or a group by.</li>
 <li>A field already declared in a view can be moved to another spot,
 keeping the attributes the base view gave it.</li>
+<li>The view root is a semantic anchor of its own, so a form, list or
+kanban can drop its Create, Edit, Delete or Duplicate buttons, and a
+list can set inline editing, a default order or row colours.</li>
 </ul>
 </div>
 </div>

@@ -34,7 +34,8 @@ per type: a second bundle cannot overwrite the same snapshot.
 The same rule applies to hide, label, widget, groups and modifier
 operations on a view node: two live inherits of the same type on the
 same anchor are refused. Two operations positioning the same field on one
-view are also refused. Company on a bundle is only a filter tag; compiled
+view are also refused, and so are two live sets of options on the same
+view root. Company on a bundle is only a filter tag; compiled
 records stay global.
 
 Moving a field relocates the node the view already declares instead of
@@ -55,6 +56,15 @@ to hide or relabel it, or add a filter next to it. A new filter either
 narrows records with a domain or groups them by a field. The domain is
 checked before it is written, so a typo becomes a broken operation with a
 reason instead of a search view nobody can open.
+
+Some settings live on the view root rather than on a node, and those are
+reached from the customization banner instead of a click. A form, list or
+kanban can drop its Create, Edit, Delete or Duplicate buttons; a list can
+also switch inline editing, set a default order and colour rows from a
+condition. Only options the arch parser of that view type actually reads
+are accepted, and a default order is checked against real stored fields,
+so an option that would be inert or that would break the list is refused
+up front.
 
 Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a

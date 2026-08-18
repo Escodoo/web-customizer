@@ -453,8 +453,31 @@ test("banner appears in customization mode and Exit turns it off", async () => {
     await mountWithCleanup(MainComponentsContainer);
     expect(".o_esc_customization_banner").toHaveCount(1);
     expect(".o_esc_customization_banner_title").toHaveText("Customization mode");
+    expect(".o_esc_customization_banner_options").toHaveCount(0);
     await contains(".o_esc_customization_banner_exit").click();
     expect(".o_esc_customization_banner").toHaveCount(0);
+});
+
+test("banner offers view options once a list is mounted", async () => {
+    enableCustomization();
+    await mountView({
+        type: "list",
+        resModel: "partner",
+        arch: `<list><field name="name"/></list>`,
+    });
+    expect(".o_esc_customization_banner_options").toHaveCount(1);
+    await contains(".o_esc_customization_banner_options").click();
+    expect.verifySteps(["view:"]);
+});
+
+test("banner stays quiet on a view type without root options", async () => {
+    enableCustomization();
+    await mountView({
+        type: "pivot",
+        resModel: "partner",
+        arch: `<pivot><field name="revenue" type="measure"/></pivot>`,
+    });
+    expect(".o_esc_customization_banner_options").toHaveCount(0);
 });
 
 test("dialog reports RPC failures and stays open", async () => {

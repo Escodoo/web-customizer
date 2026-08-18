@@ -31,10 +31,22 @@
    selectors). If the same name appears more than once, choose the node
    in the dialog. A new page after a field is wrapped in a notebook; a
    new page after an existing tab is a sibling.
-3. Or add operations from the bundle form. Fill the payload fields for the
-   selected type. The **Raw JSON** tab shows the stored intent.
-4. Click **Apply** to compile fields and inherited views.
-5. After an Odoo upgrade (`-u`), a health check runs automatically and
+3. Some settings belong to the view itself rather than to a node, so they
+   have no outline to click. On a form, list or kanban, use **View
+   options** in the customization banner. There you can stop users from
+   creating, editing, deleting or duplicating records; a list can also
+   turn inline editing on or off, set a default order and colour its rows
+   with a condition. Options left on *Leave as is* are not written, so a
+   bundle only owns what it declares. An option set to an empty value
+   drops it from the view, which is how an inline-editable list is turned
+   back into a read-only one. Only options the arch parser of that view
+   type reads are accepted: decorations exist on lists only, and pivot,
+   graph and search views have none.
+4. Or add operations from the bundle form. Fill the payload fields for the
+   selected type. The **Raw JSON** tab shows the stored intent. View
+   options are written there as one `name=value` per line.
+5. Click **Apply** to compile fields and inherited views.
+6. After an Odoo upgrade (`-u`), a health check runs automatically and
    re-resolves anchors. You can still click **Health Check** on the bundle.
    Missing anchors are marked broken (inherit deactivated) and show
    `broken_reason`. If the anchor comes back, Health Check rewrites the
@@ -42,7 +54,7 @@
    every live operation. Changing an `add_field` type or relation
    recreates the field and deletes values already stored in that
    column (label, help and required update in place).
-6. When the bundle is applied, click **Export Addon**. In the dialog, click
+7. When the bundle is applied, click **Export Addon**. In the dialog, click
    **Download ZIP** and put that module in git; it does not depend on this
    module at runtime. Compiled fields, views and menus store their XML IDs
    under the bundle ``code`` (the future addon name). Uninstalling
@@ -54,7 +66,8 @@
    modifier operations on a view node are exclusive the same way: only
    one live operation of each type may target the same anchor, so two
    bundles cannot compile two inherits for the same hide. Placing or
-   moving the same field twice on the same view is refused the same way.
+   moving the same field twice on the same view is refused the same way,
+   and so is a second live set of view options on the same root.
 
 ## Single-company pilot
 
@@ -70,10 +83,12 @@ leave this module as the production runtime.
 4. **Kanban** — hide a card field, a header button or the column progressbar.
 5. **Pivot** — click a measure header to relabel, hide or add a measure.
 6. **Menus** — hide, rename or move one navbar item that has an XML ID.
-7. Click **Apply**. Broken operations show `broken_reason`; fix the
+7. **View options** — from the banner, drop the Create button on one list
+   and colour its rows by a condition.
+8. Click **Apply**. Broken operations show `broken_reason`; fix the
    anchor and run **Health Check** (or **Re-apply**).
-8. Click **Export Addon** → **Download ZIP**.
-9. Install that module on staging (`-i <bundle.code>`). Do not install
+9. Click **Export Addon** → **Download ZIP**.
+10. Install that module on staging (`-i <bundle.code>`). Do not install
    `web_customizer` there unless the wand is still needed.
 
 Graph operations are written from the operation form rather than in

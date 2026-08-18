@@ -3,7 +3,13 @@ Known gaps, ordered by what is worth closing first. Proposals are welcome.
 Next:
 
 - A pivot or graph whose arch declares no field has nothing to anchor on,
-  so those views cannot be customized until one field exists.
+  so those views cannot be customized until one field exists. The view
+  root is an anchor now, but it only carries option writes; placing a
+  first field inside it still has to be designed.
+- List ``multi_edit`` and kanban ``quick_create`` compile from the
+  operation form but have no control in the banner dialog yet. Kanban
+  grouping flags (``group_create``, ``group_delete``) are not whitelisted
+  at all.
 - Graph operations are written from the backend form only. The view draws
   on a canvas, so there is no field node to click; offering them in place
   needs a side panel listing the arch fields.

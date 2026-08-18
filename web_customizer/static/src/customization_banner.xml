@@ -9,6 +9,12 @@
             <span class="o_esc_customization_banner_title" t-esc="title" />
             <span class="o_esc_customization_banner_hint" t-esc="hint" />
             <button
+                t-if="rootTarget"
+                class="btn btn-sm btn-light o_esc_customization_banner_options"
+                t-on-click="openViewOptions"
+                t-esc="viewOptionsLabel"
+            />
+            <button
                 class="btn btn-sm btn-light o_esc_customization_banner_exit"
                 t-on-click="exit"
                 t-esc="exitLabel"

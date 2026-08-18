@@ -59,6 +59,96 @@
                         </t>
                     </select>
                 </div>
+                <t t-if="state.action === 'set_view_attribute'">
+                    <p class="text-muted">
+                        Leave an option untouched to keep what the view already
+                        does.
+                    </p>
+                    <div
+                        class="mb-3"
+                        t-foreach="rootActionOptions"
+                        t-as="opt"
+                        t-key="opt[0]"
+                    >
+                        <label class="form-label" t-esc="opt[2]" />
+                        <select
+                            class="form-select"
+                            t-on-change="(ev) => state[opt[0]] = ev.target.value"
+                        >
+                            <option
+                                value=""
+                                t-att-selected="!state[opt[0]]"
+                            >Leave as is</option>
+                            <option
+                                value="1"
+                                t-att-selected="state[opt[0]] === '1'"
+                            >Allowed</option>
+                            <option
+                                value="0"
+                                t-att-selected="state[opt[0]] === '0'"
+                            >Not allowed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" t-if="isListView">
+                        <label class="form-label">Inline editing</label>
+                        <select
+                            class="form-select"
+                            t-on-change="(ev) => state.rootEditable = ev.target.value"
+                        >
+                            <option
+                                value=""
+                                t-att-selected="!state.rootEditable"
+                            >Leave as is</option>
+                            <option
+                                value="top"
+                                t-att-selected="state.rootEditable === 'top'"
+                            >New rows on top</option>
+                            <option
+                                value="bottom"
+                                t-att-selected="state.rootEditable === 'bottom'"
+                            >New rows at the bottom</option>
+                            <option
+                                value="off"
+                                t-att-selected="state.rootEditable === 'off'"
+                            >Off</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" t-if="props.viewType !== 'form'">
+                        <label class="form-label">Default order (optional)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="create_date desc"
+                            t-att-value="state.rootDefaultOrder"
+                            t-on-input="(ev) => state.rootDefaultOrder = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3" t-if="isListView">
+                        <label class="form-label">Row colour (optional)</label>
+                        <select
+                            class="form-select mb-2"
+                            t-on-change="(ev) => state.rootDecoration = ev.target.value"
+                        >
+                            <t t-foreach="decorations" t-as="deco" t-key="deco">
+                                <option
+                                    t-att-value="deco"
+                                    t-att-selected="state.rootDecoration === deco"
+                                    t-esc="deco"
+                                />
+                            </t>
+                        </select>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="state == 'draft'"
+                            t-att-value="state.rootDecorationCondition"
+                            t-on-input="(ev) => state.rootDecorationCondition = ev.target.value"
+                        />
+                        <div class="form-text">
+                            The condition is evaluated against each record.
+                        </div>
+                    </div>
+                </t>
                 <t t-if="state.action === 'add_after'">
                     <div class="mb-3" t-if="!state.related">
                         <label class="form-label">Field type</label>
