@@ -42,6 +42,26 @@ const FIELD_WIDGETS = [
     "url",
 ];
 
+// An action without a builder here sends an empty payload, which is what the
+// actions carrying their intent in the anchor alone (hide) need.
+const PAYLOAD_BUILDERS = {
+    add_after: "payloadForAddAfter",
+    place_after: "payloadForExistingField",
+    move_after: "payloadForExistingField",
+    rename: "payloadForRename",
+    add_page: "payloadForLabelledNode",
+    add_group: "payloadForLabelledNode",
+    add_filter: "payloadForFilter",
+    move_menu: "payloadForMenuDestination",
+    move_as_submenu: "payloadForMenuDestination",
+    add_menu: "payloadForNewMenu",
+    add_submenu: "payloadForNewMenu",
+    set_widget: "payloadForWidget",
+    set_optional: "payloadForOptional",
+    set_groups: "payloadForGroups",
+    set_modifier: "payloadForModifiers",
+};
+
 export class CustomizationFieldDialog extends Component {
     static template = "web_customizer.FieldDialog";
     static components = {Dialog, RecordSelector, MultiRecordSelector};
@@ -412,96 +432,134 @@ export class CustomizationFieldDialog extends Component {
         return {modifiers};
     }
 
+    requiredLabel(message) {
+        const string = this.state.string.trim();
+        if (!string) {
+            this.notifyError(message);
+            return false;
+        }
+        return string;
+    }
+
+    withOptionalName(payload) {
+        if (this.state.name) {
+            payload.name = this.state.name;
+        }
+        return payload;
+    }
+
+    payloadForExistingField() {
+        if (!this.state.existingFieldName) {
+            this.notifyError(_t("Select an existing field to place."));
+            return false;
+        }
+        return {field_name: this.state.existingFieldName};
+    }
+
+    payloadForRename() {
+        return {string: this.state.newLabel};
+    }
+
+    payloadForLabelledNode() {
+        const string = this.requiredLabel(_t("A label is required."));
+        return string && this.withOptionalName({string});
+    }
+
+    payloadForFilter() {
+        const string = this.requiredLabel(_t("A filter label is required."));
+        if (!string) {
+            return false;
+        }
+        const groupBy = this.state.filterGroupBy.trim();
+        const domain = this.state.filterDomain.trim();
+        if (!groupBy && !domain) {
+            this.notifyError(_t("Enter a domain or a field to group by."));
+            return false;
+        }
+        if (groupBy && domain) {
+            this.notifyError(_t("A filter carries either a domain or a grouping."));
+            return false;
+        }
+        return {string, domain, group_by: groupBy};
+    }
+
+    payloadForMenuDestination() {
+        if (!this.state.targetMenuId) {
+            this.notifyError(_t("Select a destination menu with an XML ID."));
+            return false;
+        }
+        return {target_menu_id: this.state.targetMenuId};
+    }
+
+    payloadForNewMenu() {
+        const string = this.requiredLabel(_t("A label is required."));
+        if (!string) {
+            return false;
+        }
+        if (!this.state.actionId) {
+            this.notifyError(_t("Select a window action with an XML ID."));
+            return false;
+        }
+        return this.withOptionalName({string, action_id: this.state.actionId});
+    }
+
+    payloadForWidget() {
+        const widget = this.state.widget.trim();
+        if (!widget) {
+            this.notifyError(_t("Enter a widget name."));
+            return false;
+        }
+        return {widget};
+    }
+
+    payloadForOptional() {
+        return {optional: this.state.optional};
+    }
+
+    payloadForGroups() {
+        if (!this.state.groupIds.length) {
+            this.notifyError(_t("Select at least one group."));
+            return false;
+        }
+        return {group_ids: this.state.groupIds};
+    }
+
     payloadForAction() {
-        const action = this.state.action;
-        if (action === "add_after") {
-            return this.payloadForAddAfter();
+        const builder = PAYLOAD_BUILDERS[this.state.action];
+        return builder ? this[builder]() : {};
+    }
+
+    uiParams(payload) {
+        return {
+            bundle_id: this.state.bundleId,
+            action: this.state.action,
+            model: this.props.model,
+            view_id: this.props.viewId || false,
+            view_type: this.props.viewType || "form",
+            anchor_name: this.props.anchorString ? false : this.props.fieldName,
+            anchor_kind: this.anchorKind,
+            anchor_string: this.props.anchorString || false,
+            menu_id: this.props.menuId || false,
+            ...this.anchorQualifier(),
+            payload,
+            apply: this.state.apply,
+        };
+    }
+
+    reportResult(result) {
+        const broken = result.broken || [];
+        if (broken.length) {
+            this.notification.add(broken[0].reason || _t("The operation is broken."), {
+                type: "danger",
+                sticky: true,
+            });
+            return;
         }
-        if (action === "place_after" || action === "move_after") {
-            if (!this.state.existingFieldName) {
-                this.notifyError(_t("Select an existing field to place."));
-                return false;
-            }
-            return {field_name: this.state.existingFieldName};
+        this.notification.add(_t("Customization applied."), {type: "success"});
+        this.props.close();
+        if (result.reload) {
+            browser.location.reload();
         }
-        if (action === "rename") {
-            return {string: this.state.newLabel};
-        }
-        if (action === "add_page" || action === "add_group") {
-            const string = this.state.string.trim();
-            if (!string) {
-                this.notifyError(_t("A label is required."));
-                return false;
-            }
-            const payload = {string};
-            if (this.state.name) {
-                payload.name = this.state.name;
-            }
-            return payload;
-        }
-        if (action === "add_filter") {
-            const string = this.state.string.trim();
-            if (!string) {
-                this.notifyError(_t("A filter label is required."));
-                return false;
-            }
-            const groupBy = this.state.filterGroupBy.trim();
-            const domain = this.state.filterDomain.trim();
-            if (!groupBy && !domain) {
-                this.notifyError(_t("Enter a domain or a field to group by."));
-                return false;
-            }
-            if (groupBy && domain) {
-                this.notifyError(_t("A filter carries either a domain or a grouping."));
-                return false;
-            }
-            return {string, domain, group_by: groupBy};
-        }
-        if (action === "move_menu" || action === "move_as_submenu") {
-            if (!this.state.targetMenuId) {
-                this.notifyError(_t("Select a destination menu with an XML ID."));
-                return false;
-            }
-            return {target_menu_id: this.state.targetMenuId};
-        }
-        if (action === "add_menu" || action === "add_submenu") {
-            const string = this.state.string.trim();
-            if (!string) {
-                this.notifyError(_t("A label is required."));
-                return false;
-            }
-            if (!this.state.actionId) {
-                this.notifyError(_t("Select a window action with an XML ID."));
-                return false;
-            }
-            const payload = {string, action_id: this.state.actionId};
-            if (this.state.name) {
-                payload.name = this.state.name;
-            }
-            return payload;
-        }
-        if (action === "set_widget") {
-            const widget = this.state.widget.trim();
-            if (!widget) {
-                this.notifyError(_t("Enter a widget name."));
-                return false;
-            }
-            return {widget};
-        }
-        if (action === "set_optional") {
-            return {optional: this.state.optional};
-        }
-        if (action === "set_groups") {
-            if (!this.state.groupIds.length) {
-                this.notifyError(_t("Select at least one group."));
-                return false;
-            }
-            return {group_ids: this.state.groupIds};
-        }
-        if (action === "set_modifier") {
-            return this.payloadForModifiers();
-        }
-        return {};
     }
 
     async onApply() {
@@ -518,40 +576,12 @@ export class CustomizationFieldDialog extends Component {
         }
         this.state.busy = true;
         try {
-            const params = {
-                bundle_id: this.state.bundleId,
-                action: this.state.action,
-                model: this.props.model,
-                view_id: this.props.viewId || false,
-                view_type: this.props.viewType || "form",
-                anchor_name: this.props.anchorString ? false : this.props.fieldName,
-                anchor_kind: this.anchorKind,
-                anchor_string: this.props.anchorString || false,
-                menu_id: this.props.menuId || false,
-                ...this.anchorQualifier(),
-                payload,
-                apply: this.state.apply,
-            };
             const result = await this.orm.call(
                 "customization.bundle",
                 "create_from_ui",
-                [params]
+                [this.uiParams(payload)]
             );
-            if (result.broken && result.broken.length) {
-                this.notification.add(
-                    result.broken[0].reason || _t("The operation is broken."),
-                    {
-                        type: "danger",
-                        sticky: true,
-                    }
-                );
-                return;
-            }
-            this.notification.add(_t("Customization applied."), {type: "success"});
-            this.props.close();
-            if (result.reload) {
-                browser.location.reload();
-            }
+            this.reportResult(result);
         } catch (error) {
             this.notifyError(
                 error.data?.message ||
