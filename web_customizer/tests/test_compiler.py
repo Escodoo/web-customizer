@@ -223,13 +223,16 @@ class TestCustomizationCompiler(CustomizationCase):
         self.assertEqual(operation.state, "applied")
 
     def test_add_monetary_without_currency_is_broken(self):
+        # res.partner carries currency_id as soon as accounting is around, so
+        # the model has to be one nothing adds a currency to.
+        model = self.env["ir.model"]._get("res.lang")
         bundle = self._create_bundle(
             code="client_monetary_bad",
             operations=[
                 Command.create(
                     {
                         "type": "add_field",
-                        "model_id": self.partner_model.id,
+                        "model_id": model.id,
                         "payload": {
                             "ttype": "monetary",
                             "string": "Site Amount",
