@@ -42,7 +42,12 @@ only recovery path is to discard the customizations on that view. Here the
 intent outlives the artifact: a moved anchor is re-resolved and only a
 genuinely missing one is reported.
 
-Scope stops at the user interface, and not at all of it. Pivot, graph,
-calendar and gantt views, creating a model, and report editing are not
-covered; see the roadmap. Approvals stay in `base_tier_validation`.
-Automations stay in `base.automation` / `automation_oca`.
+Pivot and graph views compile too. A pivot measure is clickable like any
+other anchor; graph has no per-field DOM to click, since it draws on a
+canvas, so graph operations are written from the backend form and compile
+and export the same way.
+
+Scope stops at the user interface, and not at all of it. Calendar and
+gantt views, creating a model, and report editing are not covered; see
+the roadmap. Approvals stay in `base_tier_validation`. Automations stay
+in `base.automation` / `automation_oca`.

@@ -2,9 +2,11 @@ Known gaps, ordered by what is worth closing first. Proposals are welcome.
 
 Next:
 
-- Pivot and graph anchors. Both views are described by measures and
-  groupings rather than by a tree of nodes, so they fit the existing
-  anchor model at a low cost.
+- A pivot or graph whose arch declares no field has nothing to anchor on,
+  so those views cannot be customized until one field exists.
+- Graph operations are written from the backend form only. The view draws
+  on a canvas, so there is no field node to click; offering them in place
+  needs a side panel listing the arch fields.
 - Free XPath anchors stay in the model for export compatibility but are
   not offered in the systray dialog.
 

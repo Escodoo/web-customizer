@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 06:44+0000\n"
-"PO-Revision-Date: 2026-08-14 06:44+0000\n"
+"POT-Creation-Date: 2026-08-18 19:17+0000\n"
+"PO-Revision-Date: 2026-08-18 19:17+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -38,6 +38,12 @@ msgstr ""
 msgid ""
 "1-based occurrence when the name is not unique. 0 means the name must be "
 "unique."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A %(view)s view can only anchor on a field, not on a %(kind)s."
 msgstr ""
 
 #. module: web_customizer
@@ -107,6 +113,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "A page title is required."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "A progressbar can only be hidden."
 msgstr ""
 
 #. module: web_customizer
@@ -218,6 +230,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Add measure after this one"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add menu after this one"
 msgstr ""
 
@@ -236,6 +254,11 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__after
 msgid "After"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_field_type
+msgid "Aggregate Role"
 msgstr ""
 
 #. module: web_customizer
@@ -430,6 +453,14 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Bundle '%(bundle)s' already has a Place Field operation for '%(field)s' in "
+"view '%(view)s'."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid ""
 "Bundle code must start with a letter and contain only lowercase letters, "
@@ -469,6 +500,21 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Change page title"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_ttype
+msgid ""
+"Changing the type and clicking Re-apply deletes values already stored in "
+"this field."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid ""
+"Changing this type later and clicking Re-apply deletes values already stored"
+" in the field."
 msgstr ""
 
 #. module: web_customizer
@@ -512,6 +558,11 @@ msgid "Code"
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__col
+msgid "Column Grouping"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_column_invisible
 msgid "Column Invisible"
 msgstr ""
@@ -528,6 +579,18 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Could not apply customization."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Could not load customization context."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid ""
 "Create a bundle under Settings → Technical → Customization\n"
@@ -537,18 +600,6 @@ msgstr ""
 #. module: web_customizer
 #: model_terms:ir.actions.act_window,help:web_customizer.action_customization_bundle
 msgid "Create a customization bundle"
-msgstr ""
-
-#. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid "Could not apply customization."
-msgstr ""
-
-#. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid "Could not load customization context."
 msgstr ""
 
 #. module: web_customizer
@@ -662,6 +713,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize page %s"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize pivot measure %s"
 msgstr ""
 
 #. module: web_customizer
@@ -792,21 +849,6 @@ msgid "Field Type"
 msgstr ""
 
 #. module: web_customizer
-#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_ttype
-msgid ""
-"Changing the type and clicking Re-apply deletes values already stored in "
-"this field."
-msgstr ""
-
-#. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid ""
-"Changing this type later and clicking Re-apply deletes values already stored "
-"in the field."
-msgstr ""
-
-#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid ""
@@ -824,6 +866,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Field type"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Field type '%(type)s' is not valid on a %(view)s view. Use one of: "
+"%(allowed)s."
 msgstr ""
 
 #. module: web_customizer
@@ -875,6 +925,11 @@ msgid "Generated view '%s' has an empty arch."
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__graph
+msgid "Graph"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__group
 msgid "Group"
 msgstr ""
@@ -896,6 +951,11 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Group label"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__groupby
+msgid "Grouping"
 msgstr ""
 
 #. module: web_customizer
@@ -954,6 +1014,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Hide this measure"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this menu"
 msgstr ""
 
@@ -961,6 +1027,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this page"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Hide this progressbar"
 msgstr ""
 
 #. module: web_customizer
@@ -1043,6 +1115,11 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__many2one
 msgid "Many2one"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__measure
+msgid "Measure"
 msgstr ""
 
 #. module: web_customizer
@@ -1189,6 +1266,12 @@ msgid "New label"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_systray.js:0
+msgid "On"
+msgstr ""
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "One of the selected groups does not exist."
@@ -1214,9 +1297,15 @@ msgid "Only customization managers can edit forms in place."
 msgstr ""
 
 #. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_systray.js:0
-msgid "On"
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Only invisible can be set on a %(view)s view, not %(keys)s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Operation '%(type)s' is not supported on a %(view)s view."
 msgstr ""
 
 #. module: web_customizer
@@ -1230,6 +1319,13 @@ msgstr ""
 #: model:ir.ui.menu,name:web_customizer.menu_customization_operation
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Operations"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_bundle__company_id
+msgid ""
+"Optional tag to filter this bundle. Compiled fields, views and menus stay "
+"global; they are not scoped by company."
 msgstr ""
 
 #. module: web_customizer
@@ -1273,6 +1369,11 @@ msgid "Payload"
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__pivot
+msgid "Pivot"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__place_field
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Place Field"
@@ -1294,6 +1395,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Place existing field after this one"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Place existing field as measure"
 msgstr ""
 
 #. module: web_customizer
@@ -1323,6 +1430,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%s' is not valid for placing a field."
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__progressbar
+msgid "Progressbar"
 msgstr ""
 
 #. module: web_customizer
@@ -1424,8 +1536,15 @@ msgid "Restrict to groups"
 msgstr ""
 
 #. module: web_customizer
-#: model:customization.bundle,name:web_customizer.bundle_sandbox
-msgid "Sandbox"
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_field_type
+msgid ""
+"Role of the field on a pivot or graph view. Pivot accepts measure, row and "
+"col; graph accepts measure and grouping."
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__row
+msgid "Row Grouping"
 msgstr ""
 
 #. module: web_customizer

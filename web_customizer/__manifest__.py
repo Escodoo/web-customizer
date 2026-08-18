@@ -24,6 +24,12 @@
     "assets": {
         "web.assets_backend": [
             "web_customizer/static/src/**/*",
+            # PivotRenderer is only defined in the lazy bundle, so importing it
+            # from assets_backend would leave the whole bundle unresolved.
+            ("remove", "web_customizer/static/src/customization_pivot_patch.js"),
+        ],
+        "web.assets_backend_lazy": [
+            "web_customizer/static/src/customization_pivot_patch.js",
         ],
         "web.assets_unit_tests": [
             "web_customizer/static/tests/customization_patches.test.js",

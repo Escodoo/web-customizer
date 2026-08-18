@@ -160,6 +160,11 @@
                                     name="payload_field_name"
                                     required="type == 'place_field'"
                                 />
+                                <field
+                                    name="payload_field_type"
+                                    invisible="view_type not in ('pivot', 'graph')"
+                                    required="view_type == 'pivot'"
+                                />
                             </group>
                             <group string="Set Widget" invisible="type != 'set_widget'">
                                 <field

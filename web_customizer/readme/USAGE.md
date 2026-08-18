@@ -62,14 +62,16 @@ leave this module as the production runtime.
 2. **List** — add, hide or relabel a column.
 3. **Search** — add, hide or relabel a search chip.
 4. **Kanban** — hide a card field, a header button or the column progressbar.
-5. **Menus** — hide, rename or move one navbar item that has an XML ID.
-6. Click **Apply**. Broken operations show `broken_reason`; fix the
+5. **Pivot** — click a measure header to relabel, hide or add a measure.
+6. **Menus** — hide, rename or move one navbar item that has an XML ID.
+7. Click **Apply**. Broken operations show `broken_reason`; fix the
    anchor and run **Health Check** (or **Re-apply**).
-7. Click **Export Addon** → **Download ZIP**.
-8. Install that module on staging (`-i <bundle.code>`). Do not install
+8. Click **Export Addon** → **Download ZIP**.
+9. Install that module on staging (`-i <bundle.code>`). Do not install
    `web_customizer` there unless the wand is still needed.
 
-Calendar, graph, pivot and gantt stay out of this pilot.
+Graph operations are written from the operation form rather than in
+place. Calendar and gantt stay out of this pilot.
 
 Generated field names always start with `x_cust_` and cannot contain `__`.
 Selection fields take one option per line as `value:Label`. Monetary

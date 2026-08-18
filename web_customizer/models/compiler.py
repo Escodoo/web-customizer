@@ -30,6 +30,22 @@ SUPPORTED_TTYPES = (
     "monetary",
 )
 SUPPORTED_ANCHOR_KINDS = ("field", "page", "button", "group", "progressbar")
+# Pivot and graph describe themselves with measures and groupings instead of a
+# tree of widgets, so they only ever anchor on <field> and only understand the
+# attributes their arch parsers read.
+AGGREGATE_VIEW_TYPES = ("pivot", "graph")
+AGGREGATE_FIELD_TYPES = {
+    "pivot": ("measure", "row", "col"),
+    "graph": ("measure", "groupby"),
+}
+AGGREGATE_OPERATION_TYPES = (
+    "place_field",
+    "set_string",
+    "set_widget",
+    "set_groups",
+    "set_modifier",
+    "hide_field",
+)
 ANCHOR_TAGS = {
     "field": "field",
     "page": "page",
@@ -597,6 +613,35 @@ def rebind_generated_xmlids(env):
         bind_generated_xmlids(operation)
 
 
+def assert_aggregate_support(operation):
+    """Reject what a pivot or graph arch parser would silently ignore.
+
+    Both parsers only visit ``<field>`` nodes, so an inherit anchored on a
+    page, group or button would compile without ever changing the view.
+    Failing here keeps the operation honest instead of applied-but-inert.
+    """
+    view_type = operation.view_type or ""
+    if view_type not in AGGREGATE_VIEW_TYPES:
+        return
+    kind = operation.anchor_kind or "field"
+    if kind != "field":
+        raise AnchorError(
+            _(
+                "A %(view)s view can only anchor on a field, not on a %(kind)s.",
+                view=view_type,
+                kind=kind,
+            )
+        )
+    if operation.type not in AGGREGATE_OPERATION_TYPES:
+        raise UserError(
+            _(
+                "Operation '%(type)s' is not supported on a %(view)s view.",
+                type=operation.type,
+                view=view_type,
+            )
+        )
+
+
 def apply_operation(operation):
     """Compile one operation into ir.model.fields / ir.ui.view records."""
     if operation.type == "add_field":
@@ -608,6 +653,7 @@ def apply_operation(operation):
             _("Anchor kind '%s' is not supported yet.") % operation.anchor_kind
         )
     else:
+        assert_aggregate_support(operation)
         ok, reason = health_check_operation(operation)
         if not ok:
             raise AnchorError(reason)
@@ -1290,6 +1336,31 @@ def _apply_add_structure(operation):
     operation.payload = payload
 
 
+def aggregate_field_type(operation):
+    """Return the ``type`` attribute for a field placed on a pivot or graph.
+
+    A pivot field without a type is parsed and then contributes nothing, so
+    the type is required there. A graph groupby carries no type at all,
+    which ``groupby`` compiles to.
+    """
+    view_type = operation.view_type or ""
+    if view_type not in AGGREGATE_VIEW_TYPES:
+        return ""
+    allowed = AGGREGATE_FIELD_TYPES[view_type]
+    field_type = (_payload(operation).get("field_type") or "measure").strip()
+    if field_type not in allowed:
+        raise UserError(
+            _(
+                "Field type '%(type)s' is not valid on a %(view)s view. "
+                "Use one of: %(allowed)s.",
+                type=field_type,
+                view=view_type,
+                allowed=", ".join(allowed),
+            )
+        )
+    return "" if field_type == "groupby" else field_type
+
+
 def _apply_place_field(operation):
     payload = _payload(operation)
     field_name = payload.get("field_name")
@@ -1304,8 +1375,10 @@ def _apply_place_field(operation):
         raise AnchorError(
             _("Position '%s' is not valid for placing a field.") % position
         )
+    field_type = aggregate_field_type(operation)
+    type_attr = f' type="{_xml_attr(field_type)}"' if field_type else ""
     arch = _inherit_arch(
-        operation, f'<field name="{_xml_attr(field_name)}"/>', position
+        operation, f'<field name="{_xml_attr(field_name)}"{type_attr}/>', position
     )
     _upsert_generated_view(operation, arch, active=True)
 
@@ -1336,6 +1409,18 @@ def _apply_attributes(operation):
         modifiers = payload.get("modifiers") or {}
         if not modifiers:
             raise UserError(_("set_modifier requires payload.modifiers."))
+        if operation.view_type in AGGREGATE_VIEW_TYPES:
+            # Those parsers read invisible only, and only as a literal.
+            unsupported = sorted(set(modifiers) - {"invisible"})
+            if unsupported:
+                raise UserError(
+                    _(
+                        "Only invisible can be set on a %(view)s view, not "
+                        "%(keys)s.",
+                        view=operation.view_type,
+                        keys=", ".join(unsupported),
+                    )
+                )
         for key in MODIFIER_KEYS:
             if key in modifiers:
                 parts.append(_attribute_xml(key, modifiers[key]))

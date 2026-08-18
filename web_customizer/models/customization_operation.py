@@ -52,6 +52,7 @@ PAYLOAD_UI_FIELDS = (
     "payload_selection",
     "payload_currency_field",
     "payload_field_name",
+    "payload_field_type",
     "payload_widget",
     "payload_groups",
     "payload_mod_invisible",
@@ -116,6 +117,8 @@ class CustomizationOperation(models.Model):
             ("list", "List"),
             ("search", "Search"),
             ("kanban", "Kanban"),
+            ("pivot", "Pivot"),
+            ("graph", "Graph"),
         ],
         default="form",
     )
@@ -224,6 +227,19 @@ class CustomizationOperation(models.Model):
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
         string="Field To Place",
+    )
+    payload_field_type = fields.Selection(
+        selection=[
+            ("measure", "Measure"),
+            ("row", "Row Grouping"),
+            ("col", "Column Grouping"),
+            ("groupby", "Grouping"),
+        ],
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Aggregate Role",
+        help="Role of the field on a pivot or graph view. Pivot accepts "
+        "measure, row and col; graph accepts measure and grouping.",
     )
     payload_widget = fields.Char(
         compute="_compute_payload_ui",
@@ -352,6 +368,7 @@ class CustomizationOperation(models.Model):
             rec.payload_selection = self._selection_to_text(payload.get("selection"))
             rec.payload_currency_field = payload.get("currency_field") or False
             rec.payload_field_name = payload.get("field_name") or False
+            rec.payload_field_type = payload.get("field_type") or False
             rec.payload_widget = payload.get("widget") or False
             rec.payload_groups = payload.get("groups") or False
             rec.payload_mod_invisible = modifiers.get("invisible") or False
@@ -455,6 +472,8 @@ class CustomizationOperation(models.Model):
         elif op_type == "place_field":
             if "payload_field_name" in ui:
                 self._set_payload_key(payload, "field_name", ui["payload_field_name"])
+            if "payload_field_type" in ui:
+                self._set_payload_key(payload, "field_type", ui["payload_field_type"])
         elif op_type in STRUCTURE_TYPES + ("set_string", "set_menu_string", "add_menu"):
             self._apply_label_payload_ui(payload, op_type, ui)
         elif op_type == "move_menu":

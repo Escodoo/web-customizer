@@ -93,6 +93,32 @@ class CustomizationCase(TransactionCase):
                 """,
             }
         )
+        cls.pivot_view = cls.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.pivot",
+                "model": "res.partner",
+                "type": "pivot",
+                "arch": """
+                    <pivot>
+                        <field name="company_type" type="row"/>
+                        <field name="color" type="measure"/>
+                    </pivot>
+                """,
+            }
+        )
+        cls.graph_view = cls.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.graph",
+                "model": "res.partner",
+                "type": "graph",
+                "arch": """
+                    <graph>
+                        <field name="company_type"/>
+                        <field name="color" type="measure"/>
+                    </graph>
+                """,
+            }
+        )
         cls.search_view = cls.env["ir.ui.view"].create(
             {
                 "name": "customization.tester.partner.search",

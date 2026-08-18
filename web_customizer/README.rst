@@ -67,10 +67,15 @@ upgrade the only recovery path is to discard the customizations on that
 view. Here the intent outlives the artifact: a moved anchor is
 re-resolved and only a genuinely missing one is reported.
 
-Scope stops at the user interface, and not at all of it. Pivot, graph,
-calendar and gantt views, creating a model, and report editing are not
-covered; see the roadmap. Approvals stay in ``base_tier_validation``.
-Automations stay in ``base.automation`` / ``automation_oca``.
+Pivot and graph views compile too. A pivot measure is clickable like any
+other anchor; graph has no per-field DOM to click, since it draws on a
+canvas, so graph operations are written from the backend form and
+compile and export the same way.
+
+Scope stops at the user interface, and not at all of it. Calendar and
+gantt views, creating a model, and report editing are not covered; see
+the roadmap. Approvals stay in ``base_tier_validation``. Automations
+stay in ``base.automation`` / ``automation_oca``.
 
 **Table of contents**
 
@@ -183,14 +188,16 @@ leave this module as the production runtime.
 3. **Search** — add, hide or relabel a search chip.
 4. **Kanban** — hide a card field, a header button or the column
    progressbar.
-5. **Menus** — hide, rename or move one navbar item that has an XML ID.
-6. Click **Apply**. Broken operations show ``broken_reason``; fix the
+5. **Pivot** — click a measure header to relabel, hide or add a measure.
+6. **Menus** — hide, rename or move one navbar item that has an XML ID.
+7. Click **Apply**. Broken operations show ``broken_reason``; fix the
    anchor and run **Health Check** (or **Re-apply**).
-7. Click **Export Addon** → **Download ZIP**.
-8. Install that module on staging (``-i <bundle.code>``). Do not install
+8. Click **Export Addon** → **Download ZIP**.
+9. Install that module on staging (``-i <bundle.code>``). Do not install
    ``web_customizer`` there unless the wand is still needed.
 
-Calendar, graph, pivot and gantt stay out of this pilot.
+Graph operations are written from the operation form rather than in
+place. Calendar and gantt stay out of this pilot.
 
 Generated field names always start with ``x_cust_`` and cannot contain
 ``__``. Selection fields take one option per line as ``value:Label``.
@@ -205,9 +212,11 @@ welcome.
 
 Next:
 
-- Pivot and graph anchors. Both views are described by measures and
-  groupings rather than by a tree of nodes, so they fit the existing
-  anchor model at a low cost.
+- A pivot or graph whose arch declares no field has nothing to anchor
+  on, so those views cannot be customized until one field exists.
+- Graph operations are written from the backend form only. The view
+  draws on a canvas, so there is no field node to click; offering them
+  in place needs a side panel listing the arch fields.
 - Free XPath anchors stay in the model for export compatibility but are
   not offered in the systray dialog.
 
@@ -244,6 +253,9 @@ First public Beta.
   place of the same field on one view.
 - Export as a standalone addon ZIP that does not depend on this module.
 - Kanban header buttons and column progressbars are semantic anchors.
+- Pivot and graph fields compile with their aggregate role (measure,
+  row, col or grouping); pivot measures are clickable in customization
+  mode.
 
 Bug Tracker
 ===========

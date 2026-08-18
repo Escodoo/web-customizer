@@ -26,6 +26,7 @@ class Partner extends models.Model {
 
     name = fields.Char();
     email = fields.Char();
+    revenue = fields.Integer();
     is_favorite = fields.Boolean();
     state = fields.Selection({
         selection: [
@@ -43,6 +44,7 @@ class Partner extends models.Model {
             id: 1,
             name: "Ada",
             email: "ada@example.com",
+            revenue: 10,
             is_favorite: false,
             state: "draft",
         },
@@ -50,6 +52,7 @@ class Partner extends models.Model {
             id: 2,
             name: "Bob",
             email: "bob@example.com",
+            revenue: 20,
             is_favorite: true,
             state: "done",
         },
@@ -344,6 +347,35 @@ test("ListRenderer outlines columns and opens the dialog", async () => {
     expect("th[data-name=email]").toHaveClass("o_esc_customization_target");
     await contains("th[data-name=email]").click();
     expect.verifySteps(["field:email"]);
+});
+
+test("PivotRenderer opens the dialog for a measure instead of sorting", async () => {
+    enableCustomization();
+    await mountView({
+        type: "pivot",
+        resModel: "partner",
+        arch: `
+            <pivot>
+                <field name="state" type="row"/>
+                <field name="revenue" type="measure"/>
+            </pivot>`,
+    });
+    await contains(".o_pivot_measure_row").click();
+    expect.verifySteps(["field:revenue"]);
+});
+
+test("PivotRenderer still sorts while customization is off", async () => {
+    await mountView({
+        type: "pivot",
+        resModel: "partner",
+        arch: `
+            <pivot>
+                <field name="state" type="row"/>
+                <field name="revenue" type="measure"/>
+            </pivot>`,
+    });
+    await contains(".o_pivot_measure_row").click();
+    expect(".o_pivot_sort_order_asc, .o_pivot_sort_order_desc").toHaveCount(1);
 });
 
 test("SearchBar outlines search fields and opens the dialog", async () => {

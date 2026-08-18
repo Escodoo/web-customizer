@@ -8,6 +8,7 @@ from odoo.exceptions import AccessError, UserError, ValidationError
 
 from ..hooks import health_check_on_upgrade
 from .compiler import (
+    AGGREGATE_VIEW_TYPES,
     MODIFIER_KEYS,
     STRUCTURE_TYPES,
     SUPPORTED_ANCHOR_KINDS,
@@ -303,6 +304,7 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
+                field_type=payload.get("field_type"),
             )
         elif action in STRUCTURE_TYPES:
             operations = self._ui_action_add_structure(
@@ -542,6 +544,8 @@ class CustomizationBundle(models.Model):
         anchor_string=False,
     ):
         """Create add_field plus place_field after/inside the clicked anchor."""
+        # The aggregate role belongs to the placement, not to the field itself.
+        field_type = payload.pop("field_type", False)
         if not payload.get("ttype") and not payload.get("related"):
             raise UserError(self.env._("A field type or a related path is required."))
         if payload.get("related") and not payload.get("ttype"):
@@ -580,6 +584,7 @@ class CustomizationBundle(models.Model):
             occurrence=occurrence,
             anchor_page=anchor_page,
             anchor_string=anchor_string,
+            field_type=field_type,
         )
         return add_op | place_op
 
@@ -777,8 +782,14 @@ class CustomizationBundle(models.Model):
         occurrence=0,
         anchor_page=False,
         anchor_string=False,
+        field_type=False,
     ):
         """Create a place_field operation and optionally compile it."""
+        payload = {"field_name": field_name}
+        if view_type in AGGREGATE_VIEW_TYPES:
+            # The in-place UI only ever anchors on a measure, so that is the
+            # role a placed field takes unless the caller asked for another.
+            payload["field_type"] = field_type or "measure"
         vals = {
             "bundle_id": bundle.id,
             "sequence": sequence,
@@ -789,7 +800,7 @@ class CustomizationBundle(models.Model):
             "anchor_kind": anchor_kind,
             "anchor_name": anchor_name,
             "position": position,
-            "payload": {"field_name": field_name},
+            "payload": payload,
         }
         vals.update(self._ui_anchor_extra(occurrence, anchor_page, anchor_string))
         operation = self.env["customization.operation"].create(vals)

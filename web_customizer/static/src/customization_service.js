@@ -63,6 +63,11 @@ export function isKanbanRoot(component) {
     return config.viewType === "kanban" && Boolean(config.viewId);
 }
 
+export function isPivotRoot(component) {
+    const config = component.env.config || {};
+    return config.viewType === "pivot" && Boolean(config.viewId);
+}
+
 export const BUTTON_TYPE_ANCHORS = [
     "edit",
     "open",
@@ -103,6 +108,9 @@ function customizationTarget(component, extra) {
         return null;
     }
     if (viewType === "kanban" && !isKanbanRoot(component)) {
+        return null;
+    }
+    if (viewType === "pivot" && !isPivotRoot(component)) {
         return null;
     }
     const viewId = extra.viewId || component.env.config?.viewId;

@@ -161,6 +161,9 @@ export class CustomizationFieldDialog extends Component {
         if (this.props.viewType === "search") {
             return _t("Customize search field %s", label);
         }
+        if (this.props.viewType === "pivot") {
+            return _t("Customize pivot measure %s", label);
+        }
         return _t("Customize field %s", label);
     }
 
@@ -210,6 +213,18 @@ export class CustomizationFieldDialog extends Component {
                     value: "move_as_submenu",
                     label: _t("Move as submenu of another menu"),
                 },
+            ];
+        }
+        if (this.props.viewType === "pivot") {
+            // A pivot parser only reads string, widget, invisible and the
+            // aggregate role, so modifiers and structure have nothing to act on.
+            return [
+                {value: "add_after", label: _t("Add measure after this one")},
+                {value: "place_after", label: _t("Place existing field as measure")},
+                {value: "hide", label: _t("Hide this measure")},
+                {value: "rename", label: _t("Change label")},
+                {value: "set_widget", label: _t("Set widget")},
+                {value: "set_groups", label: _t("Restrict to groups")},
             ];
         }
         const fieldActions = [
