@@ -82,15 +82,15 @@ class TestCustomizationSearchFilter(CustomizationCase):
         )
         bundle.action_apply()
         self.assertEqual(bundle.state, "applied")
-        self.assertEqual(
-            bundle.operation_ids.payload.get("name"), "x_cust_active_ones"
-        )
+        self.assertEqual(bundle.operation_ids.payload.get("name"), "x_cust_active_ones")
 
     def test_syntactically_broken_domain_is_refused(self):
         bundle = self._create_bundle(
             code="client_filter_syntax",
             operations=[
-                self._add_filter({"string": "Broken", "domain": "[('active', '=' True)]"})
+                self._add_filter(
+                    {"string": "Broken", "domain": "[('active', '=' True)]"}
+                )
             ],
         )
         bundle.action_apply()
@@ -117,7 +117,11 @@ class TestCustomizationSearchFilter(CustomizationCase):
             code="client_filter_dynamic",
             operations=[
                 self._add_filter(
-                    {"string": "Touched Today", "name": "x_cust_touched", "domain": domain}
+                    {
+                        "string": "Touched Today",
+                        "name": "x_cust_touched",
+                        "domain": domain,
+                    }
                 )
             ],
         )
