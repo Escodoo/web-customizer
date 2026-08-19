@@ -1,0 +1,235 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* web_customizer_report
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-19 20:01+0000\n"
+"PO-Revision-Date: 2026-08-19 20:05+0000\n"
+"Last-Translator: Marcel Savegnago <marcel.savegnago@escodoo.com.br>\n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"%(label)s '%(anchor)s' appears %(count)s times in '%(view)s'; set the "
+"occurrence to pick one."
+msgstr ""
+"%(label)s '%(anchor)s' aparece %(count)s vezes em '%(view)s'; defina a "
+"ocorrência para escolher uma."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"'%(wrapper)s' only wraps the report. Target the document template it calls "
+"(%(document)s) so localization inherits keep applying."
+msgstr ""
+"'%(wrapper)s' apenas envolve o relatório. Aponte para o template de "
+"documento que ele chama (%(document)s) para que as heranças de localização "
+"continuem valendo."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"'%s' is not a report expression. Name the variable and the field path, for "
+"example o.invoice_date."
+msgstr ""
+"'%s' não é uma expressão de relatório. Informe a variável e o caminho do "
+"campo, por exemplo o.invoice_date."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "'%s' is not a valid node name."
+msgstr "'%s' não é um nome de nó válido."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "'%s' is not a valid report anchor."
+msgstr "'%s' não é uma âncora de relatório válida."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "A move needs the name of the node to relocate."
+msgstr "Mover exige o nome do nó a ser realocado."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "A new label is required."
+msgstr "Um novo rótulo é obrigatório."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/customization_operation.py:0
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "A report node is anchored on its name or on its t-field, not on a %s."
+msgstr ""
+"Um nó de relatório é ancorado pelo seu name ou pelo seu t-field, não por um "
+"%s."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/customization_operation.py:0
+msgid "A report template only accepts hide, rename, place and move, not '%s'."
+msgstr ""
+"Um template de relatório só aceita ocultar, renomear, posicionar e mover, "
+"não '%s'."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "A target report template is required."
+msgstr "Um template de relatório de destino é obrigatório."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "An anchor is required."
+msgstr "Uma âncora é obrigatória."
+
+#. module: web_customizer_report
+#: model:ir.model.fields,field_description:web_customizer_report.field_customization_operation__anchor_kind
+msgid "Anchor Kind"
+msgstr "Tipo de Âncora"
+
+#. module: web_customizer_report
+#: model:ir.model,name:web_customizer_report.model_customization_operation
+msgid "Customization Operation"
+msgstr "Operação de Customização"
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "Field '%(field)s' does not exist on %(model)s."
+msgstr "O campo '%(field)s' não existe em %(model)s."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"Field '%(field)s' on %(model)s is not relational, so '%(rest)s' cannot be "
+"read through it."
+msgstr ""
+"O campo '%(field)s' em %(model)s não é relacional, então '%(rest)s' não pode "
+"ser lido através dele."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"Node '%(name)s' appears %(count)s times in '%(view)s', so the node to move "
+"is ambiguous."
+msgstr ""
+"O nó '%(name)s' aparece %(count)s vezes em '%(view)s', então o nó a mover é "
+"ambíguo."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "Node '%s' cannot be moved next to itself."
+msgstr "O nó '%s' não pode ser movido para junto de si mesmo."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"Node '%s' prints a record value, so it carries no static label to rename."
+msgstr ""
+"O nó '%s' imprime um valor do registro, portanto não tem rótulo estático "
+"para renomear."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"Occurrence %(occurrence)s of %(label)s '%(anchor)s' was asked for, but the "
+"template declares %(count)s."
+msgstr ""
+"Foi pedida a ocorrência %(occurrence)s de %(label)s '%(anchor)s', mas o "
+"template declara %(count)s."
+
+#. module: web_customizer_report
+#: model_terms:ir.ui.view,arch_db:web_customizer_report.view_customization_operation_form
+msgid ""
+"On a report template, a placement prints a QWeb expression\n"
+"                    (for example <code>o.x_cust_po_number</code>) and a move\n"
+"                    names the node to relocate (for example\n"
+"                    <code>td_quantity</code>)."
+msgstr ""
+"Em um template de relatório, um posicionamento imprime uma expressão QWeb\n"
+"                    (por exemplo <code>o.x_cust_po_number</code>) e um "
+"movimento\n"
+"                    nomeia o nó a realocar (por exemplo\n"
+"                    <code>td_quantity</code>)."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "Operation '%s' is not supported on a report template."
+msgstr "A operação '%s' não é suportada em um template de relatório."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "Position '%s' is not valid on a report template."
+msgstr "A posição '%s' não é válida em um template de relatório."
+
+#. module: web_customizer_report
+#: model:ir.model.fields.selection,name:web_customizer_report.selection__customization_operation__view_type__qweb
+msgid "Report (QWeb)"
+msgstr "Relatório (QWeb)"
+
+#. module: web_customizer_report
+#: model:ir.model.fields.selection,name:web_customizer_report.selection__customization_operation__anchor_kind__t_field
+msgid "Report Value"
+msgstr "Valor do Relatório"
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"Template '%(view)s' declares no variable '%(variable)s'. It knows %(known)s."
+msgstr ""
+"O template '%(view)s' não declara a variável '%(variable)s'. Ele conhece "
+"%(known)s."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid ""
+"Template '%(view)s' has no node named '%(name)s', so there is nothing to "
+"move."
+msgstr ""
+"O template '%(view)s' não tem nó chamado '%(name)s', portanto não há nada a "
+"mover."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "Template '%(view)s' has no node with %(label)s '%(anchor)s'."
+msgstr "O template '%(view)s' não tem nó com %(label)s '%(anchor)s'."
+
+#. module: web_customizer_report
+#. odoo-python
+#: code:addons/web_customizer_report/models/customization_operation.py:0
+#: code:addons/web_customizer_report/models/report_compiler.py:0
+msgid "View '%s' is not a QWeb template."
+msgstr "A visão '%s' não é um template QWeb."
+
+#. module: web_customizer_report
+#: model:ir.model.fields,field_description:web_customizer_report.field_customization_operation__view_type
+msgid "View Type"
+msgstr "Tipo de Visão"
