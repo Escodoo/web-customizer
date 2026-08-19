@@ -8,6 +8,7 @@ from . import test_menu
 from . import test_move_field
 from . import test_optional_column
 from . import test_search_filter
+from . import test_set_default
 from . import test_subview
 from . import test_view_options
 from . import test_security

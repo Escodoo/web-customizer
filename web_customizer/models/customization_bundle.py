@@ -43,6 +43,7 @@ UI_ACTIONS = (
     "add_submenu",
     "move_menu",
     "move_as_submenu",
+    "set_default",
 )
 
 
@@ -69,8 +70,8 @@ class CustomizationBundle(models.Model):
     company_id = fields.Many2one(
         "res.company",
         ondelete="set null",
-        help="Optional tag to filter this bundle. Compiled fields, views "
-        "and menus stay global; they are not scoped by company.",
+        help="Optional tag to filter this bundle. Compiled fields, views, "
+        "menus and defaults stay global; they are not scoped by company.",
     )
     operation_ids = fields.One2many(
         "customization.operation",
@@ -199,6 +200,7 @@ class CustomizationBundle(models.Model):
                 field_subview = self._ui_field_subview(view, tree, name)
             if tree is not None:
                 candidates = list_anchor_candidates(self.env, tree, name, kind, title)
+        field_info = self._ui_field_info(view, name, kind, subview)
         count = len(candidates)
         bundles = self.search_read(
             [],
@@ -214,6 +216,27 @@ class CustomizationBundle(models.Model):
             "candidates": candidates,
             "subview_inline": subview_inline,
             "field_subview": field_subview,
+            "field_ttype": field_info.get("ttype") or False,
+            "field_relation": field_info.get("relation") or False,
+            "field_related": field_info.get("related") or False,
+        }
+
+    def _ui_field_info(self, view, name, kind, subview):
+        """Describe the clicked field so the dialog can offer a typed default."""
+        if kind != "field" or not name or not view.exists():
+            return {}
+        model_name = view.model
+        if subview:
+            holder = self.env["ir.model.fields"]._get(view.model, subview)
+            if holder and holder.relation:
+                model_name = holder.relation
+        field = self.env["ir.model.fields"]._get(model_name, name)
+        if not field:
+            return {}
+        return {
+            "ttype": field.ttype,
+            "relation": field.relation or False,
+            "related": bool(field.related),
         }
 
     def _ui_field_subview(self, view, tree, name):
@@ -262,6 +285,7 @@ class CustomizationBundle(models.Model):
         Menus pass ``anchor_kind='menu'`` and ``menu_id`` instead of a view.
         ``add_menu`` / ``add_submenu`` create a sibling or child menu.
         ``move_menu`` / ``move_as_submenu`` reparent an existing menu.
+        ``set_default`` writes a global ``ir.default`` for the clicked field.
         """
         self._check_ui_access()
         params = params or {}
@@ -382,6 +406,18 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
+                anchor_subview=anchor_subview,
+            )
+        elif action == "set_default":
+            operations = self._ui_action_set_default(
+                bundle,
+                sequence,
+                model,
+                view,
+                view_type,
+                anchor_name,
+                payload,
+                apply,
                 anchor_subview=anchor_subview,
             )
         elif action in STRUCTURE_TYPES:
@@ -710,6 +746,8 @@ class CustomizationBundle(models.Model):
             )
         if action == "set_widget" and anchor_kind != "field":
             raise UserError(self.env._("Widgets can only be set on fields."))
+        if action == "set_default" and anchor_kind != "field":
+            raise UserError(self.env._("Default values can only be set on fields."))
         if action != "hide" and anchor_kind == "progressbar":
             raise UserError(self.env._("A progressbar can only be hidden."))
         if action in ("add_after", "place_after", "move_after") and anchor_kind in (
@@ -759,6 +797,46 @@ class CustomizationBundle(models.Model):
                 self.env._("Anchor on a column, a button or the '%s' table itself.")
                 % anchor_subview
             )
+
+    def _ui_action_set_default(
+        self,
+        bundle,
+        sequence,
+        model,
+        view,
+        view_type,
+        anchor_name,
+        payload,
+        apply,
+        anchor_subview=False,
+    ):
+        """Create a global ir.default for the clicked field."""
+        field_name = (payload.get("field_name") or anchor_name or "").strip()
+        if not field_name:
+            raise UserError(self.env._("A field is required to set a default."))
+        default_payload = {"field_name": field_name}
+        if "value" in payload:
+            default_payload["value"] = payload.get("value")
+        elif not (payload.get("value_xmlid") or "").strip():
+            default_payload["value"] = ""
+        if (payload.get("value_xmlid") or "").strip():
+            default_payload["value_xmlid"] = payload["value_xmlid"].strip()
+        vals = {
+            "bundle_id": bundle.id,
+            "sequence": sequence,
+            "type": "set_default",
+            "model_id": model.id,
+            "view_id": view.id,
+            "view_type": view_type,
+            "anchor_kind": "field",
+            "anchor_name": field_name,
+            "anchor_subview": anchor_subview or False,
+            "payload": default_payload,
+        }
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return operation
 
     def _ui_action_add_filter(
         self,

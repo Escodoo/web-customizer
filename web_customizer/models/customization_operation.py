@@ -11,6 +11,7 @@ from .compiler import (
     MENU_TYPES,
     MENU_WRITE_TYPES,
     PLACEMENT_TYPES,
+    SET_DEFAULT_TYPE,
     STRUCTURE_TYPES,
     AnchorError,
     _deactivate_generated_view,
@@ -24,7 +25,10 @@ from .compiler import (
     menu_write_conflicts,
     place_field_conflict_message,
     place_field_conflicts,
+    restore_default_operation,
     restore_menu_operation,
+    set_default_conflict_message,
+    set_default_conflicts,
     view_write_conflict_message,
     view_write_conflicts,
 )
@@ -87,6 +91,8 @@ PAYLOAD_UI_FIELDS = (
     "payload_action_xmlid",
     "payload_btn_class",
     "payload_target_xmlid",
+    "payload_value",
+    "payload_value_xmlid",
 )
 
 
@@ -106,6 +112,7 @@ class CustomizationOperation(models.Model):
     type = fields.Selection(
         selection=[
             ("add_field", "Add Field"),
+            ("set_default", "Set Default"),
             ("place_field", "Place Field"),
             ("move_field", "Move Field"),
             ("add_page", "Add Page"),
@@ -362,6 +369,19 @@ class CustomizationOperation(models.Model):
         string="Destination Menu",
         help="XML ID of the destination menu, for example base.menu_administration.",
     )
+    payload_value = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Default Value",
+        help="Value stored as a global ir.default. Leave empty for an empty "
+        "char default. Many2one also accepts a record XML ID below.",
+    )
+    payload_value_xmlid = fields.Char(
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Default Record",
+        help="XML ID of the many2one default, for example base.main_company.",
+    )
     state = fields.Selection(
         selection=[
             ("draft", "Draft"),
@@ -378,6 +398,9 @@ class CustomizationOperation(models.Model):
         "ir.model.fields", ondelete="set null", copy=False
     )
     generated_menu_id = fields.Many2one("ir.ui.menu", ondelete="set null", copy=False)
+    generated_default_id = fields.Many2one(
+        "ir.default", ondelete="set null", copy=False
+    )
 
     @api.depends(
         "type",
@@ -390,59 +413,63 @@ class CustomizationOperation(models.Model):
     )
     def _compute_name(self):
         for rec in self:
-            payload = rec.payload or {}
-            anchor = rec.anchor_name or rec.anchor_string or "?"
-            if rec.type == "add_field":
-                label = payload.get("string") or payload.get("name") or rec.model
-                rec.name = f"Add field {label}"
-            elif rec.type == "place_field":
-                rec.name = (
-                    f"Place {payload.get('field_name') or '?'} "
-                    f"{rec.position or 'after'} {anchor}"
-                )
-            elif rec.type == "move_field":
-                rec.name = (
-                    f"Move {payload.get('field_name') or '?'} "
-                    f"{rec.position or 'after'} {anchor}"
-                )
-            elif rec.type == "add_page":
-                rec.name = (
-                    f"Add page {payload.get('string') or payload.get('name') or '?'}"
-                )
-            elif rec.type == "add_group":
-                rec.name = (
-                    f"Add group {payload.get('string') or payload.get('name') or '?'}"
-                )
-            elif rec.type == "add_button":
-                rec.name = (
-                    f"Add button {payload.get('string') or '?'} "
-                    f"{rec.position or 'after'} {anchor}"
-                )
-            elif rec.type == "set_view_attribute":
-                options = ", ".join(sorted(payload.get("attributes") or {})) or "?"
-                rec.name = f"Set {options} on {rec.view_type or 'view'} root"
-            elif rec.type == "hide_field":
-                rec.name = f"Hide {anchor}"
-            elif rec.type == "hide_menu":
-                rec.name = f"Hide menu {rec.menu_id.display_name or anchor}"
-            elif rec.type == "set_menu_string":
-                rec.name = f"Rename menu {rec.menu_id.display_name or anchor}"
-            elif rec.type == "set_menu_groups":
-                rec.name = f"Restrict menu {rec.menu_id.display_name or anchor}"
-            elif rec.type == "add_menu":
-                rec.name = (
-                    f"Add menu {payload.get('string') or '?'} "
-                    f"{rec.position or 'after'} {rec.menu_id.display_name or anchor}"
-                )
-            elif rec.type == "move_menu":
-                rec.name = (
-                    f"Move menu {rec.menu_id.display_name or anchor} "
-                    f"{rec.position or 'after'} {payload.get('target_xmlid') or '?'}"
-                )
-            else:
-                rec.name = f"{rec.type} on {anchor}"
-            if rec.anchor_subview and rec.type not in MENU_TYPES:
-                rec.name = f"{rec.name} (in {rec.anchor_subview})"
+            rec.name = rec._operation_name()
+
+    def _operation_name(self):
+        payload = self.payload or {}
+        anchor = self.anchor_name or self.anchor_string or "?"
+        name = self._operation_name_for_type(payload, anchor)
+        if self.anchor_subview and self.type not in MENU_TYPES + (SET_DEFAULT_TYPE,):
+            return f"{name} (in {self.anchor_subview})"
+        return name
+
+    def _operation_name_for_type(self, payload, anchor):
+        if self.type == "add_field":
+            label = payload.get("string") or payload.get("name") or self.model
+            return f"Add field {label}"
+        if self.type == SET_DEFAULT_TYPE:
+            return f"Default {payload.get('field_name') or self.model or '?'}"
+        if self.type == "place_field":
+            return (
+                f"Place {payload.get('field_name') or '?'} "
+                f"{self.position or 'after'} {anchor}"
+            )
+        if self.type == "move_field":
+            return (
+                f"Move {payload.get('field_name') or '?'} "
+                f"{self.position or 'after'} {anchor}"
+            )
+        if self.type == "add_page":
+            return f"Add page {payload.get('string') or payload.get('name') or '?'}"
+        if self.type == "add_group":
+            return f"Add group {payload.get('string') or payload.get('name') or '?'}"
+        if self.type == "add_button":
+            return (
+                f"Add button {payload.get('string') or '?'} "
+                f"{self.position or 'after'} {anchor}"
+            )
+        if self.type == "set_view_attribute":
+            options = ", ".join(sorted(payload.get("attributes") or {})) or "?"
+            return f"Set {options} on {self.view_type or 'view'} root"
+        if self.type == "hide_field":
+            return f"Hide {anchor}"
+        if self.type == "hide_menu":
+            return f"Hide menu {self.menu_id.display_name or anchor}"
+        if self.type == "set_menu_string":
+            return f"Rename menu {self.menu_id.display_name or anchor}"
+        if self.type == "set_menu_groups":
+            return f"Restrict menu {self.menu_id.display_name or anchor}"
+        if self.type == "add_menu":
+            return (
+                f"Add menu {payload.get('string') or '?'} "
+                f"{self.position or 'after'} {self.menu_id.display_name or anchor}"
+            )
+        if self.type == "move_menu":
+            return (
+                f"Move menu {self.menu_id.display_name or anchor} "
+                f"{self.position or 'after'} {payload.get('target_xmlid') or '?'}"
+            )
+        return f"{self.type} on {anchor}"
 
     @api.depends("payload")
     def _compute_payload_json(self):
@@ -483,6 +510,8 @@ class CustomizationOperation(models.Model):
             rec.payload_action_xmlid = payload.get("action_xmlid") or False
             rec.payload_btn_class = payload.get("btn_class") or False
             rec.payload_target_xmlid = payload.get("target_xmlid") or False
+            rec.payload_value = self._default_value_to_text(payload)
+            rec.payload_value_xmlid = payload.get("value_xmlid") or False
 
     def _inverse_payload_ui(self):
         for rec in self:
@@ -607,6 +636,8 @@ class CustomizationOperation(models.Model):
             return payload
         if op_type == "add_field":
             self._apply_add_field_payload_ui(payload, ui)
+        elif op_type == SET_DEFAULT_TYPE:
+            self._apply_set_default_payload_ui(payload, ui)
         elif op_type in STRUCTURE_TYPES + ("set_string", "set_menu_string", "add_menu"):
             self._apply_label_payload_ui(payload, op_type, ui)
         elif op_type == "set_view_attribute":
@@ -621,6 +652,29 @@ class CustomizationOperation(models.Model):
         elif op_type == "set_modifier":
             self._apply_modifier_payload_ui(payload, ui)
         return payload
+
+    @api.model
+    @api.model
+    def _apply_set_default_payload_ui(self, payload, ui):
+        """Keep an empty string: that is a valid empty char default."""
+        if "payload_field_name" in ui:
+            self._set_payload_key(payload, "field_name", ui["payload_field_name"])
+        if "payload_value_xmlid" in ui:
+            self._set_payload_key(payload, "value_xmlid", ui["payload_value_xmlid"])
+        if "payload_value" in ui:
+            value = ui["payload_value"]
+            payload["value"] = "" if value is False else value
+
+    @staticmethod
+    def _default_value_to_text(payload):
+        if "value" not in (payload or {}):
+            return False
+        value = payload.get("value")
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if value is None:
+            return False
+        return str(value)
 
     @api.model
     def _apply_label_payload_ui(self, payload, op_type, ui):
@@ -707,6 +761,8 @@ class CustomizationOperation(models.Model):
         self.ensure_one()
         if self.type == "add_field":
             self._check_add_field_operation()
+        elif self.type == SET_DEFAULT_TYPE:
+            self._check_set_default_operation()
         elif self.type in MENU_TYPES:
             self._check_menu_operation()
         elif self.type in PLACEMENT_TYPES + ATTRIBUTE_TYPES + STRUCTURE_TYPES + (
@@ -724,6 +780,18 @@ class CustomizationOperation(models.Model):
             )
         if payload.get("name"):
             ensure_field_name(self.env, payload["name"])
+
+    def _check_set_default_operation(self):
+        if not self.model_id:
+            raise ValidationError(self.env._("A model is required to set a default."))
+        if not (self.payload or {}).get("field_name"):
+            raise ValidationError(
+                self.env._("set_default requires payload.field_name.")
+            )
+        if self.state in ("draft", "applied"):
+            other = set_default_conflicts(self)
+            if other:
+                raise ValidationError(set_default_conflict_message(self, other))
 
     def _check_menu_operation(self):
         if not self.menu_id:
@@ -827,6 +895,9 @@ class CustomizationOperation(models.Model):
         )
         for operation in menu_ops:
             restore_menu_operation(operation)
+        default_ops = self.filtered(lambda rec: rec.type == SET_DEFAULT_TYPE)
+        for operation in default_ops:
+            restore_default_operation(operation)
         views = self.mapped("generated_view_id").exists()
         fields_to_drop = self.mapped("generated_field_id").exists()
         menus_to_drop = self.mapped("generated_menu_id").exists()

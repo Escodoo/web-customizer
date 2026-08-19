@@ -375,36 +375,39 @@ backend UI by clicking, then ship the result as a real addon in git.</p>
 <p>Customizations are stored as a <strong>ledger of intentions</strong>, not as fragile
 XPath blobs in the database.</p>
 <p>Each <em>bundle</em> groups operations for a client or project. Each
-<em>operation</em> declares an intent (<tt class="docutils literal">add_field</tt>, <tt class="docutils literal">place_field</tt>, hide a
-field, set a modifier) anchored on a <strong>semantic target</strong> (for example
-“after field <tt class="docutils literal">partner_id</tt>” on a named view). A compiler turns those
-operations into regular <tt class="docutils literal">ir.model.fields</tt> (<tt class="docutils literal">x_cust_*</tt>) and inherited
-views. Applied bundles can be <strong>exported</strong> as a plain Odoo addon to
-version in git.</p>
+<em>operation</em> declares an intent (<tt class="docutils literal">add_field</tt>, <tt class="docutils literal">set_default</tt>,
+<tt class="docutils literal">place_field</tt>, hide a field, set a modifier) anchored on a <strong>semantic
+target</strong> (for example “after field <tt class="docutils literal">partner_id</tt>” on a named view). A
+compiler turns those operations into regular <tt class="docutils literal">ir.model.fields</tt>
+(<tt class="docutils literal">x_cust_*</tt>), inherited views and global <tt class="docutils literal">ir.default</tt> records.
+Applied bundles can be <strong>exported</strong> as a plain Odoo addon to version in
+git.</p>
 <p>Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
 list column header, a kanban card field or button, a kanban header
 button or progressbar, or a search field to add a field, place an
 existing field, move a field the view already declares, add a notebook
 page or group, hide it, change its label, set a widget, restrict it to
-groups, or set modifiers. Click a navbar menu to hide it, rename it,
-restrict it to groups, add a sibling or submenu (bound to a window
-action with an XML ID), or move it after another menu or as a submenu.
-Duplicate names (for example two <tt class="docutils literal">email</tt> fields) are chosen in the
-dialog. That writes the same operations as the backend form.</p>
+groups, set a global default value, or set modifiers. Click a navbar
+menu to hide it, rename it, restrict it to groups, add a sibling or
+submenu (bound to a window action with an XML ID), or move it after
+another menu or as a submenu. Duplicate names (for example two <tt class="docutils literal">email</tt>
+fields) are chosen in the dialog. That writes the same operations as the
+backend form.</p>
 <p>On module update (<tt class="docutils literal"><span class="pre">-u</span></tt>), a health check re-resolves anchors
 automatically. Missing anchors are marked <tt class="docutils literal">broken</tt> with a reason;
 other operations are left intact. Customizations never disappear
 silently. Compiled artifacts own XML IDs under the bundle code, so
-uninstalling this module does not delete unexported fields, views or
-menus. Git still needs the exported addon. A hide, rename, groups or
-move write on a standard menu is exclusive per type: a second bundle
+uninstalling this module does not delete unexported fields, views, menus
+or defaults. Git still needs the exported addon. A hide, rename, groups
+or move write on a standard menu is exclusive per type: a second bundle
 cannot overwrite the same snapshot. The same rule applies to hide,
 label, widget, groups and modifier operations on a view node: two live
 inherits of the same type on the same anchor are refused. Two operations
 positioning the same field on one view are also refused, and so are two
-live sets of options on the same view root. Company on a bundle is only
-a filter tag; compiled records stay global.</p>
+live sets of options on the same view root. Two live defaults on the
+same model field are refused the same way. Company on a bundle is only a
+filter tag; compiled records stay global.</p>
 <p>Moving a field relocates the node the view already declares instead of
 adding a second copy, so it arrives with the widget, label and modifiers
 the base view gave it, and it returns to its original spot once the
@@ -540,7 +543,9 @@ menus (apps and sections with an XML ID) are also outlined. Click one
 to add a <strong>new</strong> field after it (or <strong>inside</strong> a page or group),
 <strong>place an existing field</strong>, add a <strong>page</strong> or <strong>group</strong>, hide it,
 change its label, set a widget, restrict it to groups (search by
-name), or set modifiers (invisible / readonly / required). Click a
+name), set a <strong>default value</strong> (global <tt class="docutils literal">ir.default</tt>, empty text is
+a real empty default), or set modifiers (invisible / readonly /
+required). Related fields ignore defaults and are refused. Click a
 <strong>menu</strong> to hide it, rename it, restrict it to groups, add a
 <strong>sibling menu</strong> after it, add a <strong>submenu</strong>, or <strong>move</strong> it after
 another menu or as a submenu. New menus need a window action that
@@ -610,17 +615,20 @@ that column (label, help and required update in place).</li>
 click <strong>Download ZIP</strong> and put that module in git; it does not depend
 on this module at runtime. Compiled fields, views and menus store
 their XML IDs under the bundle <tt class="docutils literal">code</tt> (the future addon name).
-Uninstalling <tt class="docutils literal">web_customizer</tt> leaves those records in the database.
-Unlink a bundle or operation to undo a customization. Hide, rename,
-groups and move write the standard <tt class="docutils literal">ir.ui.menu</tt> record; only one
-live operation of each type may target the same menu, so two bundles
-cannot overwrite each other. Unlink restores that snapshot. Hide,
-label, widget, groups and modifier operations on a view node are
-exclusive the same way: only one live operation of each type may
-target the same anchor, so two bundles cannot compile two inherits
-for the same hide. Placing or moving the same field twice on the same
-view is refused the same way, and so is a second live set of view
-options on the same root.</li>
+Uninstalling <tt class="docutils literal">web_customizer</tt> leaves those records in the database,
+defaults included. Unlink a bundle or operation to undo a
+customization. Hide, rename, groups and move write the standard
+<tt class="docutils literal">ir.ui.menu</tt> record; only one live operation of each type may
+target the same menu, so two bundles cannot overwrite each other.
+Unlink restores that snapshot. Hide, label, widget, groups and
+modifier operations on a view node are exclusive the same way: only
+one live operation of each type may target the same anchor, so two
+bundles cannot compile two inherits for the same hide. Placing or
+moving the same field twice on the same view is refused the same way,
+and so is a second live set of view options on the same root. A
+second live default on the same model field is refused; unlink
+restores the native <tt class="docutils literal">ir.default</tt> when the bundle had overwritten
+one.</li>
 </ol>
 <div class="section" id="single-company-pilot">
 <h2><a class="toc-backref" href="#toc-entry-4">Single-company pilot</a></h2>
@@ -649,6 +657,9 @@ grouped kanban, drop quick-create or the create of a column.</li>
 <li><strong>Button</strong> — on a form header, add a button calling an action the
 database already has, and check the exported manifest depends on the
 module owning it.</li>
+<li><strong>Default</strong> — click a field and choose <strong>Set default value</strong>. Check
+a new record picks it up. Unlink the operation to drop or restore
+the previous global default.</li>
 <li>Click <strong>Apply</strong>. Broken operations show <tt class="docutils literal">broken_reason</tt>; fix the
 anchor and run <strong>Health Check</strong> (or <strong>Re-apply</strong>).</li>
 <li>Click <strong>Export Addon</strong> → <strong>Download ZIP</strong>.</li>
@@ -737,6 +748,10 @@ the list.</li>
 <li>A button calling an action that already exists can be added to a form,
 a list or a kanban; the arch keeps the XML ID, so the export depends
 on the module owning the action.</li>
+<li>A field can be given a global default (<tt class="docutils literal">ir.default</tt>). The value is
+validated, related fields are refused, and the export writes
+<tt class="docutils literal">data/ir_default.xml</tt>. Unlink restores a native default the bundle
+overwrote.</li>
 </ul>
 </div>
 </div>

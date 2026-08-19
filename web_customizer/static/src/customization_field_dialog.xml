@@ -469,6 +469,47 @@
                         />
                     </div>
                 </t>
+                <t t-if="state.action === 'set_default'">
+                    <div class="mb-3" t-if="isMany2oneDefault">
+                        <label class="form-label">Default record</label>
+                        <RecordSelector
+                            resId="state.defaultRecordId"
+                            resModel="state.fieldRelation"
+                            update.bind="onDefaultRecordUpdate"
+                            fieldString.translate="Default record"
+                            placeholder.translate="Search a record..."
+                        />
+                    </div>
+                    <div class="mb-3" t-elif="isBooleanDefault">
+                        <label class="form-label">Default value</label>
+                        <select
+                            class="form-select o_esc_default_value"
+                            t-on-change="(ev) => state.defaultValue = ev.target.value"
+                        >
+                            <option
+                                value="false"
+                                t-att-selected="state.defaultValue !== 'true'"
+                            >False</option>
+                            <option
+                                value="true"
+                                t-att-selected="state.defaultValue === 'true'"
+                            >True</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" t-else="">
+                        <label class="form-label">Default value</label>
+                        <input
+                            type="text"
+                            class="form-control o_esc_default_value"
+                            t-att-value="state.defaultValue"
+                            t-on-input="(ev) => state.defaultValue = ev.target.value"
+                        />
+                    </div>
+                    <div class="form-text">
+                        Applies to every new record. Leave empty for an empty
+                        text default. Unlink the operation to drop it.
+                    </div>
+                </t>
                 <t t-if="state.action === 'set_widget'">
                     <div class="mb-3">
                         <label class="form-label">Widget</label>

@@ -32,3 +32,7 @@ First public Beta.
 - A button calling an action that already exists can be added to a form, a
   list or a kanban; the arch keeps the XML ID, so the export depends on
   the module owning the action.
+- A field can be given a global default (``ir.default``). The value is
+  validated, related fields are refused, and the export writes
+  ``data/ir_default.xml``. Unlink restores a native default the bundle
+  overwrote.

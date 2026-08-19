@@ -73,6 +73,7 @@ const PAYLOAD_BUILDERS = {
     set_optional: "payloadForOptional",
     set_groups: "payloadForGroups",
     set_modifier: "payloadForModifiers",
+    set_default: "payloadForDefault",
 };
 
 export class CustomizationFieldDialog extends Component {
@@ -145,6 +146,11 @@ export class CustomizationFieldDialog extends Component {
             anchorPage: "",
             subviewInline: true,
             fieldSubview: false,
+            fieldTtype: "",
+            fieldRelation: "",
+            fieldRelated: false,
+            defaultValue: "",
+            defaultRecordId: false,
             loadError: "",
         });
         onWillStart(async () => {
@@ -174,6 +180,9 @@ export class CustomizationFieldDialog extends Component {
         this.state.anchorUnique = Boolean(info.anchor_unique);
         this.state.subviewInline = info.subview_inline !== false;
         this.state.fieldSubview = info.field_subview || false;
+        this.state.fieldTtype = info.field_ttype || "";
+        this.state.fieldRelation = info.field_relation || "";
+        this.state.fieldRelated = Boolean(info.field_related);
         this.state.candidates = info.candidates || [];
         if (this.state.candidates.length) {
             this.state.anchorIndex = this.state.candidates[0].index;
@@ -369,6 +378,7 @@ export class CustomizationFieldDialog extends Component {
                 {value: "rename", label: _t("Change label")},
                 {value: "set_widget", label: _t("Set widget")},
                 {value: "set_groups", label: _t("Restrict to groups")},
+                ...this.defaultActionOption,
             ];
         }
         return this.fieldActions;
@@ -384,6 +394,7 @@ export class CustomizationFieldDialog extends Component {
             {value: "set_widget", label: _t("Set widget")},
             {value: "set_groups", label: _t("Restrict to groups")},
             {value: "set_modifier", label: _t("Set modifiers")},
+            ...this.defaultActionOption,
         ];
         if ((this.props.viewType || "form") === "form") {
             fieldActions.splice(3, 0, {
@@ -420,6 +431,25 @@ export class CustomizationFieldDialog extends Component {
             });
         }
         return fieldActions;
+    }
+
+    get defaultActionOption() {
+        if (this.state.fieldRelated) {
+            return [];
+        }
+        return [{value: "set_default", label: _t("Set default value")}];
+    }
+
+    get isMany2oneDefault() {
+        return this.state.fieldTtype === "many2one" && this.state.fieldRelation;
+    }
+
+    get isBooleanDefault() {
+        return this.state.fieldTtype === "boolean";
+    }
+
+    onDefaultRecordUpdate(resId) {
+        this.state.defaultRecordId = resId || false;
     }
 
     get existingFieldDomain() {
@@ -689,6 +719,16 @@ export class CustomizationFieldDialog extends Component {
             return false;
         }
         return {group_ids: this.state.groupIds};
+    }
+
+    payloadForDefault() {
+        if (this.isMany2oneDefault) {
+            return {value: this.state.defaultRecordId || false};
+        }
+        if (this.isBooleanDefault) {
+            return {value: this.state.defaultValue === "true"};
+        }
+        return {value: this.state.defaultValue};
     }
 
     payloadForAction() {

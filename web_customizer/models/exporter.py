@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import io
+import json
 import re
 import zipfile
 from xml.sax.saxutils import escape
@@ -10,7 +11,14 @@ from lxml import etree
 
 from odoo.exceptions import UserError
 
-from .compiler import MENU_TYPES, field_xmlid_name, menu_xmlid_name, view_xmlid_name
+from .compiler import (
+    MENU_TYPES,
+    SET_DEFAULT_TYPE,
+    default_xmlid_name,
+    field_xmlid_name,
+    menu_xmlid_name,
+    view_xmlid_name,
+)
 
 XML_HEADER = """<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2026 Escodoo
@@ -48,11 +56,14 @@ def export_bundle_files(bundle):
     fields = operations.mapped("generated_field_id").exists()
     views = operations.mapped("generated_view_id").filtered("active").exists()
     menu_ops = operations.filtered(lambda o: o.type in MENU_TYPES and o.menu_id)
-    if not fields and not views and not menu_ops:
+    default_ops = operations.filtered(
+        lambda o: o.type == SET_DEFAULT_TYPE and o.generated_default_id
+    )
+    if not fields and not views and not menu_ops and not default_ops:
         raise UserError(
             bundle.env._(
                 "Applied operations in bundle '%s' did not generate "
-                "fields, views or menus."
+                "fields, views, menus or defaults."
             )
             % bundle.code
         )
@@ -78,6 +89,11 @@ def export_bundle_files(bundle):
         files["data/ir_ui_menu.xml"] = _menus_xml(menu_ops)
         data_files.append("data/ir_ui_menu.xml")
         depends.update(_menu_modules(menu_ops))
+
+    if default_ops:
+        files["data/ir_default.xml"] = _defaults_xml(default_ops)
+        data_files.append("data/ir_default.xml")
+        depends.update(_default_modules(default_ops))
 
     files["__manifest__.py"] = _manifest(bundle, sorted(depends), data_files)
     return files
@@ -372,3 +388,61 @@ def _add_menu_record(operation):
         lines.append(f'        <field name="sequence" eval="{sequence}"/>')
     lines.append("    </record>")
     return "\n".join(lines)
+
+
+def _defaults_xml(operations):
+    records = "\n".join(_default_record(operation) for operation in operations)
+    return f"{XML_HEADER}<odoo>\n{records}\n</odoo>\n"
+
+
+def _default_record(operation):
+    default = operation.generated_default_id
+    field = default.field_id
+    field_ref = _default_field_ref(field, operation.bundle_id.code)
+    xmlid = default_xmlid_name(operation)
+    payload = operation.payload or {}
+    value_xmlid = (payload.get("value_xmlid") or "").strip()
+    lines = [
+        f'    <record id="{escape(xmlid)}" model="ir.default">',
+        f'        <field name="field_id" ref="{escape(field_ref)}"/>',
+    ]
+    if value_xmlid:
+        lines.append(f'        <field name="json_value" eval="ref({value_xmlid!r})"/>')
+    else:
+        json_value = default.json_value
+        if json_value is False:
+            json_value = json.dumps(payload.get("value"), ensure_ascii=False)
+        lines.append(f'        <field name="json_value">{escape(json_value)}</field>')
+    lines.append("    </record>")
+    return "\n".join(lines)
+
+
+def _default_field_ref(field, bundle_code):
+    """Return a field XML ID, local when the field belongs to this addon."""
+    xmlid = field.get_external_id().get(field.id)
+    if xmlid:
+        module, name = xmlid.split(".", 1) if "." in xmlid else ("", xmlid)
+        if module == bundle_code:
+            return name
+        return xmlid
+    if (field.name or "").startswith("x_cust_"):
+        return field_xmlid_name(field)
+    raise UserError(
+        field.env._("Field '%s' has no XML ID and cannot be exported.")
+        % f"{field.model}.{field.name}"
+    )
+
+
+def _default_modules(operations):
+    """Modules owning the defaulted fields and many2one value XML IDs."""
+    modules = set()
+    for operation in operations:
+        default = operation.generated_default_id
+        if default and default.field_id:
+            xmlid = default.field_id.get_external_id().get(default.field_id.id)
+            _add_xmlid_module(modules, xmlid)
+        _add_xmlid_module(modules, (operation.payload or {}).get("value_xmlid"))
+        if operation.model_id:
+            modules.update(_model_modules(operation.model_id))
+    modules.discard(operations[:1].bundle_id.code)
+    return modules

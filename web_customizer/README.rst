@@ -29,12 +29,13 @@ Customizations are stored as a **ledger of intentions**, not as fragile
 XPath blobs in the database.
 
 Each *bundle* groups operations for a client or project. Each
-*operation* declares an intent (``add_field``, ``place_field``, hide a
-field, set a modifier) anchored on a **semantic target** (for example
-“after field ``partner_id``\ ” on a named view). A compiler turns those
-operations into regular ``ir.model.fields`` (``x_cust_*``) and inherited
-views. Applied bundles can be **exported** as a plain Odoo addon to
-version in git.
+*operation* declares an intent (``add_field``, ``set_default``,
+``place_field``, hide a field, set a modifier) anchored on a **semantic
+target** (for example “after field ``partner_id``\ ” on a named view). A
+compiler turns those operations into regular ``ir.model.fields``
+(``x_cust_*``), inherited views and global ``ir.default`` records.
+Applied bundles can be **exported** as a plain Odoo addon to version in
+git.
 
 Customization managers can turn on customization mode from the systray
 and click a field, page tab, group title, or named button on a form, a
@@ -42,25 +43,27 @@ list column header, a kanban card field or button, a kanban header
 button or progressbar, or a search field to add a field, place an
 existing field, move a field the view already declares, add a notebook
 page or group, hide it, change its label, set a widget, restrict it to
-groups, or set modifiers. Click a navbar menu to hide it, rename it,
-restrict it to groups, add a sibling or submenu (bound to a window
-action with an XML ID), or move it after another menu or as a submenu.
-Duplicate names (for example two ``email`` fields) are chosen in the
-dialog. That writes the same operations as the backend form.
+groups, set a global default value, or set modifiers. Click a navbar
+menu to hide it, rename it, restrict it to groups, add a sibling or
+submenu (bound to a window action with an XML ID), or move it after
+another menu or as a submenu. Duplicate names (for example two ``email``
+fields) are chosen in the dialog. That writes the same operations as the
+backend form.
 
 On module update (``-u``), a health check re-resolves anchors
 automatically. Missing anchors are marked ``broken`` with a reason;
 other operations are left intact. Customizations never disappear
 silently. Compiled artifacts own XML IDs under the bundle code, so
-uninstalling this module does not delete unexported fields, views or
-menus. Git still needs the exported addon. A hide, rename, groups or
-move write on a standard menu is exclusive per type: a second bundle
+uninstalling this module does not delete unexported fields, views, menus
+or defaults. Git still needs the exported addon. A hide, rename, groups
+or move write on a standard menu is exclusive per type: a second bundle
 cannot overwrite the same snapshot. The same rule applies to hide,
 label, widget, groups and modifier operations on a view node: two live
 inherits of the same type on the same anchor are refused. Two operations
 positioning the same field on one view are also refused, and so are two
-live sets of options on the same view root. Company on a bundle is only
-a filter tag; compiled records stay global.
+live sets of options on the same view root. Two live defaults on the
+same model field are refused the same way. Company on a bundle is only a
+filter tag; compiled records stay global.
 
 Moving a field relocates the node the view already declares instead of
 adding a second copy, so it arrives with the widget, label and modifiers
@@ -193,7 +196,9 @@ Usage
    to add a **new** field after it (or **inside** a page or group),
    **place an existing field**, add a **page** or **group**, hide it,
    change its label, set a widget, restrict it to groups (search by
-   name), or set modifiers (invisible / readonly / required). Click a
+   name), set a **default value** (global ``ir.default``, empty text is
+   a real empty default), or set modifiers (invisible / readonly /
+   required). Related fields ignore defaults and are refused. Click a
    **menu** to hide it, rename it, restrict it to groups, add a
    **sibling menu** after it, add a **submenu**, or **move** it after
    another menu or as a submenu. New menus need a window action that
@@ -263,17 +268,20 @@ Usage
    click **Download ZIP** and put that module in git; it does not depend
    on this module at runtime. Compiled fields, views and menus store
    their XML IDs under the bundle ``code`` (the future addon name).
-   Uninstalling ``web_customizer`` leaves those records in the database.
-   Unlink a bundle or operation to undo a customization. Hide, rename,
-   groups and move write the standard ``ir.ui.menu`` record; only one
-   live operation of each type may target the same menu, so two bundles
-   cannot overwrite each other. Unlink restores that snapshot. Hide,
-   label, widget, groups and modifier operations on a view node are
-   exclusive the same way: only one live operation of each type may
-   target the same anchor, so two bundles cannot compile two inherits
-   for the same hide. Placing or moving the same field twice on the same
-   view is refused the same way, and so is a second live set of view
-   options on the same root.
+   Uninstalling ``web_customizer`` leaves those records in the database,
+   defaults included. Unlink a bundle or operation to undo a
+   customization. Hide, rename, groups and move write the standard
+   ``ir.ui.menu`` record; only one live operation of each type may
+   target the same menu, so two bundles cannot overwrite each other.
+   Unlink restores that snapshot. Hide, label, widget, groups and
+   modifier operations on a view node are exclusive the same way: only
+   one live operation of each type may target the same anchor, so two
+   bundles cannot compile two inherits for the same hide. Placing or
+   moving the same field twice on the same view is refused the same way,
+   and so is a second live set of view options on the same root. A
+   second live default on the same model field is refused; unlink
+   restores the native ``ir.default`` when the bundle had overwritten
+   one.
 
 Single-company pilot
 --------------------
@@ -303,10 +311,13 @@ leave this module as the production runtime.
 9.  **Button** — on a form header, add a button calling an action the
     database already has, and check the exported manifest depends on the
     module owning it.
-10. Click **Apply**. Broken operations show ``broken_reason``; fix the
+10. **Default** — click a field and choose **Set default value**. Check
+    a new record picks it up. Unlink the operation to drop or restore
+    the previous global default.
+11. Click **Apply**. Broken operations show ``broken_reason``; fix the
     anchor and run **Health Check** (or **Re-apply**).
-11. Click **Export Addon** → **Download ZIP**.
-12. Install that module on staging (``-i <bundle.code>``). Do not
+12. Click **Export Addon** → **Download ZIP**.
+13. Install that module on staging (``-i <bundle.code>``). Do not
     install ``web_customizer`` there unless the wand is still needed.
 
 Graph operations are written from the operation form rather than in
@@ -394,6 +405,10 @@ First public Beta.
 - A button calling an action that already exists can be added to a form,
   a list or a kanban; the arch keeps the XML ID, so the export depends
   on the module owning the action.
+- A field can be given a global default (``ir.default``). The value is
+  validated, related fields are refused, and the export writes
+  ``data/ir_default.xml``. Unlink restores a native default the bundle
+  overwrote.
 
 Bug Tracker
 ===========

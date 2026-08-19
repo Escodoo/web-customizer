@@ -13,8 +13,10 @@
    **new** field after it (or **inside** a page or group), **place an
    existing field**,
    add a **page** or **group**, hide it, change its label, set a widget,
-   restrict it to groups (search by name), or set modifiers (invisible /
-   readonly / required). Click a **menu** to hide it, rename it, restrict
+   restrict it to groups (search by name), set a **default value** (global
+   ``ir.default``, empty text is a real empty default), or set modifiers
+   (invisible / readonly / required). Related fields ignore defaults and
+   are refused. Click a **menu** to hide it, rename it, restrict
    it to groups, add a **sibling menu** after it, add a **submenu**, or
    **move** it after another menu or as a submenu. New menus need a
    window action that already has an XML ID. The destination of a move
@@ -84,7 +86,8 @@
    **Download ZIP** and put that module in git; it does not depend on this
    module at runtime. Compiled fields, views and menus store their XML IDs
    under the bundle ``code`` (the future addon name). Uninstalling
-   ``web_customizer`` leaves those records in the database. Unlink a bundle or
+   ``web_customizer`` leaves those records in the database, defaults included.
+   Unlink a bundle or
    operation to undo a customization. Hide, rename, groups and move write
    the standard ``ir.ui.menu`` record; only one live operation of each
    type may target the same menu, so two bundles cannot overwrite each
@@ -94,6 +97,8 @@
    bundles cannot compile two inherits for the same hide. Placing or
    moving the same field twice on the same view is refused the same way,
    and so is a second live set of view options on the same root.
+   A second live default on the same model field is refused; unlink
+   restores the native ``ir.default`` when the bundle had overwritten one.
 
 ## Single-company pilot
 
@@ -120,10 +125,13 @@ leave this module as the production runtime.
 9. **Button** — on a form header, add a button calling an action the
    database already has, and check the exported manifest depends on the
    module owning it.
-10. Click **Apply**. Broken operations show `broken_reason`; fix the
+10. **Default** — click a field and choose **Set default value**. Check
+   a new record picks it up. Unlink the operation to drop or restore
+   the previous global default.
+11. Click **Apply**. Broken operations show `broken_reason`; fix the
    anchor and run **Health Check** (or **Re-apply**).
-11. Click **Export Addon** → **Download ZIP**.
-12. Install that module on staging (`-i <bundle.code>`). Do not install
+12. Click **Export Addon** → **Download ZIP**.
+13. Install that module on staging (`-i <bundle.code>`). Do not install
    `web_customizer` there unless the wand is still needed.
 
 Graph operations are written from the operation form rather than in

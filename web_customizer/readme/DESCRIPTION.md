@@ -5,10 +5,11 @@ Customizations are stored as a **ledger of intentions**, not as fragile
 XPath blobs in the database.
 
 Each *bundle* groups operations for a client or project. Each *operation*
-declares an intent (`add_field`, `place_field`, hide a field, set a modifier)
-anchored on a **semantic target** (for example “after field `partner_id`” on a
-named view). A compiler turns those operations into regular `ir.model.fields`
-(`x_cust_*`) and inherited views. Applied bundles can be **exported** as a
+declares an intent (`add_field`, `set_default`, `place_field`, hide a field,
+set a modifier) anchored on a **semantic target** (for example “after field
+`partner_id`” on a named view). A compiler turns those operations into
+regular `ir.model.fields` (`x_cust_*`), inherited views and global
+`ir.default` records. Applied bundles can be **exported** as a
 plain Odoo addon to version in git.
 
 Customization managers can turn on customization mode from the systray and
@@ -17,7 +18,8 @@ header, a kanban card field or button, a kanban header button or
 progressbar, or a search field to add a field, place an
 existing field, move a field the view already declares, add a notebook page
 or group, hide it, change its label, set a
-widget, restrict it to groups, or set modifiers. Click a navbar menu to hide
+widget, restrict it to groups, set a global default value, or set modifiers.
+Click a navbar menu to hide
 it, rename it, restrict it to groups, add a sibling or submenu (bound to a
 window action with an XML ID), or move it after another menu or as a
 submenu. Duplicate names (for example two `email`
@@ -28,14 +30,15 @@ On module update (`-u`), a health check re-resolves anchors automatically.
 Missing anchors are marked `broken` with a reason; other operations are left
 intact. Customizations never disappear silently. Compiled artifacts own XML
 IDs under the bundle code, so uninstalling this module does not delete
-unexported fields, views or menus. Git still needs the exported addon.
+unexported fields, views, menus or defaults. Git still needs the exported addon.
 A hide, rename, groups or move write on a standard menu is exclusive
 per type: a second bundle cannot overwrite the same snapshot.
 The same rule applies to hide, label, widget, groups and modifier
 operations on a view node: two live inherits of the same type on the
 same anchor are refused. Two operations positioning the same field on one
 view are also refused, and so are two live sets of options on the same
-view root. Company on a bundle is only a filter tag; compiled
+view root. Two live defaults on the same model field are refused
+the same way. Company on a bundle is only a filter tag; compiled
 records stay global.
 
 Moving a field relocates the node the view already declares instead of

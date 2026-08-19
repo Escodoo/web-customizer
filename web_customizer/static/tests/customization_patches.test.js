@@ -838,3 +838,46 @@ test("dialog reports RPC failures and stays open", async () => {
     expect.verifySteps(["danger:Could not apply customization."]);
     expect(".o_esc_customization_dialog").toHaveCount(1);
 });
+
+test("the dialog sends a default value for the clicked field", async () => {
+    mockService("orm", {
+        async call(model, method, args) {
+            if (method === "get_ui_context") {
+                return {
+                    bundles: [{id: 1, name: "Sandbox"}],
+                    anchor_count: 1,
+                    anchor_unique: true,
+                    candidates: [],
+                    field_ttype: "char",
+                };
+            }
+            if (method === "create_from_ui") {
+                const params = args[0];
+                expect.step([params.action, JSON.stringify(params.payload)].join("|"));
+                return {operation_ids: [1], broken: []};
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+        async read() {
+            return [];
+        },
+    });
+    const env = await makeDialogMockEnv();
+    await mountWithCleanup(CustomizationFieldDialog, {
+        env,
+        props: {
+            close() {
+                expect.step("close");
+            },
+            fieldName: "email",
+            fieldLabel: "Email",
+            model: "partner",
+            viewId: 1,
+            viewType: "form",
+        },
+    });
+    await contains(".o_esc_action_select").select("set_default");
+    await contains(".o_esc_default_value").edit("site@example.com");
+    await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps(['set_default|{"value":"site@example.com"}', "close"]);
+});

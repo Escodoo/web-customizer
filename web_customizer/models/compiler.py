@@ -111,6 +111,9 @@ MENU_WRITE_LABELS = {
     "set_menu_groups": "Set Menu Groups",
     "move_menu": "Move Menu",
 }
+# A default is global (no user, company or condition) and lives on the
+# model field, not on a view node.
+SET_DEFAULT_TYPE = "set_default"
 ATTRIBUTE_TYPES = (
     "set_string",
     "set_widget",
@@ -689,6 +692,8 @@ def health_check_operation(operation):
     """
     if operation.type == "add_field":
         return True, ""
+    if operation.type == SET_DEFAULT_TYPE:
+        return _health_check_set_default(operation)
     if operation.type in MENU_TYPES:
         return _health_check_menu(operation)
     if operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
@@ -741,12 +746,20 @@ def menu_xmlid_name(operation):
     return f"menu_{slug}_{operation.id}"
 
 
+def default_xmlid_name(operation):
+    """Stable XML ID name for a generated global ir.default."""
+    model_key = (operation.model or "").replace(".", "_")
+    field_name = _payload(operation).get("field_name") or "field"
+    field_key = re.sub(r"[^a-zA-Z0-9_]+", "_", field_name).strip("_") or "field"
+    return f"default_{model_key}_{field_key}"
+
+
 def ensure_generated_xmlid(env, module, name, record):
     """Point ``module.name`` at ``record``, migrating a legacy xmlid if needed.
 
     Generated artifacts belong to the bundle code (the future exported
     addon), not to ``web_customizer``. Uninstalling this module
-    must not cascade-delete compiled fields, views or menus.
+    must not cascade-delete compiled fields, views, menus or defaults.
     """
     Imd = env["ir.model.data"].sudo()
     wanted = Imd.search([("module", "=", module), ("name", "=", name)], limit=1)
@@ -809,6 +822,13 @@ def bind_generated_xmlids(operation):
             menu_xmlid_name(operation),
             operation.generated_menu_id,
         )
+    if operation.generated_default_id:
+        ensure_generated_xmlid(
+            operation.env,
+            module,
+            default_xmlid_name(operation),
+            operation.generated_default_id,
+        )
 
 
 def rebind_generated_xmlids(env):
@@ -820,9 +840,11 @@ def rebind_generated_xmlids(env):
             [
                 "|",
                 "|",
+                "|",
                 ("generated_view_id", "!=", False),
                 ("generated_field_id", "!=", False),
                 ("generated_menu_id", "!=", False),
+                ("generated_default_id", "!=", False),
             ]
         )
     )
@@ -863,6 +885,8 @@ def apply_operation(operation):
     """Compile one operation into ir.model.fields / ir.ui.view records."""
     if operation.type == "add_field":
         _apply_add_field(operation)
+    elif operation.type == SET_DEFAULT_TYPE:
+        _apply_set_default(operation)
     elif operation.type in MENU_TYPES:
         _apply_menu(operation)
     elif operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
@@ -1248,6 +1272,273 @@ def restore_menu_operation(operation):
         vals["sequence"] = previous["sequence"]
     if vals:
         menu.write(vals)
+
+
+def set_default_conflicts(operation):
+    """Return another live global default on the same model field."""
+    Operation = operation.env["customization.operation"]
+    field_name = (_payload(operation).get("field_name") or "").strip()
+    if operation.type != SET_DEFAULT_TYPE or not operation.model_id or not field_name:
+        return Operation.browse()
+    domain = [
+        ("type", "=", SET_DEFAULT_TYPE),
+        ("model_id", "=", operation.model_id.id),
+        ("state", "in", ("draft", "applied")),
+    ]
+    if operation.id:
+        domain.append(("id", "!=", operation.id))
+    others = Operation.search(domain)
+    return others.filtered(
+        lambda rec: (_payload(rec).get("field_name") or "").strip() == field_name
+    )[:1]
+
+
+def set_default_conflict_message(operation, other):
+    """Explain which bundle already owns this global default."""
+    field_name = (_payload(operation).get("field_name") or "").strip()
+    return operation.env._(
+        "Bundle '%(bundle)s' already sets a default on '%(model)s.%(field)s'."
+    ) % {
+        "bundle": other.bundle_id.code,
+        "model": operation.model,
+        "field": field_name,
+    }
+
+
+def assert_no_set_default_conflict(operation):
+    """Refuse a second live default on the same model field."""
+    other = set_default_conflicts(operation)
+    if other:
+        raise UserError(set_default_conflict_message(operation, other))
+
+
+def _set_default_field(operation):
+    """Return ``(model, field)`` or raise if the target cannot take a default."""
+    field_name = (_payload(operation).get("field_name") or "").strip()
+    if not field_name:
+        raise UserError(operation.env._("set_default requires payload.field_name."))
+    if not operation.model:
+        raise UserError(operation.env._("A model is required to set a default."))
+    try:
+        model = operation.env[operation.model]
+    except KeyError as err:
+        raise UserError(
+            operation.env._("Model '%s' is missing.") % operation.model
+        ) from err
+    field = model._fields.get(field_name)
+    if field is None:
+        raise UserError(
+            operation.env._("Field '%(model)s.%(field)s' is missing.")
+            % {"model": operation.model, "field": field_name}
+        )
+    if field.related:
+        raise UserError(
+            operation.env._("Related field '%(model)s.%(field)s' ignores defaults.")
+            % {"model": operation.model, "field": field_name}
+        )
+    return model, field
+
+
+def _set_default_value(operation, field):
+    """Return the Python value ``ir.default.set`` should store."""
+    payload = _payload(operation)
+    value_xmlid = (payload.get("value_xmlid") or "").strip()
+    if value_xmlid:
+        if field.type != "many2one":
+            raise UserError(
+                operation.env._("value_xmlid is only valid on a many2one field.")
+            )
+        try:
+            record = operation.env.ref(value_xmlid)
+        except ValueError as err:
+            raise UserError(
+                operation.env._("Record '%s' is missing.") % value_xmlid
+            ) from err
+        if record._name != field.comodel_name:
+            raise UserError(
+                operation.env._("Record '%(xmlid)s' is a %(got)s, not a %(want)s.")
+                % {
+                    "xmlid": value_xmlid,
+                    "got": record._name,
+                    "want": field.comodel_name,
+                }
+            )
+        return record.id
+    if "value" not in payload:
+        return ""
+    return _coerce_default_value(operation, field, payload.get("value"))
+
+
+def _coerce_default_value(operation, field, value):
+    """Turn a UI string or raw payload into something ``convert_to_cache`` accepts."""
+    coercers = {
+        "boolean": _coerce_boolean_default,
+        "integer": _coerce_integer_default,
+        "float": _coerce_float_default,
+        "monetary": _coerce_float_default,
+        "many2one": _coerce_many2one_default,
+    }
+    coercer = coercers.get(field.type)
+    if coercer:
+        return coercer(operation, field, value)
+    if value is False or value is None:
+        return ""
+    return value
+
+
+def _coerce_boolean_default(operation, _field, value):
+    if isinstance(value, bool):
+        return value
+    text = str(value or "").strip().lower()
+    if text in ("1", "true", "yes"):
+        return True
+    if text in ("0", "false", "no", ""):
+        return False
+    raise UserError(
+        operation.env._("Boolean default must be true or false, not '%s'.") % value
+    )
+
+
+def _coerce_integer_default(operation, _field, value):
+    if value in (None, False, ""):
+        raise UserError(operation.env._("Integer default '%s' is invalid.") % value)
+    try:
+        return int(value)
+    except (TypeError, ValueError) as err:
+        raise UserError(
+            operation.env._("Integer default '%s' is invalid.") % value
+        ) from err
+
+
+def _coerce_float_default(operation, _field, value):
+    if value in (None, False, ""):
+        raise UserError(operation.env._("Float default '%s' is invalid.") % value)
+    try:
+        return float(value)
+    except (TypeError, ValueError) as err:
+        raise UserError(
+            operation.env._("Float default '%s' is invalid.") % value
+        ) from err
+
+
+def _coerce_many2one_default(operation, field, value):
+    if value in (None, False, ""):
+        raise UserError(
+            operation.env._("Select a record or an XML ID for this default.")
+        )
+    if isinstance(value, int):
+        return value
+    text = str(value).strip()
+    if text.isdigit():
+        return int(text)
+    try:
+        record = operation.env.ref(text)
+    except ValueError as err:
+        raise UserError(operation.env._("Record '%s' is missing.") % text) from err
+    if record._name != field.comodel_name:
+        raise UserError(
+            operation.env._("Record '%(xmlid)s' is a %(got)s, not a %(want)s.")
+            % {
+                "xmlid": text,
+                "got": record._name,
+                "want": field.comodel_name,
+            }
+        )
+    return record.id
+
+
+def _validate_default_value(operation, field, value):
+    """Refuse a value ``ir.default`` would reject."""
+    model = operation.env[operation.model]
+    try:
+        field.convert_to_cache(value, model)
+    except (TypeError, ValueError, ValidationError) as err:
+        raise UserError(
+            operation.env._("Invalid default for %(model)s.%(field)s: %(value)s")
+            % {
+                "model": operation.model,
+                "field": field.name,
+                "value": value,
+            }
+        ) from err
+
+
+def _global_default(env, field_rec):
+    """Return the unique global ``ir.default`` for ``field_rec``, if any."""
+    return (
+        env["ir.default"]
+        .sudo()
+        .search(
+            [
+                ("field_id", "=", field_rec.id),
+                ("user_id", "=", False),
+                ("company_id", "=", False),
+                ("condition", "=", False),
+            ],
+            limit=1,
+        )
+    )
+
+
+def _health_check_set_default(operation):
+    try:
+        _model, field = _set_default_field(operation)
+        value = _set_default_value(operation, field)
+        _validate_default_value(operation, field, value)
+    except (UserError, ValidationError) as err:
+        return False, str(err)
+    return True, ""
+
+
+def _apply_set_default(operation):
+    """Create or update the global ``ir.default`` for the payload field."""
+    ok, reason = _health_check_set_default(operation)
+    if not ok:
+        raise UserError(reason)
+    assert_no_set_default_conflict(operation)
+    model, field = _set_default_field(operation)
+    value = _set_default_value(operation, field)
+    field_rec = operation.env["ir.model.fields"]._get(model._name, field.name)
+    if not field_rec:
+        raise UserError(
+            operation.env._("Field '%(model)s.%(field)s' is missing.")
+            % {"model": model._name, "field": field.name}
+        )
+    payload = dict(_payload(operation))
+    previous = dict(payload.get("previous") or {})
+    existing = _global_default(operation.env, field_rec)
+    owned = operation.generated_default_id.exists()
+    if existing and existing != owned:
+        previous.setdefault("json_value", existing.json_value)
+        previous.setdefault("created", False)
+    elif not existing and not owned:
+        previous.setdefault("created", True)
+    operation.env["ir.default"].sudo().set(model._name, field.name, value)
+    default = owned or _global_default(operation.env, field_rec)
+    if not default:
+        raise UserError(
+            operation.env._("Could not write the default for '%s'.") % field.name
+        )
+    operation.generated_default_id = default
+    payload["previous"] = previous
+    if field.type == "many2one" and not (payload.get("value_xmlid") or "").strip():
+        record = operation.env[field.comodel_name].browse(value)
+        xmlid = record.get_external_id().get(record.id)
+        if xmlid:
+            payload["value_xmlid"] = xmlid
+    operation.payload = payload
+
+
+def restore_default_operation(operation):
+    """Undo a global default using the snapshot stored on first apply."""
+    default = operation.generated_default_id.exists()
+    previous = (_payload(operation).get("previous")) or {}
+    if previous.get("created"):
+        if default:
+            default.sudo().unlink()
+        return
+    if default and "json_value" in previous:
+        default.sudo().write({"json_value": previous["json_value"]})
 
 
 def _add_field_schema_changed(field, ttype, related, payload):
