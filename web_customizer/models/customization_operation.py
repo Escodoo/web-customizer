@@ -173,6 +173,11 @@ class CustomizationOperation(models.Model):
     anchor_page = fields.Char(
         help="Parent notebook page name, used to disambiguate the anchor.",
     )
+    anchor_subview = fields.Char(
+        help="Name of the x2many field whose embedded subview holds the "
+        "anchor. The operation then targets the related model, while the "
+        "view stays the parent one.",
+    )
     position = fields.Selection(
         selection=[
             ("before", "Before"),
@@ -355,7 +360,13 @@ class CustomizationOperation(models.Model):
     generated_menu_id = fields.Many2one("ir.ui.menu", ondelete="set null", copy=False)
 
     @api.depends(
-        "type", "anchor_name", "anchor_string", "payload", "model_id", "menu_id"
+        "type",
+        "anchor_name",
+        "anchor_string",
+        "anchor_subview",
+        "payload",
+        "model_id",
+        "menu_id",
     )
     def _compute_name(self):
         for rec in self:
@@ -405,6 +416,8 @@ class CustomizationOperation(models.Model):
                 )
             else:
                 rec.name = f"{rec.type} on {anchor}"
+            if rec.anchor_subview and rec.type not in MENU_TYPES:
+                rec.name = f"{rec.name} (in {rec.anchor_subview})"
 
     @api.depends("payload")
     def _compute_payload_json(self):
@@ -655,6 +668,7 @@ class CustomizationOperation(models.Model):
         "anchor_kind",
         "anchor_occurrence",
         "anchor_page",
+        "anchor_subview",
         "payload",
         "model_id",
         "state",

@@ -188,6 +188,52 @@ class CustomizationCase(TransactionCase):
             }
         )
 
+    def _form_with_subview(self):
+        """Form whose x2many carries a written list, plus a name it shares."""
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.subview",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                                <field name="company_id"/>
+                            </group>
+                            <field name="bank_ids">
+                                <list>
+                                    <field name="acc_number"/>
+                                    <field name="company_id"/>
+                                </list>
+                            </field>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
+    def _form_with_referenced_subview(self):
+        """Form whose x2many borrows its list from a res.partner.bank view."""
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.subview.ref",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <field name="bank_ids"/>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
     def _form_with_group(self):
         return self.env["ir.ui.view"].create(
             {

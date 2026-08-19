@@ -31,6 +31,13 @@ patch(Field.prototype, {
         return names;
     },
     onCustomizationClick(ev) {
+        // This handler captures on the way down, so a column header of a
+        // table written inside the field would never see its own click.
+        // That header anchors on the related model, which is the more
+        // precise target, so leave it alone.
+        if (ev.target.closest?.(".o_field_x2many thead th[data-name]")) {
+            return;
+        }
         openCustomizationFor(this, this.props.name, ev);
     },
 });

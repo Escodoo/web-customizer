@@ -31,7 +31,17 @@
    selectors). If the same name appears more than once, choose the node
    in the dialog. A new page after a field is wrapped in a notebook; a
    new page after an existing tab is a sibling.
-3. Some settings belong to the view itself rather than to a node, so they
+3. A table inside a form (order lines, bank accounts, any x2many written
+   with its own ``<list>``) is customized in place: its column headers
+   are outlined too. A column belongs to the **related** model, so the
+   dialog adds or places fields there, while the inherit is written on
+   the form that declares the table. The same field name on the record
+   and in the table are separate anchors and never conflict. If the
+   table is not written in the form but taken from another view, the
+   dialog says so and names the model whose list view to open instead.
+   Options on the table itself (inline editing, hiding its Add a line)
+   are written from the operation form for now.
+4. Some settings belong to the view itself rather than to a node, so they
    have no outline to click. On a form, list or kanban, use **View
    options** in the customization banner. There you can stop users from
    creating, editing, deleting or duplicating records; a list can also
@@ -42,11 +52,11 @@
    back into a read-only one. Only options the arch parser of that view
    type reads are accepted: decorations exist on lists only, and pivot,
    graph and search views have none.
-4. Or add operations from the bundle form. Fill the payload fields for the
+5. Or add operations from the bundle form. Fill the payload fields for the
    selected type. The **Raw JSON** tab shows the stored intent. View
    options are written there as one `name=value` per line.
-5. Click **Apply** to compile fields and inherited views.
-6. After an Odoo upgrade (`-u`), a health check runs automatically and
+6. Click **Apply** to compile fields and inherited views.
+7. After an Odoo upgrade (`-u`), a health check runs automatically and
    re-resolves anchors. You can still click **Health Check** on the bundle.
    Missing anchors are marked broken (inherit deactivated) and show
    `broken_reason`. If the anchor comes back, Health Check rewrites the
@@ -54,7 +64,7 @@
    every live operation. Changing an `add_field` type or relation
    recreates the field and deletes values already stored in that
    column (label, help and required update in place).
-7. When the bundle is applied, click **Export Addon**. In the dialog, click
+8. When the bundle is applied, click **Export Addon**. In the dialog, click
    **Download ZIP** and put that module in git; it does not depend on this
    module at runtime. Compiled fields, views and menus store their XML IDs
    under the bundle ``code`` (the future addon name). Uninstalling
@@ -78,17 +88,20 @@ leave this module as the production runtime.
    button.
 2. **List** — add, hide, relabel a column, or make it optional so users
    can turn it on from the column picker.
-3. **Search** — add, hide or relabel a search chip, or add a filter with a
+3. **Embedded table** — on a form with order lines or bank accounts,
+   click a column header and add or relabel a column of the related
+   model.
+4. **Search** — add, hide or relabel a search chip, or add a filter with a
    domain or a group by.
-4. **Kanban** — hide a card field, a header button or the column progressbar.
-5. **Pivot** — click a measure header to relabel, hide or add a measure.
-6. **Menus** — hide, rename or move one navbar item that has an XML ID.
-7. **View options** — from the banner, drop the Create button on one list
+5. **Kanban** — hide a card field, a header button or the column progressbar.
+6. **Pivot** — click a measure header to relabel, hide or add a measure.
+7. **Menus** — hide, rename or move one navbar item that has an XML ID.
+8. **View options** — from the banner, drop the Create button on one list
    and colour its rows by a condition.
-8. Click **Apply**. Broken operations show `broken_reason`; fix the
+9. Click **Apply**. Broken operations show `broken_reason`; fix the
    anchor and run **Health Check** (or **Re-apply**).
-9. Click **Export Addon** → **Download ZIP**.
-10. Install that module on staging (`-i <bundle.code>`). Do not install
+10. Click **Export Addon** → **Download ZIP**.
+11. Install that module on staging (`-i <bundle.code>`). Do not install
    `web_customizer` there unless the wand is still needed.
 
 Graph operations are written from the operation form rather than in

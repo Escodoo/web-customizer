@@ -20,6 +20,7 @@ from .compiler import (
     resolve_related_field,
     slugify_field_suffix,
     source_unnamed_page_string,
+    xpath_quote,
 )
 
 UI_ACTIONS = (
@@ -168,7 +169,12 @@ class CustomizationBundle(models.Model):
 
     @api.model
     def get_ui_context(
-        self, view_id, anchor_name, anchor_kind="field", anchor_string=False
+        self,
+        view_id,
+        anchor_name,
+        anchor_kind="field",
+        anchor_string=False,
+        anchor_subview=False,
     ):
         """Return bundles and whether the semantic anchor is unique on the view."""
         self._check_ui_access()
@@ -176,12 +182,17 @@ class CustomizationBundle(models.Model):
         kind = anchor_kind or "field"
         name = (anchor_name or "").strip()
         title = (anchor_string or "").strip()
+        subview = (anchor_subview or "").strip()
         candidates = []
+        subview_inline = True
         if view.exists() and (name or title):
             if title and not name:
                 title = source_unnamed_page_string(view, title)
             tree = arch_tree(view.with_context(lang=None))
-            candidates = list_anchor_candidates(self.env, tree, name, kind, title)
+            if subview:
+                tree, subview_inline = self._ui_subview_tree(tree, subview)
+            if tree is not None:
+                candidates = list_anchor_candidates(self.env, tree, name, kind, title)
         count = len(candidates)
         bundles = self.search_read(
             [],
@@ -195,7 +206,22 @@ class CustomizationBundle(models.Model):
             "anchor_unique": count == 1,
             "anchor_kind": kind,
             "candidates": candidates,
+            "subview_inline": subview_inline,
         }
+
+    def _ui_subview_tree(self, tree, subview):
+        """Narrow the arch to an embedded subview, if this view carries one.
+
+        Odoo embeds the subview of an x2many field when it serves the parent
+        view, so a client cannot tell a written subview from a borrowed one.
+        Only the written one lives in this arch.
+        """
+        nodes = tree.xpath(
+            f".//field[@name={xpath_quote(subview)}]" f"/*[self::list or self::kanban]"
+        )
+        if not nodes:
+            return None, False
+        return nodes[0], True
 
     @api.model
     def create_from_ui(self, params):
@@ -249,6 +275,9 @@ class CustomizationBundle(models.Model):
                 or raw_string
             )
         self._assert_ui_action_fits_anchor(action, anchor_kind, params)
+        anchor_subview = (params.get("anchor_subview") or "").strip() or False
+        if anchor_subview:
+            self._assert_ui_action_fits_subview(action, anchor_kind, anchor_subview)
         view_type = params.get("view_type") or "form"
         payload = dict(params.get("payload") or {})
         apply = params.get("apply", True)
@@ -271,6 +300,7 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
+                anchor_subview=anchor_subview,
             )
         elif action in ("place_after", "move_after"):
             field_name = self._ui_existing_field_name(
@@ -290,6 +320,7 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
+                anchor_subview=anchor_subview,
                 field_type=payload.get("field_type"),
                 op_type="move_field" if action == "move_after" else "place_field",
             )
@@ -338,6 +369,7 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
+                anchor_subview=anchor_subview,
             )
         return self._ui_result(bundle, operations, apply)
 
@@ -543,6 +575,7 @@ class CustomizationBundle(models.Model):
         occurrence=0,
         anchor_page=False,
         anchor_string=False,
+        anchor_subview=False,
     ):
         """Create add_field plus place_field after/inside the clicked anchor."""
         # The aggregate role belongs to the placement, not to the field itself.
@@ -585,6 +618,7 @@ class CustomizationBundle(models.Model):
             occurrence=occurrence,
             anchor_page=anchor_page,
             anchor_string=anchor_string,
+            anchor_subview=anchor_subview,
             field_type=field_type,
         )
         return add_op | place_op
@@ -619,6 +653,22 @@ class CustomizationBundle(models.Model):
                 raise UserError(
                     self.env._("Place a page or group on a field, page or group.")
                 )
+
+    def _assert_ui_action_fits_subview(self, action, anchor_kind, anchor_subview):
+        """Reject an action that makes no sense inside an embedded subview."""
+        if action in STRUCTURE_TYPES or action == "add_filter":
+            raise UserError(
+                self.env._(
+                    "Pages, groups and filters cannot be added inside the "
+                    "'%s' table."
+                )
+                % anchor_subview
+            )
+        if anchor_kind not in ("field", "button", "view"):
+            raise UserError(
+                self.env._("Anchor on a column, a button or the '%s' table itself.")
+                % anchor_subview
+            )
 
     def _ui_action_add_filter(
         self,
@@ -720,6 +770,7 @@ class CustomizationBundle(models.Model):
         occurrence=0,
         anchor_page=False,
         anchor_string=False,
+        anchor_subview=False,
     ):
         """Create a hide/rename/widget/groups/modifier operation on the anchor."""
         vals = {
@@ -731,7 +782,11 @@ class CustomizationBundle(models.Model):
             "anchor_kind": anchor_kind,
             "anchor_name": anchor_name,
         }
-        vals.update(self._ui_anchor_extra(occurrence, anchor_page, anchor_string))
+        vals.update(
+            self._ui_anchor_extra(
+                occurrence, anchor_page, anchor_string, anchor_subview
+            )
+        )
         if action == "hide":
             vals.update({"type": "hide_field", "payload": {}})
         elif action == "set_view_attribute":
@@ -878,6 +933,7 @@ class CustomizationBundle(models.Model):
         occurrence=0,
         anchor_page=False,
         anchor_string=False,
+        anchor_subview=False,
         field_type=False,
         op_type="place_field",
     ):
@@ -900,7 +956,11 @@ class CustomizationBundle(models.Model):
             "position": position,
             "payload": payload,
         }
-        vals.update(self._ui_anchor_extra(occurrence, anchor_page, anchor_string))
+        vals.update(
+            self._ui_anchor_extra(
+                occurrence, anchor_page, anchor_string, anchor_subview
+            )
+        )
         operation = self.env["customization.operation"].create(vals)
         if apply:
             operation.action_apply()
@@ -919,7 +979,9 @@ class CustomizationBundle(models.Model):
         page = (params.get("anchor_page") or "").strip() or False
         return occurrence, page
 
-    def _ui_anchor_extra(self, anchor_occurrence, anchor_page, anchor_string=False):
+    def _ui_anchor_extra(
+        self, anchor_occurrence, anchor_page, anchor_string=False, anchor_subview=False
+    ):
         """Fields that qualify an otherwise ambiguous semantic anchor."""
         extra = {}
         if anchor_occurrence:
@@ -928,6 +990,8 @@ class CustomizationBundle(models.Model):
             extra["anchor_page"] = anchor_page
         if anchor_string:
             extra["anchor_string"] = anchor_string
+        if anchor_subview:
+            extra["anchor_subview"] = anchor_subview
         return extra
 
     @api.model

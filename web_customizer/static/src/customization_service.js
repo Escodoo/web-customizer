@@ -118,18 +118,25 @@ function fieldLabelOf(component, fieldName, extra) {
     );
 }
 
+const ROOT_CHECKS = {
+    form: isFormRootField,
+    list: isListRoot,
+    kanban: isKanbanRoot,
+    pivot: isPivotRoot,
+};
+
 function customizationTarget(component, extra) {
     const viewType = extra.viewType || component.env.config?.viewType || "form";
-    if (viewType === "form" && !isFormRootField(component)) {
-        return null;
+    if (extra.anchorSubview) {
+        // The anchor sits in a table written inside the parent view, so the
+        // inherit rides on that view while the node belongs to its model.
+        const holderId = component.env.config?.viewId;
+        return holderId
+            ? {viewType, viewId: holderId, anchorSubview: extra.anchorSubview}
+            : null;
     }
-    if (viewType === "list" && !isListRoot(component)) {
-        return null;
-    }
-    if (viewType === "kanban" && !isKanbanRoot(component)) {
-        return null;
-    }
-    if (viewType === "pivot" && !isPivotRoot(component)) {
+    const isRoot = ROOT_CHECKS[viewType];
+    if (isRoot && !isRoot(component)) {
         return null;
     }
     const viewId = extra.viewId || component.env.config?.viewId;
@@ -164,6 +171,7 @@ export function openCustomizationFor(component, fieldName, ev, extra = {}) {
         viewType: target.viewType,
         anchorKind: extra.anchorKind || "field",
         anchorString,
+        anchorSubview: target.anchorSubview || "",
     });
     return true;
 }

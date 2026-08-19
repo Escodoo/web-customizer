@@ -82,6 +82,7 @@ export class CustomizationFieldDialog extends Component {
         viewType: {type: String, optional: true},
         anchorKind: {type: String, optional: true},
         anchorString: {type: String, optional: true},
+        anchorSubview: {type: String, optional: true},
         menuId: {type: Number, optional: true},
     };
 
@@ -131,6 +132,7 @@ export class CustomizationFieldDialog extends Component {
             candidates: [],
             anchorIndex: 0,
             anchorPage: "",
+            subviewInline: true,
             loadError: "",
         });
         onWillStart(async () => {
@@ -143,11 +145,13 @@ export class CustomizationFieldDialog extends Component {
                         this.props.anchorString ? false : this.props.fieldName,
                         this.anchorKind,
                         this.props.anchorString || false,
+                        this.props.anchorSubview || false,
                     ]
                 );
                 this.state.bundles = info.bundles || [];
                 this.state.anchorCount = info.anchor_count || 0;
                 this.state.anchorUnique = Boolean(info.anchor_unique);
+                this.state.subviewInline = info.subview_inline !== false;
                 this.state.candidates = info.candidates || [];
                 if (this.state.candidates.length) {
                     this.state.anchorIndex = this.state.candidates[0].index;
@@ -614,6 +618,7 @@ export class CustomizationFieldDialog extends Component {
             anchor_name: this.props.anchorString ? false : this.props.fieldName,
             anchor_kind: this.anchorKind,
             anchor_string: this.props.anchorString || false,
+            anchor_subview: this.props.anchorSubview || false,
             menu_id: this.props.menuId || false,
             ...this.anchorQualifier(),
             payload,

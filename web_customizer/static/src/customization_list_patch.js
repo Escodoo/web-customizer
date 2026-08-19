@@ -11,19 +11,23 @@ patch(ListRenderer.prototype, {
         super.setup(...arguments);
         this.customization = useCustomizationService();
     },
+    get customizationSubview() {
+        return this.env.customizationSubview || null;
+    },
     getColumnClass(column) {
         const names = super.getColumnClass(column);
         if (
             column.type === "field" &&
             column.name &&
             this.customization?.state.enabled &&
-            isListRoot(this)
+            (isListRoot(this) || this.customizationSubview)
         ) {
             return `${names} o_esc_customization_target`.trim();
         }
         return names;
     },
     onClickSortColumn(column) {
+        const subview = this.customizationSubview;
         if (
             column?.type === "field" &&
             column.name &&
@@ -31,6 +35,7 @@ patch(ListRenderer.prototype, {
                 viewType: "list",
                 fieldLabel: column.label || column.name,
                 model: this.props.list?.resModel,
+                anchorSubview: subview?.name,
             })
         ) {
             return;

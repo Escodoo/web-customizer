@@ -66,6 +66,17 @@ are accepted, and a default order is checked against real stored fields,
 so an option that would be inert or that would break the list is refused
 up front.
 
+A table written inside a form is customizable in place: click a column
+header of an x2many list to add, place, move, rename, hide or narrow a
+column of the **related** model, without leaving the record. The
+operation targets that model while the inherit rides on the form that
+declares the table, and a column of the record itself keeps anchoring on
+the form, so the same name on both sides never collide. When the table
+is not written in the form but borrowed from another view, Odoo embeds
+it at render time and the client cannot tell; that case is refused with
+the model whose list view to open instead, rather than compiled into an
+inherit that would match nothing.
+
 Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and compile

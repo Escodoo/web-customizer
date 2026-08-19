@@ -417,25 +417,120 @@ def list_anchor_candidates(
 
 
 def _anchor_nodes(arch_tree, tag, anchor_name, anchor_string=None):
-    """Return matching view nodes by technical name or unnamed page title."""
+    """Return matching view nodes by technical name or unnamed page title.
+
+    The search is relative to ``arch_tree`` so that a caller can narrow it
+    down to an embedded subview instead of the whole view.
+    """
     name = (anchor_name or "").strip()
     if name:
         if not re.match(r"^[\w.]+$", name):
             return []
         attr = "field" if tag == "progressbar" else "name"
-        nodes = arch_tree.xpath(f"//{tag}[@{attr}='{name}']")
+        nodes = arch_tree.xpath(f".//{tag}[@{attr}='{name}']")
         if nodes or tag != "button" or name not in BUTTON_TYPE_ANCHORS:
             return nodes
-        return arch_tree.xpath(f"//{tag}[@type='{name}']")
+        return arch_tree.xpath(f".//{tag}[@type='{name}']")
     title = (anchor_string or "").strip()
     if tag not in ("page", "group") or not title:
         return []
     quoted = xpath_quote(title)
     return [
         node
-        for node in arch_tree.xpath(f"//{tag}[@string={quoted}]")
+        for node in arch_tree.xpath(f".//{tag}[@string={quoted}]")
         if not node.get("name")
     ]
+
+
+SUBVIEW_TAGS = ("list", "kanban")
+SUBVIEW_TTYPES = ("one2many", "many2many")
+
+
+def _check_subview_model(operation, subview):
+    """Refuse a subview anchor whose model no longer matches the arch.
+
+    The operation targets the comodel while the view stays the parent one,
+    so a field renamed or retyped upstream would otherwise compile against
+    the wrong model without anyone noticing.
+    """
+    env = operation.env
+    parent = operation.view_id.model
+    field = env["ir.model.fields"]._get(parent, subview)
+    if not field:
+        raise AnchorError(
+            env._(
+                "Field '%(field)s' does not exist on %(model)s.",
+                field=subview,
+                model=parent or "?",
+            )
+        )
+    if field.ttype not in SUBVIEW_TTYPES:
+        raise AnchorError(
+            env._(
+                "Field '%(field)s' is a %(ttype)s, so it holds no subview.",
+                field=subview,
+                ttype=field.ttype,
+            )
+        )
+    if operation.model and field.relation != operation.model:
+        raise AnchorError(
+            env._(
+                "Field '%(field)s' points at %(relation)s, but the operation "
+                "targets %(model)s.",
+                field=subview,
+                relation=field.relation,
+                model=operation.model,
+            )
+        )
+
+
+def subview_scope(operation, arch_tree):
+    """Narrow the arch down to the embedded subview this operation targets.
+
+    Odoo embeds the subview of an x2many field when it serves the parent
+    view, so the client sees one either way. Only an arch that really
+    carries it can be inherited here; a referenced one belongs to another
+    view and has to be customized there.
+    """
+    subview = (operation.anchor_subview or "").strip()
+    if not subview:
+        return arch_tree
+    env = operation.env
+    tag = operation.view_type or ""
+    if tag not in SUBVIEW_TAGS:
+        raise AnchorError(
+            env._("A subview anchor targets a list or a kanban, not a %s.")
+            % (tag or "?")
+        )
+    _check_subview_model(operation, subview)
+    holders = arch_tree.xpath(f".//field[@name={xpath_quote(subview)}]")
+    if not holders:
+        raise AnchorError(env._("Field '%s' is not in the target view.") % subview)
+    if len(holders) > 1:
+        raise AnchorError(
+            env._("Field '%s' appears more than once in the target view.") % subview
+        )
+    nodes = holders[0].xpath(f"./{tag}")
+    if not nodes:
+        raise AnchorError(
+            env._(
+                "Field '%(field)s' has no %(tag)s written in this view. Its "
+                "table comes from a %(model)s view, so customize that view "
+                "instead.",
+                field=subview,
+                tag=tag,
+                model=operation.model or "?",
+            )
+        )
+    return nodes[0]
+
+
+def subview_expr_prefix(operation):
+    """Inherit xpath prefix that scopes an anchor to the embedded subview."""
+    subview = (operation.anchor_subview or "").strip()
+    if not subview:
+        return ""
+    return f"//field[@name={xpath_quote(subview)}]/{operation.view_type}"
 
 
 def resolve_anchor(
@@ -543,7 +638,7 @@ def _check_move_source(operation, arch_tree, anchor_node):
         raise AnchorError(operation.env._("move_field requires payload.field_name."))
     if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
         raise AnchorError(operation.env._("Field name '%s' is not valid.") % field_name)
-    nodes = arch_tree.xpath(f"//field[@name={xpath_quote(field_name)}]")
+    nodes = arch_tree.xpath(f".//field[@name={xpath_quote(field_name)}]")
     if not nodes:
         raise AnchorError(
             operation.env._(
@@ -583,9 +678,10 @@ def health_check_operation(operation):
         return False, operation.env._("A target view is required.")
     try:
         arch_tree = combined_arch_for_operation(operation.view_id, operation)
+        scope = subview_scope(operation, arch_tree)
         anchor_node = resolve_anchor(
             operation.env,
-            arch_tree,
+            scope,
             operation.anchor_name,
             operation.anchor_kind,
             operation.anchor_occurrence,
@@ -593,6 +689,8 @@ def health_check_operation(operation):
             operation.anchor_string,
         )
         if operation.type == "move_field":
+            # The engine resolves position="move" against the whole view, so
+            # the source must be unique there, not only inside the subview.
             _check_move_source(operation, arch_tree, anchor_node)
     except AnchorError as err:
         return False, err.reason
@@ -878,6 +976,7 @@ def view_write_conflicts(operation):
         ("anchor_string", "=", operation.anchor_string or False),
         ("anchor_occurrence", "=", operation.anchor_occurrence or 0),
         ("anchor_page", "=", operation.anchor_page or False),
+        ("anchor_subview", "=", operation.anchor_subview or False),
         ("state", "in", ("draft", "applied")),
     ]
     if operation.id:
@@ -919,6 +1018,7 @@ def place_field_conflicts(operation):
     domain = [
         ("view_id", "=", operation.view_id.id),
         ("type", "in", list(PLACEMENT_TYPES)),
+        ("anchor_subview", "=", operation.anchor_subview or False),
         ("state", "in", ("draft", "applied")),
     ]
     if operation.id:
@@ -1353,8 +1453,42 @@ def _button_type_expr(operation, arch_tree, tag, anchor, page, occurrence):
     return f"//button[@type={xpath_quote(anchor)}]"
 
 
+def _subview_inherit_arch(operation, inner_xml, position, arch_tree=None):
+    """Inherit arch for an anchor inside an embedded subview.
+
+    A bare ``<field name="x" position="...">`` spec would be resolved
+    against the whole parent view, where the same name usually also exists
+    on the record itself, so the scoped xpath is not optional here.
+    """
+    env = operation.env
+    kind = operation.anchor_kind or "field"
+    if arch_tree is None:
+        arch_tree = combined_arch_for_operation(operation.view_id, operation)
+    # Resolving the scope here turns a referenced subview into a readable
+    # reason instead of an inherit whose xpath matches nothing.
+    subview_scope(operation, arch_tree)
+    prefix = subview_expr_prefix(operation)
+    if kind == "view":
+        expr = prefix
+    else:
+        tag = ANCHOR_TAGS.get(kind, "field")
+        anchor = (operation.anchor_name or "").strip()
+        if not anchor:
+            raise AnchorError(
+                env._("An anchor inside a subview must have a technical name.")
+            )
+        attr = "field" if tag == "progressbar" else "name"
+        expr = f"{prefix}//{tag}[@{attr}={xpath_quote(anchor)}]"
+        occurrence = operation.anchor_occurrence or 0
+        if occurrence:
+            expr = f"({expr})[{int(occurrence)}]"
+    return f'<xpath expr="{_xml_attr(expr)}" position="{position}">{inner_xml}</xpath>'
+
+
 def _inherit_arch(operation, inner_xml, position, arch_tree=None):
     kind = operation.anchor_kind or "field"
+    if operation.anchor_subview:
+        return _subview_inherit_arch(operation, inner_xml, position, arch_tree)
     if kind == "view":
         if arch_tree is None:
             arch_tree = combined_arch_for_operation(operation.view_id, operation)
@@ -1418,10 +1552,19 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
 
 def _upsert_generated_view(operation, arch, active=True):
     view = operation.generated_view_id
+    # An inherit belongs to the arch it extends. A subview operation targets
+    # the related model, but the inherit still rides on the parent view, so
+    # type and model have to follow that one instead of the anchor.
+    if operation.anchor_subview:
+        view_type = operation.view_id.type
+        model = operation.view_id.model
+    else:
+        view_type = operation.view_type or operation.view_id.type
+        model = operation.model
     values = {
         "name": (f"Customization {operation.bundle_id.code} operation {operation.id}"),
-        "type": operation.view_type or operation.view_id.type,
-        "model": operation.model,
+        "type": view_type,
+        "model": model,
         "inherit_id": operation.view_id.id,
         "mode": "extension",
         "arch": arch,

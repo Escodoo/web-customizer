@@ -6,6 +6,14 @@ Next:
   so those views cannot be customized until one field exists. The view
   root is an anchor now, but it only carries option writes; placing a
   first field inside it still has to be designed.
+- Options on the root of an embedded table (``editable``, ``create``,
+  ``delete``) compile from the operation form but have no entry point in
+  place yet; the banner button targets the view the user is looking at,
+  not the table inside it.
+- Inside an embedded table only list subviews are clickable. A kanban
+  subview and the form that opens when a line is expanded render outside
+  that subtree, so they need their own way to publish which x2many field
+  holds them.
 - List ``multi_edit`` and kanban ``quick_create`` compile from the
   operation form but have no control in the banner dialog yet. Kanban
   grouping flags (``group_create``, ``group_delete``) are not whitelisted

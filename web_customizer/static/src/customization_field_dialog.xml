@@ -9,6 +9,11 @@
                     to customize.
                 </p>
                 <p class="text-danger" t-if="state.loadError" t-esc="state.loadError" />
+                <p class="text-danger" t-if="!state.subviewInline">
+                    The "<t t-esc="props.anchorSubview" />" table is not written
+                    in this view, so it cannot be customized from here. Open the
+                    <t t-esc="props.model" /> list view instead.
+                </p>
                 <p
                     class="text-danger"
                     t-if="!state.loadError and !state.bundles.length"

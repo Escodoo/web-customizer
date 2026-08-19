@@ -28,6 +28,7 @@ class Partner extends models.Model {
     email = fields.Char();
     revenue = fields.Integer();
     is_favorite = fields.Boolean();
+    line_ids = fields.One2many({relation: "partner.line"});
     state = fields.Selection({
         selection: [
             ["draft", "Draft"],
@@ -59,6 +60,15 @@ class Partner extends models.Model {
     ];
 }
 
+class PartnerLine extends models.Model {
+    _name = "partner.line";
+
+    note = fields.Char();
+    partner_id = fields.Many2one({relation: "partner"});
+
+    _records = [{id: 1, note: "First", partner_id: 1}];
+}
+
 class Users extends models.Model {
     _name = "res.users";
 
@@ -69,14 +79,15 @@ class Users extends models.Model {
     }
 }
 
-defineModels([Partner, Users]);
+defineModels([Partner, PartnerLine, Users]);
 
 function enableCustomization() {
     mockService("web_customizer", (env, {dialog, notification}) => {
         const service = customizationService.start(env, {dialog, notification});
         service.state.enabled = true;
         service.openFieldDialog = (info) => {
-            expect.step(`${info.anchorKind || "field"}:${info.fieldName}`);
+            const scope = info.anchorSubview ? `@${info.anchorSubview}` : "";
+            expect.step(`${info.anchorKind || "field"}:${info.fieldName}${scope}`);
         };
         return service;
     });
@@ -346,6 +357,52 @@ test("ListRenderer outlines columns and opens the dialog", async () => {
     });
     expect("th[data-name=email]").toHaveClass("o_esc_customization_target");
     await contains("th[data-name=email]").click();
+    expect.verifySteps(["field:email"]);
+});
+
+test("a column of a written table anchors inside that table", async () => {
+    enableCustomization();
+    await mountView({
+        type: "form",
+        resModel: "partner",
+        resId: 1,
+        arch: `
+            <form>
+                <sheet>
+                    <field name="line_ids">
+                        <list>
+                            <field name="note"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>`,
+    });
+    expect("th[data-name=note]").toHaveClass("o_esc_customization_target");
+    await contains("th[data-name=note]").click();
+    expect.verifySteps(["field:note@line_ids"]);
+});
+
+test("a field of the record itself keeps anchoring on the view", async () => {
+    enableCustomization();
+    await mountView({
+        type: "form",
+        resModel: "partner",
+        resId: 1,
+        arch: `
+            <form>
+                <sheet>
+                    <group>
+                        <field name="email"/>
+                    </group>
+                    <field name="line_ids">
+                        <list>
+                            <field name="note"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>`,
+    });
+    await contains(".o_field_widget[name=email]").click();
     expect.verifySteps(["field:email"]);
 });
 
