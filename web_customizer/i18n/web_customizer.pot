@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-19 02:15+0000\n"
-"PO-Revision-Date: 2026-08-19 02:15+0000\n"
+"POT-Creation-Date: 2026-08-19 02:42+0000\n"
+"PO-Revision-Date: 2026-08-19 02:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -39,6 +39,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "'%(name)s' is not a decoration. Use one of: %(allowed)s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "'%(xmlid)s' is a %(model)s, not an action a button can call."
 msgstr ""
 
 #. module: web_customizer
@@ -88,6 +94,21 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "A %s view has no root options to set."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "A button label is required."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A button needs an action to call."
 msgstr ""
 
 #. module: web_customizer
@@ -223,6 +244,7 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_action_xmlid
 msgid "Action"
 msgstr ""
 
@@ -242,7 +264,19 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Action to call"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Active Customers"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_button
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Add Button"
 msgstr ""
 
 #. module: web_customizer
@@ -288,6 +322,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add at least one selection option."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Add button after this one"
 msgstr ""
 
 #. module: web_customizer
@@ -562,6 +602,15 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid ""
+"Bundle '%(bundle)s' already adds a button calling '%(action)s' on view "
+"'%(view)s'. Two buttons for the same action would just sit next to each "
+"other."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
 "Bundle '%(bundle)s' already has a %(type)s operation for '%(field)s' in view"
 " '%(view)s'."
 msgstr ""
@@ -598,6 +647,29 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__button
 msgid "Button"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_btn_class
+msgid "Button Style"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Button class '%s' is not supported."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Button label"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Buttons can only be added on forms, lists and kanbans."
 msgstr ""
 
 #. module: web_customizer
@@ -1424,6 +1496,13 @@ msgid "Leave as is"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_btn_class__btn-link
+msgid "Link"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__list
 msgid "List"
 msgstr ""
@@ -1896,7 +1975,20 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "Position '%s' is not valid for placing a button."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%s' is not valid for placing a field."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_btn_class__btn-primary
+msgid "Primary"
 msgstr ""
 
 #. module: web_customizer
@@ -2061,6 +2153,19 @@ msgid "Search a window action..."
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Search an action..."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_btn_class__btn-secondary
+msgid "Secondary"
+msgstr ""
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Select a customization bundle first."
@@ -2096,6 +2201,14 @@ msgstr ""
 #: code:addons/web_customizer/models/customization_bundle.py:0
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select at least one group."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Select the action the button calls."
 msgstr ""
 
 #. module: web_customizer
@@ -2244,6 +2357,12 @@ msgid ""
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Style"
+msgstr ""
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/exporter.py:0
 msgid "Target view '%s' has no XML ID. Export needs a stable inherit_id."
@@ -2284,9 +2403,23 @@ msgid "The \""
 msgstr ""
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "The action is missing."
+msgstr ""
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "The action must have an XML ID."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"The action must have an XML ID. A server action runs on\n"
+"                            the record; a window action opens its view."
 msgstr ""
 
 #. module: web_customizer
@@ -2501,24 +2634,21 @@ msgid "Widgets can only be set on fields."
 msgstr ""
 
 #. module: web_customizer
-#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_action_xmlid
-msgid "Window Action"
-msgstr ""
-
-#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Window action"
 msgstr ""
 
 #. module: web_customizer
-#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_target_xmlid
-msgid "XML ID of the destination menu, for example base.menu_administration."
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_action_xmlid
+msgid ""
+"XML ID of the action, for example base.action_partner_form. A menu needs a "
+"window action; a button also takes a server action."
 msgstr ""
 
 #. module: web_customizer
-#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_action_xmlid
-msgid "XML ID of the window action, for example base.action_partner_form."
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_target_xmlid
+msgid "XML ID of the destination menu, for example base.menu_administration."
 msgstr ""
 
 #. module: web_customizer
