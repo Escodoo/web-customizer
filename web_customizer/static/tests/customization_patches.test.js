@@ -408,6 +408,35 @@ test("a card of a written kanban anchors inside that table", async () => {
     expect.verifySteps(["field:note@line_ids"]);
 });
 
+test("a field of a written line form anchors inside that form", async () => {
+    enableCustomization();
+    await mountView({
+        type: "form",
+        resModel: "partner",
+        resId: 1,
+        arch: `
+            <form>
+                <sheet>
+                    <field name="line_ids">
+                        <list>
+                            <field name="note"/>
+                        </list>
+                        <form>
+                            <field name="note"/>
+                            <field name="partner_id"/>
+                        </form>
+                    </field>
+                </sheet>
+            </form>`,
+    });
+    await contains(".o_data_row .o_data_cell").click();
+    expect(".modal .o_field_widget[name=partner_id]").toHaveClass(
+        "o_esc_customization_target"
+    );
+    await contains(".modal .o_field_widget[name=partner_id]").click();
+    expect.verifySteps(["field:partner_id@line_ids"]);
+});
+
 test("a field of the record itself keeps anchoring on the view", async () => {
     enableCustomization();
     await mountView({

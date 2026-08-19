@@ -258,6 +258,130 @@ class TestCustomizationSubview(CustomizationCase):
         )
         self.assertFalse(info["field_subview"])
 
+    def test_place_a_field_inside_the_written_line_form(self):
+        view = self._form_with_form_subview()
+        bundle = self._create_bundle(
+            code="client_sub_form_place",
+            operations=[
+                Command.create(
+                    {
+                        "type": "place_field",
+                        "model_id": self.bank_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "field",
+                        "anchor_name": "acc_number",
+                        "anchor_subview": "bank_ids",
+                        "position": "after",
+                        "payload": {"field_name": "bank_id"},
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        self._assert_applied(bundle)
+        names = self._root(view).xpath(".//field[@name='bank_ids']/form//field")
+        self.assertEqual(
+            [node.get("name") for node in names],
+            ["acc_number", "bank_id", "company_id"],
+        )
+        # The list of the same field is left alone.
+        self.assertEqual(
+            [
+                node.get("name")
+                for node in self._root(view).xpath(
+                    ".//field[@name='bank_ids']/list/field"
+                )
+            ],
+            ["acc_number"],
+        )
+
+    def test_a_shared_name_is_renamed_only_inside_the_line_form(self):
+        view = self._form_with_form_subview()
+        bundle = self._create_bundle(
+            code="client_sub_form_scope",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_string",
+                        "model_id": self.bank_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "field",
+                        "anchor_name": "company_id",
+                        "anchor_subview": "bank_ids",
+                        "position": "attributes",
+                        "payload": {"string": "Owning Company"},
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        self._assert_applied(bundle)
+        inner = self._root(view).xpath(
+            ".//field[@name='bank_ids']/form//field[@name='company_id']"
+        )
+        outer = self._root(view).xpath("./sheet/group/field[@name='company_id']")
+        self.assertEqual(inner[0].get("string"), "Owning Company")
+        self.assertNotEqual(outer[0].get("string"), "Owning Company")
+
+    def test_a_group_can_be_added_inside_the_line_form(self):
+        view = self._form_with_form_subview()
+        bundle = self._create_bundle(code="client_sub_form_group")
+        self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "add_group",
+                "model": "res.partner.bank",
+                "view_id": view.id,
+                "view_type": "form",
+                "anchor_kind": "field",
+                "anchor_name": "acc_number",
+                "anchor_subview": "bank_ids",
+                "payload": {"string": "Extra"},
+            }
+        )
+        self._assert_applied(bundle)
+        groups = self._root(view).xpath(".//field[@name='bank_ids']/form//group")
+        self.assertGreaterEqual(len(groups), 2)
+
+    def test_a_borrowed_line_form_is_refused(self):
+        view = self._form_with_subview()
+        bundle = self._create_bundle(
+            code="client_sub_form_borrowed",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_string",
+                        "model_id": self.bank_model.id,
+                        "view_id": view.id,
+                        "view_type": "form",
+                        "anchor_kind": "field",
+                        "anchor_name": "acc_number",
+                        "anchor_subview": "bank_ids",
+                        "position": "attributes",
+                        "payload": {"string": "Account"},
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.operation_ids.state, "broken")
+        self.assertIn("form", bundle.operation_ids.broken_reason)
+
+    def test_the_ui_reports_when_the_line_form_is_written(self):
+        view = self._form_with_form_subview()
+        info = self.env["customization.bundle"].get_ui_context(
+            view.id, "acc_number", "field", False, "bank_ids", "form"
+        )
+        self.assertTrue(info["subview_inline"])
+        self.assertEqual(info["anchor_count"], 1)
+        borrowed = self._form_with_subview()
+        missing = self.env["customization.bundle"].get_ui_context(
+            borrowed.id, "acc_number", "field", False, "bank_ids", "form"
+        )
+        self.assertFalse(missing["subview_inline"])
+
     def test_the_parent_and_the_subview_are_separate_scopes(self):
         """Same view, same name, different scope: no conflict."""
         view = self._form_with_subview()

@@ -177,6 +177,7 @@ class CustomizationBundle(models.Model):
         anchor_kind="field",
         anchor_string=False,
         anchor_subview=False,
+        view_type=False,
     ):
         """Return bundles and whether the semantic anchor is unique on the view."""
         self._check_ui_access()
@@ -193,7 +194,7 @@ class CustomizationBundle(models.Model):
                 title = source_unnamed_page_string(view, title)
             tree = arch_tree(view.with_context(lang=None))
             if subview:
-                tree, subview_inline = self._ui_subview_tree(tree, subview)
+                tree, subview_inline = self._ui_subview_tree(tree, subview, view_type)
             elif kind == "field":
                 field_subview = self._ui_field_subview(view, tree, name)
             if tree is not None:
@@ -232,16 +233,20 @@ class CustomizationBundle(models.Model):
             return False
         return {"type": nodes[0].tag, "model": field.relation}
 
-    def _ui_subview_tree(self, tree, subview):
+    def _ui_subview_tree(self, tree, subview, view_type=False):
         """Narrow the arch to an embedded subview, if this view carries one.
 
         Odoo embeds the subview of an x2many field when it serves the parent
         view, so a client cannot tell a written subview from a borrowed one.
-        Only the written one lives in this arch.
+        Only the written one lives in this arch. A field may write a list
+        and a form side by side, so the tag must match the view the click
+        came from rather than taking the first child.
         """
-        nodes = tree.xpath(
-            f".//field[@name={xpath_quote(subview)}]" f"/*[self::list or self::kanban]"
-        )
+        holder = f".//field[@name={xpath_quote(subview)}]"
+        if view_type in ("list", "kanban", "form"):
+            nodes = tree.xpath(f"{holder}/{view_type}")
+        else:
+            nodes = tree.xpath(f"{holder}/*[self::list or self::kanban]")
         if not nodes:
             return None, False
         return nodes[0], True
@@ -300,7 +305,9 @@ class CustomizationBundle(models.Model):
         self._assert_ui_action_fits_anchor(action, anchor_kind, params)
         anchor_subview = (params.get("anchor_subview") or "").strip() or False
         if anchor_subview:
-            self._assert_ui_action_fits_subview(action, anchor_kind, anchor_subview)
+            self._assert_ui_action_fits_subview(
+                action, anchor_kind, anchor_subview, params.get("view_type") or "form"
+            )
         view_type = params.get("view_type") or "form"
         payload = dict(params.get("payload") or {})
         apply = params.get("apply", True)
@@ -392,6 +399,7 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_page=anchor_page,
                 anchor_string=anchor_string,
+                anchor_subview=anchor_subview,
             )
         else:
             operations = self._ui_action_on_anchor(
@@ -725,17 +733,28 @@ class CustomizationBundle(models.Model):
                     self.env._("Place a page or group on a field, page or group.")
                 )
 
-    def _assert_ui_action_fits_subview(self, action, anchor_kind, anchor_subview):
+    def _assert_ui_action_fits_subview(
+        self, action, anchor_kind, anchor_subview, view_type="list"
+    ):
         """Reject an action that makes no sense inside an embedded subview."""
-        if action in STRUCTURE_TYPES or action == "add_filter":
+        if action == "add_filter":
             raise UserError(
-                self.env._(
-                    "Pages, groups and filters cannot be added inside the "
-                    "'%s' table."
-                )
+                self.env._("Filters cannot be added inside the '%s' table.")
                 % anchor_subview
             )
-        if anchor_kind not in ("field", "button", "view"):
+        # A written line form is a form: pages and groups belong there. A
+        # list or kanban has no notebook to put them in.
+        if action in STRUCTURE_TYPES and view_type != "form":
+            raise UserError(
+                self.env._("Pages and groups cannot be added inside the '%s' table.")
+                % anchor_subview
+            )
+        allowed = (
+            ("field", "button", "page", "group", "view")
+            if view_type == "form"
+            else ("field", "button", "view")
+        )
+        if anchor_kind not in allowed:
             raise UserError(
                 self.env._("Anchor on a column, a button or the '%s' table itself.")
                 % anchor_subview
@@ -798,6 +817,7 @@ class CustomizationBundle(models.Model):
         occurrence=0,
         anchor_page=False,
         anchor_string=False,
+        anchor_subview=False,
     ):
         """Create an add_page or add_group operation on the clicked anchor."""
         string = (payload.get("string") or "").strip()
@@ -820,7 +840,11 @@ class CustomizationBundle(models.Model):
             "position": position,
             "payload": {"string": string, "name": name},
         }
-        vals.update(self._ui_anchor_extra(occurrence, anchor_page, anchor_string))
+        vals.update(
+            self._ui_anchor_extra(
+                occurrence, anchor_page, anchor_string, anchor_subview
+            )
+        )
         operation = self.env["customization.operation"].create(vals)
         if apply:
             operation.action_apply()

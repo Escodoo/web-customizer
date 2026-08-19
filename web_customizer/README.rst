@@ -105,6 +105,13 @@ time and the client cannot tell; that case is refused with the model
 whose list view to open instead, rather than compiled into an inherit
 that would match nothing.
 
+The form that opens when a line of that table is expanded is the same
+story: if the parent writes a ``<form>`` next to the list, its fields,
+pages, groups and buttons are anchors on the related model, and the
+inherit still rides on the parent. When that form is borrowed from the
+related model, the dialog says so and names the model whose form to open
+instead.
+
 A button that calls an action the database already has can be added next
 to any field or button of a form, a list or a kanban, including inside a
 written table and next to the buttons of a form header. The arch keeps
@@ -214,7 +221,10 @@ Usage
    lines inline editable, drop its Add a line, or set its default order.
    If the table is not written in the form but taken from another view,
    the dialog says so and names the model whose list view to open
-   instead.
+   instead. Opening a line of a non-editable list does the same for the
+   form written next to that list: its fields, pages and groups are
+   outlined too. If that form is borrowed, open the related model's form
+   view instead.
 4. To call an existing action from a view, click a field or a button of
    a form, a list or a kanban and choose **Add button after this one**.
    Pick the action in the selector (a window action opens its view, a
@@ -278,7 +288,8 @@ leave this module as the production runtime.
 3.  **Embedded table** — on a form with order lines or bank accounts,
     click a column header and add or relabel a column of the related
     model, then click the field itself and make the table inline
-    editable.
+    editable. Open a line and relabel a field of the form written next
+    to the list.
 4.  **Search** — add, hide or relabel a search chip, or add a filter
     with a domain or a group by.
 5.  **Kanban** — hide a card field, a header button or the column
@@ -318,9 +329,6 @@ Next:
   on, so those views cannot be customized until one field exists. The
   view root is an anchor now, but it only carries option writes; placing
   a first field inside it still has to be designed.
-- The form that opens when a line of an embedded table is expanded
-  renders in a dialog, outside the subtree that publishes which x2many
-  field holds it, so its fields are not anchors yet.
 - Graph operations are written from the backend form only. The view
   draws on a canvas, so there is no field node to click; offering them
   in place needs a side panel listing the arch fields.
@@ -380,7 +388,9 @@ First public Beta.
   rename of its columns.
 - Columns and cards of a table written inside a form are semantic
   anchors on the related model, so order lines and the like are
-  customized in place, options of the table included.
+  customized in place, options of the table included. The form that
+  opens a line is an anchor of the same field when it is written next to
+  the list.
 - A button calling an action that already exists can be added to a form,
   a list or a kanban; the arch keeps the XML ID, so the export depends
   on the module owning the action.

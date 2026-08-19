@@ -461,7 +461,9 @@ def _anchor_nodes(arch_tree, tag, anchor_name, anchor_string=None):
     ]
 
 
-SUBVIEW_TAGS = ("list", "kanban")
+# A form written next to the list is the dialog that opens a line. It is
+# a subview of the same field, not a view of its own.
+SUBVIEW_TAGS = ("list", "kanban", "form")
 SUBVIEW_TTYPES = ("one2many", "many2many")
 
 
@@ -518,7 +520,7 @@ def subview_scope(operation, arch_tree):
     tag = operation.view_type or ""
     if tag not in SUBVIEW_TAGS:
         raise AnchorError(
-            env._("A subview anchor targets a list or a kanban, not a %s.")
+            env._("A subview anchor targets a list, a kanban or a form, not a %s.")
             % (tag or "?")
         )
     _check_subview_model(operation, subview)

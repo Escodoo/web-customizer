@@ -81,6 +81,13 @@ it at render time and the client cannot tell; that case is refused with
 the model whose list view to open instead, rather than compiled into an
 inherit that would match nothing.
 
+The form that opens when a line of that table is expanded is the same
+story: if the parent writes a ``<form>`` next to the list, its fields,
+pages, groups and buttons are anchors on the related model, and the
+inherit still rides on the parent. When that form is borrowed from the
+related model, the dialog says so and names the model whose form to
+open instead.
+
 A button that calls an action the database already has can be added next
 to any field or button of a form, a list or a kanban, including inside a
 written table and next to the buttons of a form header. The arch keeps

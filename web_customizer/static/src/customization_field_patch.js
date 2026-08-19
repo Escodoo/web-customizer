@@ -1,7 +1,7 @@
 import {InnerGroup, OuterGroup} from "@web/views/form/form_group/form_group";
 import {
     SUBVIEW_ANCHOR_SELECTOR,
-    isFormRootField,
+    isFormAnchorable,
     isKanbanRoot,
     openCustomizationFor,
     useCustomizationService,
@@ -25,7 +25,7 @@ patch(Field.prototype, {
         const names = super.classNames;
         if (
             this.customization?.state.enabled &&
-            (isFormRootField(this) || isKanbanRoot(this))
+            (isFormAnchorable(this) || isKanbanRoot(this))
         ) {
             names.o_esc_customization_target = true;
         }
@@ -50,7 +50,7 @@ patch(FormLabel.prototype, {
     },
     get className() {
         const names = super.className;
-        if (this.customization?.state.enabled && isFormRootField(this)) {
+        if (this.customization?.state.enabled && isFormAnchorable(this)) {
             return `${names} o_esc_customization_target`.trim();
         }
         return names;
@@ -67,7 +67,7 @@ patch(Notebook.prototype, {
     },
     get navItems() {
         const items = super.navItems;
-        if (!(this.customization?.state.enabled && isFormRootField(this))) {
+        if (!(this.customization?.state.enabled && isFormAnchorable(this))) {
             return items;
         }
         return items.map(([id, page]) => {
@@ -105,7 +105,7 @@ patch(ViewButton.prototype, {
         if (
             anchor &&
             this.customization?.state.enabled &&
-            (isFormRootField(this) || isKanbanRoot(this))
+            (isFormAnchorable(this) || isKanbanRoot(this))
         ) {
             return `${names} o_esc_customization_target`.trim();
         }
@@ -188,7 +188,7 @@ function patchFormGroup(GroupClass) {
             if (
                 !(
                     this.customization?.state.enabled &&
-                    isFormRootField(this) &&
+                    isFormAnchorable(this) &&
                     (this.props.groupName || this.props.groupTitle)
                 )
             ) {

@@ -42,7 +42,10 @@
    lines inline editable, drop its Add a line, or set its default order.
    If the table is not written in the form but taken from another view,
    the dialog says so and names the model whose list view to open
-   instead.
+   instead. Opening a line of a non-editable list does the same for the
+   form written next to that list: its fields, pages and groups are
+   outlined too. If that form is borrowed, open the related model's form
+   view instead.
 4. To call an existing action from a view, click a field or a button of a
    form, a list or a kanban and choose **Add button after this one**. Pick
    the action in the selector (a window action opens its view, a server
@@ -104,7 +107,8 @@ leave this module as the production runtime.
 3. **Embedded table** — on a form with order lines or bank accounts,
    click a column header and add or relabel a column of the related
    model, then click the field itself and make the table inline
-   editable.
+   editable. Open a line and relabel a field of the form written next
+   to the list.
 4. **Search** — add, hide or relabel a search chip, or add a filter with a
    domain or a group by.
 5. **Kanban** — hide a card field, a header button or the column progressbar.

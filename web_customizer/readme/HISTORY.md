@@ -27,7 +27,8 @@ First public Beta.
   columns.
 - Columns and cards of a table written inside a form are semantic anchors
   on the related model, so order lines and the like are customized in
-  place, options of the table included.
+  place, options of the table included. The form that opens a line is
+  an anchor of the same field when it is written next to the list.
 - A button calling an action that already exists can be added to a form, a
   list or a kanban; the arch keeps the XML ID, so the export depends on
   the module owning the action.

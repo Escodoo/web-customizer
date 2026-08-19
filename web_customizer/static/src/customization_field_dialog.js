@@ -156,6 +156,7 @@ export class CustomizationFieldDialog extends Component {
                         this.anchorKind,
                         this.props.anchorString || false,
                         this.props.anchorSubview || false,
+                        this.props.viewType || false,
                     ])
                 );
             } catch (error) {

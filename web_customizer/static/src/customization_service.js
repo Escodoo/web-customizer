@@ -10,6 +10,10 @@ export const customizationService = {
         // A dialog mounts its own view over the one behind it, so the stack
         // keeps the banner pointing at what the user is actually looking at.
         const mounted = [];
+        // A table inside a form publishes here as well as via useSubEnv: the
+        // line form opens in a dialog, outside that subtree, and still needs
+        // to know which x2many field holds it.
+        const subviews = [];
         return {
             state,
             toggle() {
@@ -32,6 +36,18 @@ export const customizationService = {
                     state.view = mounted[mounted.length - 1] || null;
                 };
             },
+            registerSubview(info) {
+                subviews.push(info);
+                return () => {
+                    const index = subviews.indexOf(info);
+                    if (index >= 0) {
+                        subviews.splice(index, 1);
+                    }
+                };
+            },
+            currentSubview() {
+                return subviews[subviews.length - 1] || null;
+            },
             openFieldDialog(info) {
                 dialog.add(CustomizationFieldDialog, info);
             },
@@ -48,6 +64,8 @@ export function useCustomizationService() {
         state,
         toggle: () => customization.toggle(),
         registerView: (view) => customization.registerView(view),
+        registerSubview: (info) => customization.registerSubview(info),
+        currentSubview: () => customization.currentSubview(),
         openFieldDialog: (info) => customization.openFieldDialog(info),
     };
 }
@@ -64,8 +82,11 @@ export const SUBVIEW_MODES = ["list", "kanban"];
 // through to the more precise target underneath.
 export const SUBVIEW_ANCHOR_SELECTOR = [
     ".o_field_x2many thead th[data-name]",
+    ".o_field_x2many .o_data_row",
+    ".o_field_x2many .o_field_x2many_list_row_add",
     ".o_field_x2many .o_esc_kanban_field",
     ".o_field_x2many .o_esc_kanban_button",
+    ".o_field_x2many .o_kanban_record",
 ].join(", ");
 
 function formRecord(component) {
@@ -82,6 +103,15 @@ export function isFormRootField(component) {
         return false;
     }
     return true;
+}
+
+export function isFormAnchorable(component) {
+    // The form that opens a line of a table is not the model root and has
+    // no view of its own; the holder published on the env is the signal.
+    if (component.env.customizationSubview?.viewMode === "form") {
+        return true;
+    }
+    return isFormRootField(component);
 }
 
 export function isListRoot(component) {
@@ -137,16 +167,28 @@ const ROOT_CHECKS = {
     pivot: isPivotRoot,
 };
 
-function customizationTarget(component, extra) {
-    const viewType = extra.viewType || component.env.config?.viewType || "form";
-    if (extra.anchorSubview) {
-        // The anchor sits in a table written inside the parent view, so the
-        // inherit rides on that view while the node belongs to its model.
-        const holderId = component.env.config?.viewId;
-        return holderId
-            ? {viewType, viewId: holderId, anchorSubview: extra.anchorSubview}
-            : null;
+function subviewTarget(component, extra) {
+    // The anchor sits in a table written inside the parent view, so the
+    // inherit rides on that view while the node belongs to its model.
+    const published = component.env.customizationSubview;
+    const anchorSubview = extra.anchorSubview || published?.name;
+    if (!anchorSubview) {
+        return null;
     }
+    const viewType =
+        extra.viewType ||
+        published?.viewMode ||
+        component.env.config?.viewType ||
+        "form";
+    const holderId = extra.viewId || component.env.config?.viewId;
+    return holderId ? {viewType, viewId: holderId, anchorSubview} : null;
+}
+
+function customizationTarget(component, extra) {
+    if (extra.anchorSubview || component.env.customizationSubview?.name) {
+        return subviewTarget(component, extra);
+    }
+    const viewType = extra.viewType || component.env.config?.viewType || "form";
     const isRoot = ROOT_CHECKS[viewType];
     if (isRoot && !isRoot(component)) {
         return null;

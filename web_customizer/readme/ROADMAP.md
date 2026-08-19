@@ -6,9 +6,6 @@ Next:
   so those views cannot be customized until one field exists. The view
   root is an anchor now, but it only carries option writes; placing a
   first field inside it still has to be designed.
-- The form that opens when a line of an embedded table is expanded
-  renders in a dialog, outside the subtree that publishes which x2many
-  field holds it, so its fields are not anchors yet.
 - Graph operations are written from the backend form only. The view draws
   on a canvas, so there is no field node to click; offering them in place
   needs a side panel listing the arch fields.

@@ -239,6 +239,37 @@ class CustomizationCase(TransactionCase):
             }
         )
 
+    def _form_with_form_subview(self):
+        """Form whose x2many writes the dialog that opens a line."""
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.subview.form",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                                <field name="company_id"/>
+                            </group>
+                            <field name="bank_ids">
+                                <list>
+                                    <field name="acc_number"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="acc_number"/>
+                                        <field name="company_id"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
     def _form_with_referenced_subview(self):
         """Form whose x2many borrows its list from a res.partner.bank view."""
         return self.env["ir.ui.view"].create(
