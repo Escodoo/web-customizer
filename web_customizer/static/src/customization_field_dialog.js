@@ -133,33 +133,20 @@ export class CustomizationFieldDialog extends Component {
             anchorIndex: 0,
             anchorPage: "",
             subviewInline: true,
+            fieldSubview: false,
             loadError: "",
         });
         onWillStart(async () => {
             try {
-                const info = await this.orm.call(
-                    "customization.bundle",
-                    "get_ui_context",
-                    [
+                this.loadContext(
+                    await this.orm.call("customization.bundle", "get_ui_context", [
                         this.props.viewId || false,
                         this.props.anchorString ? false : this.props.fieldName,
                         this.anchorKind,
                         this.props.anchorString || false,
                         this.props.anchorSubview || false,
-                    ]
+                    ])
                 );
-                this.state.bundles = info.bundles || [];
-                this.state.anchorCount = info.anchor_count || 0;
-                this.state.anchorUnique = Boolean(info.anchor_unique);
-                this.state.subviewInline = info.subview_inline !== false;
-                this.state.candidates = info.candidates || [];
-                if (this.state.candidates.length) {
-                    this.state.anchorIndex = this.state.candidates[0].index;
-                    this.state.anchorPage = this.state.candidates[0].page || "";
-                }
-                if (this.state.bundles.length) {
-                    this.state.bundleId = this.state.bundles[0].id;
-                }
             } catch (error) {
                 this.state.loadError =
                     error.data?.message ||
@@ -169,8 +156,37 @@ export class CustomizationFieldDialog extends Component {
         });
     }
 
+    loadContext(info) {
+        this.state.bundles = info.bundles || [];
+        this.state.anchorCount = info.anchor_count || 0;
+        this.state.anchorUnique = Boolean(info.anchor_unique);
+        this.state.subviewInline = info.subview_inline !== false;
+        this.state.fieldSubview = info.field_subview || false;
+        this.state.candidates = info.candidates || [];
+        if (this.state.candidates.length) {
+            this.state.anchorIndex = this.state.candidates[0].index;
+            this.state.anchorPage = this.state.candidates[0].page || "";
+        }
+        if (this.state.bundles.length) {
+            this.state.bundleId = this.state.bundles[0].id;
+        }
+    }
+
+    get tableTarget() {
+        // A click on the x2many field can also mean "options of the table it
+        // writes", and those belong to the related model, not to this form.
+        return this.anchorKind === "field" ? this.state.fieldSubview : false;
+    }
+
+    get targetViewType() {
+        if (this.state.action === "set_view_attribute" && this.tableTarget) {
+            return this.tableTarget.type;
+        }
+        return this.props.viewType;
+    }
+
     get isListView() {
-        return this.props.viewType === "list";
+        return this.targetViewType === "list";
     }
 
     get rootActionOptions() {
@@ -207,6 +223,9 @@ export class CustomizationFieldDialog extends Component {
         const label = this.props.fieldLabel || this.props.fieldName;
         if (this.anchorKind === "view") {
             return _t("Options of this %s view", this.props.viewType || "");
+        }
+        if (this.props.anchorSubview) {
+            return _t("Customize column %s", label);
         }
         if (this.anchorKind === "page") {
             return _t("Customize page %s", label);
@@ -345,6 +364,12 @@ export class CustomizationFieldDialog extends Component {
             fieldActions.splice(3, 0, {
                 value: "add_filter",
                 label: _t("Add filter after this one"),
+            });
+        }
+        if (this.state.fieldSubview) {
+            fieldActions.push({
+                value: "set_view_attribute",
+                label: _t("Set options of this table"),
             });
         }
         return fieldActions;
@@ -581,7 +606,7 @@ export class CustomizationFieldDialog extends Component {
                 this.state.rootEditable === "off" ? "" : this.state.rootEditable;
         }
         const order = this.state.rootDefaultOrder.trim();
-        if (order && this.props.viewType !== "form") {
+        if (order && this.targetViewType !== "form") {
             attributes.default_order = order;
         }
         const condition = this.state.rootDecorationCondition.trim();
@@ -609,7 +634,7 @@ export class CustomizationFieldDialog extends Component {
     }
 
     uiParams(payload) {
-        return {
+        const params = {
             bundle_id: this.state.bundleId,
             action: this.state.action,
             model: this.props.model,
@@ -624,6 +649,20 @@ export class CustomizationFieldDialog extends Component {
             payload,
             apply: this.state.apply,
         };
+        if (this.state.action === "set_view_attribute" && this.tableTarget) {
+            // The clicked node is the field, but the options land on the
+            // table it writes, which belongs to the related model.
+            Object.assign(params, {
+                model: this.tableTarget.model,
+                view_type: this.tableTarget.type,
+                anchor_kind: "view",
+                anchor_name: false,
+                anchor_subview: this.props.fieldName,
+                anchor_index: null,
+                anchor_page: false,
+            });
+        }
+        return params;
     }
 
     reportResult(result) {

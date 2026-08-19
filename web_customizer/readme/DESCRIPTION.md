@@ -67,10 +67,13 @@ so an option that would be inert or that would break the list is refused
 up front.
 
 A table written inside a form is customizable in place: click a column
-header of an x2many list to add, place, move, rename, hide or narrow a
-column of the **related** model, without leaving the record. The
-operation targets that model while the inherit rides on the form that
-declares the table, and a column of the record itself keeps anchoring on
+header of an x2many list, or a field on its card when it renders as a
+kanban, to add, place, move, rename, hide or narrow a node of the
+**related** model, without leaving the record. Clicking the x2many
+field itself also offers the options of that table, so a list of lines
+can be made inline editable or lose its Add a line. The operation
+targets the related model while the inherit rides on the form that
+declares the table, and a field of the record itself keeps anchoring on
 the form, so the same name on both sides never collide. When the table
 is not written in the form but borrowed from another view, Odoo embeds
 it at render time and the client cannot tell; that case is refused with

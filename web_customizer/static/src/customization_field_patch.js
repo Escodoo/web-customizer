@@ -1,5 +1,6 @@
 import {InnerGroup, OuterGroup} from "@web/views/form/form_group/form_group";
 import {
+    SUBVIEW_ANCHOR_SELECTOR,
     isFormRootField,
     isKanbanRoot,
     openCustomizationFor,
@@ -31,11 +32,11 @@ patch(Field.prototype, {
         return names;
     },
     onCustomizationClick(ev) {
-        // This handler captures on the way down, so a column header of a
-        // table written inside the field would never see its own click.
-        // That header anchors on the related model, which is the more
-        // precise target, so leave it alone.
-        if (ev.target.closest?.(".o_field_x2many thead th[data-name]")) {
+        // This handler captures on the way down, so an anchor inside a
+        // subview written in this field would never see its own click. It
+        // targets the related model, which is the more precise answer, so
+        // leave it alone.
+        if (ev.target.closest?.(SUBVIEW_ANCHOR_SELECTOR)) {
             return;
         }
         openCustomizationFor(this, this.props.name, ev);

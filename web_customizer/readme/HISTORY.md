@@ -23,5 +23,6 @@ First public Beta.
 - The view root is a semantic anchor of its own, so a form, list or kanban
   can drop its Create, Edit, Delete or Duplicate buttons, and a list can
   set inline editing, a default order or row colours.
-- Columns of a table written inside a form are semantic anchors on the
-  related model, so order lines and the like are customized in place.
+- Columns and cards of a table written inside a form are semantic anchors
+  on the related model, so order lines and the like are customized in
+  place, options of the table included.

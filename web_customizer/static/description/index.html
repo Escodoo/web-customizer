@@ -430,15 +430,18 @@ reads are accepted, and a default order is checked against real stored
 fields, so an option that would be inert or that would break the list is
 refused up front.</p>
 <p>A table written inside a form is customizable in place: click a column
-header of an x2many list to add, place, move, rename, hide or narrow a
-column of the <strong>related</strong> model, without leaving the record. The
-operation targets that model while the inherit rides on the form that
-declares the table, and a column of the record itself keeps anchoring on
-the form, so the same name on both sides never collide. When the table
-is not written in the form but borrowed from another view, Odoo embeds
-it at render time and the client cannot tell; that case is refused with
-the model whose list view to open instead, rather than compiled into an
-inherit that would match nothing.</p>
+header of an x2many list, or a field on its card when it renders as a
+kanban, to add, place, move, rename, hide or narrow a node of the
+<strong>related</strong> model, without leaving the record. Clicking the x2many field
+itself also offers the options of that table, so a list of lines can be
+made inline editable or lose its Add a line. The operation targets the
+related model while the inherit rides on the form that declares the
+table, and a field of the record itself keeps anchoring on the form, so
+the same name on both sides never collide. When the table is not written
+in the form but borrowed from another view, Odoo embeds it at render
+time and the client cannot tell; that case is refused with the model
+whose list view to open instead, rather than compiled into an inherit
+that would match nothing.</p>
 <p>Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and
@@ -537,15 +540,17 @@ selectors). If the same name appears more than once, choose the node
 in the dialog. A new page after a field is wrapped in a notebook; a
 new page after an existing tab is a sibling.</li>
 <li>A table inside a form (order lines, bank accounts, any x2many written
-with its own <tt class="docutils literal">&lt;list&gt;</tt>) is customized in place: its column headers
-are outlined too. A column belongs to the <strong>related</strong> model, so the
-dialog adds or places fields there, while the inherit is written on
-the form that declares the table. The same field name on the record
-and in the table are separate anchors and never conflict. If the
-table is not written in the form but taken from another view, the
-dialog says so and names the model whose list view to open instead.
-Options on the table itself (inline editing, hiding its Add a line)
-are written from the operation form for now.</li>
+with its own <tt class="docutils literal">&lt;list&gt;</tt> or <tt class="docutils literal">&lt;kanban&gt;</tt>) is customized in place: its
+column headers, or its card fields and buttons, are outlined too. A
+node there belongs to the <strong>related</strong> model, so the dialog adds or
+places fields there, while the inherit is written on the form that
+declares the table. The same field name on the record and in the
+table are separate anchors and never conflict. Click the x2many field
+itself and choose <strong>Set options of this table</strong> to make a list of
+lines inline editable, drop its Add a line, or set its default order.
+If the table is not written in the form but taken from another view,
+the dialog says so and names the model whose list view to open
+instead.</li>
 <li>Some settings belong to the view itself rather than to a node, so
 they have no outline to click. On a form, list or kanban, use <strong>View
 options</strong> in the customization banner. There you can stop users from
@@ -596,7 +601,8 @@ or button.</li>
 can turn it on from the column picker.</li>
 <li><strong>Embedded table</strong> — on a form with order lines or bank accounts,
 click a column header and add or relabel a column of the related
-model.</li>
+model, then click the field itself and make the table inline
+editable.</li>
 <li><strong>Search</strong> — add, hide or relabel a search chip, or add a filter
 with a domain or a group by.</li>
 <li><strong>Kanban</strong> — hide a card field, a header button or the column
@@ -630,14 +636,9 @@ welcome.</p>
 on, so those views cannot be customized until one field exists. The
 view root is an anchor now, but it only carries option writes; placing
 a first field inside it still has to be designed.</li>
-<li>Options on the root of an embedded table (<tt class="docutils literal">editable</tt>, <tt class="docutils literal">create</tt>,
-<tt class="docutils literal">delete</tt>) compile from the operation form but have no entry point in
-place yet; the banner button targets the view the user is looking at,
-not the table inside it.</li>
-<li>Inside an embedded table only list subviews are clickable. A kanban
-subview and the form that opens when a line is expanded render outside
-that subtree, so they need their own way to publish which x2many field
-holds them.</li>
+<li>The form that opens when a line of an embedded table is expanded
+renders in a dialog, outside the subtree that publishes which x2many
+field holds it, so its fields are not anchors yet.</li>
 <li>List <tt class="docutils literal">multi_edit</tt> and kanban <tt class="docutils literal">quick_create</tt> compile from the
 operation form but have no control in the banner dialog yet. Kanban
 grouping flags (<tt class="docutils literal">group_create</tt>, <tt class="docutils literal">group_delete</tt>) are not
@@ -692,8 +693,9 @@ keeping the attributes the base view gave it.</li>
 <li>The view root is a semantic anchor of its own, so a form, list or
 kanban can drop its Create, Edit, Delete or Duplicate buttons, and a
 list can set inline editing, a default order or row colours.</li>
-<li>Columns of a table written inside a form are semantic anchors on the
-related model, so order lines and the like are customized in place.</li>
+<li>Columns and cards of a table written inside a form are semantic
+anchors on the related model, so order lines and the like are
+customized in place, options of the table included.</li>
 </ul>
 </div>
 </div>

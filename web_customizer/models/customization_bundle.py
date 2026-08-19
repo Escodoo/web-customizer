@@ -185,12 +185,15 @@ class CustomizationBundle(models.Model):
         subview = (anchor_subview or "").strip()
         candidates = []
         subview_inline = True
+        field_subview = False
         if view.exists() and (name or title):
             if title and not name:
                 title = source_unnamed_page_string(view, title)
             tree = arch_tree(view.with_context(lang=None))
             if subview:
                 tree, subview_inline = self._ui_subview_tree(tree, subview)
+            elif kind == "field":
+                field_subview = self._ui_field_subview(view, tree, name)
             if tree is not None:
                 candidates = list_anchor_candidates(self.env, tree, name, kind, title)
         count = len(candidates)
@@ -207,7 +210,25 @@ class CustomizationBundle(models.Model):
             "anchor_kind": kind,
             "candidates": candidates,
             "subview_inline": subview_inline,
+            "field_subview": field_subview,
         }
+
+    def _ui_field_subview(self, view, tree, name):
+        """Describe the table this x2many field writes in the view, if any.
+
+        Options on that table belong to the related model, so the dialog
+        needs both its tag and its model to offer them on the field click.
+        """
+        holders = tree.xpath(f".//field[@name={xpath_quote(name)}]")
+        if len(holders) != 1:
+            return False
+        nodes = holders[0].xpath("./*[self::list or self::kanban]")
+        if len(nodes) != 1:
+            return False
+        field = self.env["ir.model.fields"]._get(view.model, name)
+        if not field or field.ttype not in ("one2many", "many2many"):
+            return False
+        return {"type": nodes[0].tag, "model": field.relation}
 
     def _ui_subview_tree(self, tree, subview):
         """Narrow the arch to an embedded subview, if this view carries one.

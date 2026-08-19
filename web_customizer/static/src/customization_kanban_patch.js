@@ -58,15 +58,21 @@ patch(KanbanRecord.prototype, {
         super.setup(...arguments);
         this.customization = useCustomizationService();
     },
+    get customizationSubview() {
+        return this.env.customizationSubview || null;
+    },
+    get customizationAnchorable() {
+        return Boolean(isKanbanRoot(this) || this.customizationSubview);
+    },
     getRecordClasses() {
         const classes = super.getRecordClasses();
-        if (this.customization?.state.enabled && isKanbanRoot(this)) {
+        if (this.customization?.state.enabled && this.customizationAnchorable) {
             return `${classes} o_esc_customization_mode`.trim();
         }
         return classes;
     },
     onGlobalClick(ev) {
-        if (this.customization?.state.enabled && isKanbanRoot(this)) {
+        if (this.customization?.state.enabled && this.customizationAnchorable) {
             ev.preventDefault();
             ev.stopPropagation();
             return;
@@ -74,7 +80,7 @@ patch(KanbanRecord.prototype, {
         return super.onGlobalClick(ev);
     },
     onCustomizationFieldClick(ev, fieldName) {
-        if (!this.customization?.state.enabled || !isKanbanRoot(this)) {
+        if (!this.customization?.state.enabled || !this.customizationAnchorable) {
             return;
         }
         const label = this.props.record?.fields?.[fieldName]?.string || fieldName;
@@ -82,17 +88,19 @@ patch(KanbanRecord.prototype, {
             viewType: "kanban",
             fieldLabel: label,
             model: this.props.record?.resModel,
+            anchorSubview: this.customizationSubview?.name,
         });
     },
     onCustomizationButtonClick(ev, anchor, label, original) {
         if (
             this.customization?.state.enabled &&
-            isKanbanRoot(this) &&
+            this.customizationAnchorable &&
             openCustomizationFor(this, anchor, ev, {
                 viewType: "kanban",
                 anchorKind: "button",
                 fieldLabel: label || anchor,
                 model: this.props.record?.resModel,
+                anchorSubview: this.customizationSubview?.name,
             })
         ) {
             return;

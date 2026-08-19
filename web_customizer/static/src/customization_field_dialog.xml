@@ -52,7 +52,7 @@
                 <div class="mb-3">
                     <label class="form-label">Action</label>
                     <select
-                        class="form-select"
+                        class="form-select o_esc_action_select"
                         t-on-change="(ev) => state.action = ev.target.value"
                     >
                         <t t-foreach="actions" t-as="act" t-key="act.value">
@@ -65,6 +65,11 @@
                     </select>
                 </div>
                 <t t-if="state.action === 'set_view_attribute'">
+                    <p class="text-muted" t-if="tableTarget">
+                        These options apply to the
+                        <t t-esc="props.fieldLabel or props.fieldName" /> table,
+                        not to the record around it.
+                    </p>
                     <p class="text-muted">
                         Leave an option untouched to keep what the view already
                         does.
@@ -97,7 +102,7 @@
                     <div class="mb-3" t-if="isListView">
                         <label class="form-label">Inline editing</label>
                         <select
-                            class="form-select"
+                            class="form-select o_esc_root_editable"
                             t-on-change="(ev) => state.rootEditable = ev.target.value"
                         >
                             <option
@@ -118,7 +123,7 @@
                             >Off</option>
                         </select>
                     </div>
-                    <div class="mb-3" t-if="props.viewType !== 'form'">
+                    <div class="mb-3" t-if="targetViewType !== 'form'">
                         <label class="form-label">Default order (optional)</label>
                         <input
                             type="text"

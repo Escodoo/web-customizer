@@ -214,6 +214,31 @@ class CustomizationCase(TransactionCase):
             }
         )
 
+    def _form_with_kanban_subview(self):
+        """Form whose x2many writes a kanban instead of a list."""
+        return self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.subview.kanban",
+                "model": "res.partner",
+                "type": "form",
+                "arch": """
+                    <form>
+                        <sheet>
+                            <field name="bank_ids">
+                                <kanban>
+                                    <templates>
+                                        <t t-name="card">
+                                            <field name="acc_number"/>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </sheet>
+                    </form>
+                """,
+            }
+        )
+
     def _form_with_referenced_subview(self):
         """Form whose x2many borrows its list from a res.partner.bank view."""
         return self.env["ir.ui.view"].create(

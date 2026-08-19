@@ -56,6 +56,18 @@ export function useCustomizationService() {
 // everywhere else rather than offering an entry that compiles to nothing.
 export const ROOT_OPTION_VIEW_TYPES = ["form", "list", "kanban"];
 
+// Subviews an x2many can write inline, and which this addon can anchor in.
+export const SUBVIEW_MODES = ["list", "kanban"];
+
+// Nodes inside an embedded subview that carry an anchor of their own. The
+// field around them captures clicks on the way down, so it has to let these
+// through to the more precise target underneath.
+export const SUBVIEW_ANCHOR_SELECTOR = [
+    ".o_field_x2many thead th[data-name]",
+    ".o_field_x2many .o_esc_kanban_field",
+    ".o_field_x2many .o_esc_kanban_button",
+].join(", ");
+
 function formRecord(component) {
     return component.props.record || component.env.model?.root;
 }

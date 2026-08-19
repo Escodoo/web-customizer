@@ -69,9 +69,7 @@ class TestCustomizationSubview(CustomizationCase):
         )
         bundle.action_apply()
         self._assert_applied(bundle)
-        self.assertEqual(
-            self._columns(view), ["acc_number", "bank_id", "company_id"]
-        )
+        self.assertEqual(self._columns(view), ["acc_number", "bank_id", "company_id"])
 
     def test_a_shared_name_is_renamed_only_inside_the_subview(self):
         """The parent carries company_id too, so the scope has to hold."""
@@ -210,6 +208,55 @@ class TestCustomizationSubview(CustomizationCase):
                 code="client_sub_second",
                 operations=[self._rename(view, "acc_number", "Number")],
             )
+
+    def test_a_card_field_of_a_written_kanban_is_an_anchor(self):
+        view = self._form_with_kanban_subview()
+        bundle = self._create_bundle(
+            code="client_sub_kanban",
+            operations=[
+                Command.create(
+                    {
+                        "type": "set_string",
+                        "model_id": self.bank_model.id,
+                        "view_id": view.id,
+                        "view_type": "kanban",
+                        "anchor_kind": "field",
+                        "anchor_name": "acc_number",
+                        "anchor_subview": "bank_ids",
+                        "position": "attributes",
+                        "payload": {"string": "Account"},
+                    }
+                )
+            ],
+        )
+        bundle.action_apply()
+        self._assert_applied(bundle)
+        root = self._root(view)
+        node = root.xpath(
+            ".//field[@name='bank_ids']/kanban//field[@name='acc_number']"
+        )
+        self.assertEqual(node[0].get("string"), "Account")
+
+    def test_the_ui_reports_the_table_a_field_writes(self):
+        view = self._form_with_subview()
+        info = self.env["customization.bundle"].get_ui_context(
+            view.id, "bank_ids", "field"
+        )
+        self.assertEqual(
+            info["field_subview"], {"type": "list", "model": "res.partner.bank"}
+        )
+
+    def test_the_ui_reports_no_table_for_a_plain_field(self):
+        view = self._form_with_subview()
+        info = self.env["customization.bundle"].get_ui_context(view.id, "name", "field")
+        self.assertFalse(info["field_subview"])
+
+    def test_the_ui_reports_no_table_when_the_view_borrows_one(self):
+        view = self._form_with_referenced_subview()
+        info = self.env["customization.bundle"].get_ui_context(
+            view.id, "bank_ids", "field"
+        )
+        self.assertFalse(info["field_subview"])
 
     def test_the_parent_and_the_subview_are_separate_scopes(self):
         """Same view, same name, different scope: no conflict."""

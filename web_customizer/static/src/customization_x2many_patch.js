@@ -1,3 +1,4 @@
+import {SUBVIEW_MODES} from "./customization_service";
 import {X2ManyField} from "@web/views/fields/x2many/x2many_field";
 import {patch} from "@web/core/utils/patch";
 import {useSubEnv} from "@odoo/owl";
@@ -9,7 +10,7 @@ import {useSubEnv} from "@odoo/owl";
 patch(X2ManyField.prototype, {
     setup() {
         super.setup(...arguments);
-        if (this.props.viewMode === "list") {
+        if (SUBVIEW_MODES.includes(this.props.viewMode)) {
             useSubEnv({
                 customizationSubview: {
                     name: this.props.name,

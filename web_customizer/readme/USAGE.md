@@ -32,15 +32,17 @@
    in the dialog. A new page after a field is wrapped in a notebook; a
    new page after an existing tab is a sibling.
 3. A table inside a form (order lines, bank accounts, any x2many written
-   with its own ``<list>``) is customized in place: its column headers
-   are outlined too. A column belongs to the **related** model, so the
-   dialog adds or places fields there, while the inherit is written on
-   the form that declares the table. The same field name on the record
-   and in the table are separate anchors and never conflict. If the
-   table is not written in the form but taken from another view, the
-   dialog says so and names the model whose list view to open instead.
-   Options on the table itself (inline editing, hiding its Add a line)
-   are written from the operation form for now.
+   with its own ``<list>`` or ``<kanban>``) is customized in place: its
+   column headers, or its card fields and buttons, are outlined too. A
+   node there belongs to the **related** model, so the dialog adds or
+   places fields there, while the inherit is written on the form that
+   declares the table. The same field name on the record and in the
+   table are separate anchors and never conflict. Click the x2many field
+   itself and choose **Set options of this table** to make a list of
+   lines inline editable, drop its Add a line, or set its default order.
+   If the table is not written in the form but taken from another view,
+   the dialog says so and names the model whose list view to open
+   instead.
 4. Some settings belong to the view itself rather than to a node, so they
    have no outline to click. On a form, list or kanban, use **View
    options** in the customization banner. There you can stop users from
@@ -90,7 +92,8 @@ leave this module as the production runtime.
    can turn it on from the column picker.
 3. **Embedded table** — on a form with order lines or bank accounts,
    click a column header and add or relabel a column of the related
-   model.
+   model, then click the field itself and make the table inline
+   editable.
 4. **Search** — add, hide or relabel a search chip, or add a filter with a
    domain or a group by.
 5. **Kanban** — hide a card field, a header button or the column progressbar.

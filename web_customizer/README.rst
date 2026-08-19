@@ -91,15 +91,18 @@ fields, so an option that would be inert or that would break the list is
 refused up front.
 
 A table written inside a form is customizable in place: click a column
-header of an x2many list to add, place, move, rename, hide or narrow a
-column of the **related** model, without leaving the record. The
-operation targets that model while the inherit rides on the form that
-declares the table, and a column of the record itself keeps anchoring on
-the form, so the same name on both sides never collide. When the table
-is not written in the form but borrowed from another view, Odoo embeds
-it at render time and the client cannot tell; that case is refused with
-the model whose list view to open instead, rather than compiled into an
-inherit that would match nothing.
+header of an x2many list, or a field on its card when it renders as a
+kanban, to add, place, move, rename, hide or narrow a node of the
+**related** model, without leaving the record. Clicking the x2many field
+itself also offers the options of that table, so a list of lines can be
+made inline editable or lose its Add a line. The operation targets the
+related model while the inherit rides on the form that declares the
+table, and a field of the record itself keeps anchoring on the form, so
+the same name on both sides never collide. When the table is not written
+in the form but borrowed from another view, Odoo embeds it at render
+time and the client cannot tell; that case is refused with the model
+whose list view to open instead, rather than compiled into an inherit
+that would match nothing.
 
 Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
@@ -188,15 +191,17 @@ Usage
    in the dialog. A new page after a field is wrapped in a notebook; a
    new page after an existing tab is a sibling.
 3. A table inside a form (order lines, bank accounts, any x2many written
-   with its own ``<list>``) is customized in place: its column headers
-   are outlined too. A column belongs to the **related** model, so the
-   dialog adds or places fields there, while the inherit is written on
-   the form that declares the table. The same field name on the record
-   and in the table are separate anchors and never conflict. If the
-   table is not written in the form but taken from another view, the
-   dialog says so and names the model whose list view to open instead.
-   Options on the table itself (inline editing, hiding its Add a line)
-   are written from the operation form for now.
+   with its own ``<list>`` or ``<kanban>``) is customized in place: its
+   column headers, or its card fields and buttons, are outlined too. A
+   node there belongs to the **related** model, so the dialog adds or
+   places fields there, while the inherit is written on the form that
+   declares the table. The same field name on the record and in the
+   table are separate anchors and never conflict. Click the x2many field
+   itself and choose **Set options of this table** to make a list of
+   lines inline editable, drop its Add a line, or set its default order.
+   If the table is not written in the form but taken from another view,
+   the dialog says so and names the model whose list view to open
+   instead.
 4. Some settings belong to the view itself rather than to a node, so
    they have no outline to click. On a form, list or kanban, use **View
    options** in the customization banner. There you can stop users from
@@ -248,7 +253,8 @@ leave this module as the production runtime.
     can turn it on from the column picker.
 3.  **Embedded table** — on a form with order lines or bank accounts,
     click a column header and add or relabel a column of the related
-    model.
+    model, then click the field itself and make the table inline
+    editable.
 4.  **Search** — add, hide or relabel a search chip, or add a filter
     with a domain or a group by.
 5.  **Kanban** — hide a card field, a header button or the column
@@ -284,14 +290,9 @@ Next:
   on, so those views cannot be customized until one field exists. The
   view root is an anchor now, but it only carries option writes; placing
   a first field inside it still has to be designed.
-- Options on the root of an embedded table (``editable``, ``create``,
-  ``delete``) compile from the operation form but have no entry point in
-  place yet; the banner button targets the view the user is looking at,
-  not the table inside it.
-- Inside an embedded table only list subviews are clickable. A kanban
-  subview and the form that opens when a line is expanded render outside
-  that subtree, so they need their own way to publish which x2many field
-  holds them.
+- The form that opens when a line of an embedded table is expanded
+  renders in a dialog, outside the subtree that publishes which x2many
+  field holds it, so its fields are not anchors yet.
 - List ``multi_edit`` and kanban ``quick_create`` compile from the
   operation form but have no control in the banner dialog yet. Kanban
   grouping flags (``group_create``, ``group_delete``) are not
@@ -347,8 +348,9 @@ First public Beta.
 - The view root is a semantic anchor of its own, so a form, list or
   kanban can drop its Create, Edit, Delete or Duplicate buttons, and a
   list can set inline editing, a default order or row colours.
-- Columns of a table written inside a form are semantic anchors on the
-  related model, so order lines and the like are customized in place.
+- Columns and cards of a table written inside a form are semantic
+  anchors on the related model, so order lines and the like are
+  customized in place, options of the table included.
 
 Bug Tracker
 ===========
