@@ -80,6 +80,18 @@ it at render time and the client cannot tell; that case is refused with
 the model whose list view to open instead, rather than compiled into an
 inherit that would match nothing.
 
+A button that calls an action the database already has can be added next
+to any field or button of a form, a list or a kanban, including inside a
+written table and next to the buttons of a form header. The arch keeps
+the XML ID of the action rather than its database id, which is what the
+view validator and the client both accept, so the button survives a
+reinstall of the module owning the action and the export carries a
+readable reference plus the dependency on that module. Anything that is
+not an action, or an action without an XML ID, is refused before it is
+written, and a second button calling the same action on the same view is
+refused as well. Creating the action itself is out of scope: a server
+action is written where server actions belong, then bound here.
+
 Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and compile

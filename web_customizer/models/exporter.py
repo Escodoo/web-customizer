@@ -72,6 +72,7 @@ def export_bundle_files(bundle):
         files["views/inherited_views.xml"] = _views_xml(views, operations)
         data_files.append("views/inherited_views.xml")
         depends.update(_view_modules(views))
+        depends.update(_button_action_modules(operations))
 
     if menu_ops:
         files["data/ir_ui_menu.xml"] = _menus_xml(menu_ops)
@@ -251,6 +252,16 @@ def _view_modules(views):
 def _add_xmlid_module(modules, xmlid):
     if xmlid and "." in xmlid:
         modules.add(xmlid.split(".", 1)[0])
+
+
+def _button_action_modules(operations):
+    """Modules owning the actions the exported buttons call by XML ID."""
+    modules = set()
+    for operation in operations:
+        if operation.type != "add_button":
+            continue
+        _add_xmlid_module(modules, (operation.payload or {}).get("action_xmlid"))
+    return modules
 
 
 def _menu_modules(operations):

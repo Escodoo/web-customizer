@@ -104,6 +104,18 @@ time and the client cannot tell; that case is refused with the model
 whose list view to open instead, rather than compiled into an inherit
 that would match nothing.
 
+A button that calls an action the database already has can be added next
+to any field or button of a form, a list or a kanban, including inside a
+written table and next to the buttons of a form header. The arch keeps
+the XML ID of the action rather than its database id, which is what the
+view validator and the client both accept, so the button survives a
+reinstall of the module owning the action and the export carries a
+readable reference plus the dependency on that module. Anything that is
+not an action, or an action without an XML ID, is refused before it is
+written, and a second button calling the same action on the same view is
+refused as well. Creating the action itself is out of scope: a server
+action is written where server actions belong, then bound here.
+
 Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and
@@ -202,7 +214,16 @@ Usage
    If the table is not written in the form but taken from another view,
    the dialog says so and names the model whose list view to open
    instead.
-4. Some settings belong to the view itself rather than to a node, so
+4. To call an existing action from a view, click a field or a button of
+   a form, a list or a kanban and choose **Add button after this one**.
+   Pick the action in the selector (a window action opens its view, a
+   server action runs on the record) and give the button a label and a
+   style. The action must already have an XML ID, which is what gets
+   written in the view and what the exported addon depends on; this
+   addon does not create actions. Clicking a button of a form header is
+   how a button is added to that header. The same action cannot be
+   called twice from the same view.
+5. Some settings belong to the view itself rather than to a node, so
    they have no outline to click. On a form, list or kanban, use **View
    options** in the customization banner. There you can stop users from
    creating, editing, deleting or duplicating records; a list can also
@@ -213,11 +234,11 @@ Usage
    turned back into a read-only one. Only options the arch parser of
    that view type reads are accepted: decorations exist on lists only,
    and pivot, graph and search views have none.
-5. Or add operations from the bundle form. Fill the payload fields for
+6. Or add operations from the bundle form. Fill the payload fields for
    the selected type. The **Raw JSON** tab shows the stored intent. View
    options are written there as one ``name=value`` per line.
-6. Click **Apply** to compile fields and inherited views.
-7. After an Odoo upgrade (``-u``), a health check runs automatically and
+7. Click **Apply** to compile fields and inherited views.
+8. After an Odoo upgrade (``-u``), a health check runs automatically and
    re-resolves anchors. You can still click **Health Check** on the
    bundle. Missing anchors are marked broken (inherit deactivated) and
    show ``broken_reason``. If the anchor comes back, Health Check
@@ -225,7 +246,7 @@ Usage
    still recompiles every live operation. Changing an ``add_field`` type
    or relation recreates the field and deletes values already stored in
    that column (label, help and required update in place).
-8. When the bundle is applied, click **Export Addon**. In the dialog,
+9. When the bundle is applied, click **Export Addon**. In the dialog,
    click **Download ZIP** and put that module in git; it does not depend
    on this module at runtime. Compiled fields, views and menus store
    their XML IDs under the bundle ``code`` (the future addon name).
@@ -264,10 +285,13 @@ leave this module as the production runtime.
 7.  **Menus** — hide, rename or move one navbar item that has an XML ID.
 8.  **View options** — from the banner, drop the Create button on one
     list and colour its rows by a condition.
-9.  Click **Apply**. Broken operations show ``broken_reason``; fix the
+9.  **Button** — on a form header, add a button calling an action the
+    database already has, and check the exported manifest depends on the
+    module owning it.
+10. Click **Apply**. Broken operations show ``broken_reason``; fix the
     anchor and run **Health Check** (or **Re-apply**).
-10. Click **Export Addon** → **Download ZIP**.
-11. Install that module on staging (``-i <bundle.code>``). Do not
+11. Click **Export Addon** → **Download ZIP**.
+12. Install that module on staging (``-i <bundle.code>``). Do not
     install ``web_customizer`` there unless the wand is still needed.
 
 Graph operations are written from the operation form rather than in
@@ -300,6 +324,10 @@ Next:
 - Graph operations are written from the backend form only. The view
   draws on a canvas, so there is no field node to click; offering them
   in place needs a side panel listing the arch fields.
+- A button binds an action that already exists; writing the server
+  action itself is not offered, and neither is a button calling a model
+  method, since a method name cannot be validated against user intent
+  the way an XML ID can.
 - Free XPath anchors stay in the model for export compatibility but are
   not offered in the systray dialog.
 
@@ -351,6 +379,9 @@ First public Beta.
 - Columns and cards of a table written inside a form are semantic
   anchors on the related model, so order lines and the like are
   customized in place, options of the table included.
+- A button calling an action that already exists can be added to a form,
+  a list or a kanban; the arch keeps the XML ID, so the export depends
+  on the module owning the action.
 
 Bug Tracker
 ===========

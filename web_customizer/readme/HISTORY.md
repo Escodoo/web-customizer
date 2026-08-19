@@ -26,3 +26,6 @@ First public Beta.
 - Columns and cards of a table written inside a form are semantic anchors
   on the related model, so order lines and the like are customized in
   place, options of the table included.
+- A button calling an action that already exists can be added to a form, a
+  list or a kanban; the arch keeps the XML ID, so the export depends on
+  the module owning the action.

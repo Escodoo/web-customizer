@@ -617,6 +617,66 @@ test("options of a table are written on its own model", async () => {
     ]);
 });
 
+test("a button needs an action before it is written", async () => {
+    mockService("notification", {
+        add(message, options) {
+            expect.step(`${options.type}:${message}`);
+        },
+    });
+    mockService("orm", {
+        async call(model, method, args) {
+            if (method === "get_ui_context") {
+                return {
+                    bundles: [{id: 1, name: "Sandbox"}],
+                    anchor_count: 1,
+                    anchor_unique: true,
+                    candidates: [],
+                };
+            }
+            if (model === "ir.actions.actions") {
+                // The action selector queries as soon as it renders; the
+                // choice itself is made through its update callback below.
+                return {records: [], length: 0};
+            }
+            if (method === "create_from_ui") {
+                const params = args[0];
+                expect.step([params.action, JSON.stringify(params.payload)].join("|"));
+                return {operation_ids: [1], broken: []};
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+        async read() {
+            return [];
+        },
+    });
+    const env = await makeDialogMockEnv();
+    const dialog = await mountWithCleanup(CustomizationFieldDialog, {
+        env,
+        props: {
+            close() {
+                expect.step("close");
+            },
+            fieldName: "name",
+            fieldLabel: "Name",
+            model: "partner",
+            viewId: 1,
+            viewType: "form",
+        },
+    });
+    await contains(".o_esc_action_select").select("add_button");
+    await contains(".o_esc_button_label").edit("Open Contacts");
+    await contains(".o_esc_button_class").select("btn-primary");
+    await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps(["danger:Select the action the button calls."]);
+    dialog.onWindowActionUpdate(7);
+    await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps([
+        'add_button|{"string":"Open Contacts","action_id":7,"btn_class":"btn-primary"}',
+        "success:Customization applied.",
+        "close",
+    ]);
+});
+
 test("dialog reports RPC failures and stays open", async () => {
     mockService("notification", {
         add(message, options) {

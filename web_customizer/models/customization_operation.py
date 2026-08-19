@@ -15,6 +15,8 @@ from .compiler import (
     AnchorError,
     _deactivate_generated_view,
     apply_operation,
+    button_action_conflict_message,
+    button_action_conflicts,
     ensure_field_name,
     ensure_menu_xmlid_name,
     health_check_operation,
@@ -49,6 +51,11 @@ PLACEMENT_PAYLOAD_UI = (
 )
 SIMPLE_PAYLOAD_UI = {
     "move_menu": (("payload_target_xmlid", "target_xmlid"),),
+    "add_button": (
+        ("payload_string", "string"),
+        ("payload_action_xmlid", "action_xmlid"),
+        ("payload_btn_class", "btn_class"),
+    ),
     "set_widget": (("payload_widget", "widget"),),
     "set_optional": (("payload_optional", "optional"),),
     "set_groups": (("payload_groups", "groups"),),
@@ -78,6 +85,7 @@ PAYLOAD_UI_FIELDS = (
     "payload_mod_required",
     "payload_mod_column_invisible",
     "payload_action_xmlid",
+    "payload_btn_class",
     "payload_target_xmlid",
 )
 
@@ -102,6 +110,7 @@ class CustomizationOperation(models.Model):
             ("move_field", "Move Field"),
             ("add_page", "Add Page"),
             ("add_group", "Add Group"),
+            ("add_button", "Add Button"),
             ("add_filter", "Add Filter"),
             ("set_string", "Set Label"),
             ("set_widget", "Set Widget"),
@@ -333,8 +342,19 @@ class CustomizationOperation(models.Model):
     payload_action_xmlid = fields.Char(
         compute="_compute_payload_ui",
         inverse="_inverse_payload_ui",
-        string="Window Action",
-        help="XML ID of the window action, for example base.action_partner_form.",
+        string="Action",
+        help="XML ID of the action, for example base.action_partner_form. "
+        "A menu needs a window action; a button also takes a server action.",
+    )
+    payload_btn_class = fields.Selection(
+        selection=[
+            ("btn-primary", "Primary"),
+            ("btn-secondary", "Secondary"),
+            ("btn-link", "Link"),
+        ],
+        compute="_compute_payload_ui",
+        inverse="_inverse_payload_ui",
+        string="Button Style",
     )
     payload_target_xmlid = fields.Char(
         compute="_compute_payload_ui",
@@ -392,6 +412,11 @@ class CustomizationOperation(models.Model):
             elif rec.type == "add_group":
                 rec.name = (
                     f"Add group {payload.get('string') or payload.get('name') or '?'}"
+                )
+            elif rec.type == "add_button":
+                rec.name = (
+                    f"Add button {payload.get('string') or '?'} "
+                    f"{rec.position or 'after'} {anchor}"
                 )
             elif rec.type == "set_view_attribute":
                 options = ", ".join(sorted(payload.get("attributes") or {})) or "?"
@@ -456,6 +481,7 @@ class CustomizationOperation(models.Model):
                 modifiers.get("column_invisible") or False
             )
             rec.payload_action_xmlid = payload.get("action_xmlid") or False
+            rec.payload_btn_class = payload.get("btn_class") or False
             rec.payload_target_xmlid = payload.get("target_xmlid") or False
 
     def _inverse_payload_ui(self):
@@ -683,7 +709,9 @@ class CustomizationOperation(models.Model):
             self._check_add_field_operation()
         elif self.type in MENU_TYPES:
             self._check_menu_operation()
-        elif self.type in PLACEMENT_TYPES + ATTRIBUTE_TYPES + STRUCTURE_TYPES:
+        elif self.type in PLACEMENT_TYPES + ATTRIBUTE_TYPES + STRUCTURE_TYPES + (
+            "add_button",
+        ):
             self._check_view_operation()
 
     def _check_add_field_operation(self):
@@ -730,6 +758,10 @@ class CustomizationOperation(models.Model):
             other = place_field_conflicts(self)
             if other:
                 raise ValidationError(place_field_conflict_message(self, other))
+        elif self.type == "add_button":
+            other = button_action_conflicts(self)
+            if other:
+                raise ValidationError(button_action_conflict_message(self, other))
 
     def _mark_broken(self, reason):
         self.ensure_one()

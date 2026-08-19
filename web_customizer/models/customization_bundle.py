@@ -20,6 +20,7 @@ from .compiler import (
     resolve_related_field,
     slugify_field_suffix,
     source_unnamed_page_string,
+    validated_button_action,
     xpath_quote,
 )
 
@@ -36,6 +37,7 @@ UI_ACTIONS = (
     "set_view_attribute",
     "add_page",
     "add_group",
+    "add_button",
     "add_filter",
     "add_menu",
     "add_submenu",
@@ -359,6 +361,22 @@ class CustomizationBundle(models.Model):
                 occurrence=occurrence,
                 anchor_string=anchor_string,
             )
+        elif action == "add_button":
+            operations = self._ui_action_add_button(
+                bundle,
+                sequence,
+                model,
+                view,
+                view_type,
+                anchor_name,
+                payload,
+                apply,
+                anchor_kind=anchor_kind,
+                occurrence=occurrence,
+                anchor_page=anchor_page,
+                anchor_string=anchor_string,
+                anchor_subview=anchor_subview,
+            )
         elif action in STRUCTURE_TYPES:
             operations = self._ui_action_add_structure(
                 bundle,
@@ -580,6 +598,30 @@ class CustomizationBundle(models.Model):
             )
         return xmlid
 
+    def _ui_button_action_xmlid(self, payload):
+        """Return the XML ID of any action a button may call.
+
+        A button is not limited to a window action, so the record id coming
+        from the selector is read on ``ir.actions.actions`` and turned into
+        its concrete model, which is where the XML ID is registered.
+        """
+        if (payload.get("action_xmlid") or "").strip():
+            return validated_button_action(self.env, payload.get("action_xmlid"))
+        action_id = payload.get("action_id")
+        if not action_id:
+            raise UserError(self.env._("Select the action the button calls."))
+        action = self.env["ir.actions.actions"].browse(int(action_id)).exists()
+        if not action:
+            raise UserError(self.env._("The action is missing."))
+        concrete = self.env[action.type].browse(action.id)
+        xmlid = concrete.get_external_id().get(action.id)
+        if not xmlid:
+            raise UserError(
+                self.env._("Action '%s' has no XML ID and cannot be used.")
+                % action.display_name
+            )
+        return xmlid
+
     def _ui_action_add_after(
         self,
         bundle,
@@ -649,6 +691,14 @@ class CustomizationBundle(models.Model):
         if (action == "set_view_attribute") != (anchor_kind == "view"):
             raise UserError(
                 self.env._("View options are set on the view itself, not on a node.")
+            )
+        if action == "add_button" and (params.get("view_type") or "form") not in (
+            "form",
+            "list",
+            "kanban",
+        ):
+            raise UserError(
+                self.env._("Buttons can only be added on forms, lists and kanbans.")
             )
         if action == "set_widget" and anchor_kind != "field":
             raise UserError(self.env._("Widgets can only be set on fields."))
@@ -771,6 +821,53 @@ class CustomizationBundle(models.Model):
             "payload": {"string": string, "name": name},
         }
         vals.update(self._ui_anchor_extra(occurrence, anchor_page, anchor_string))
+        operation = self.env["customization.operation"].create(vals)
+        if apply:
+            operation.action_apply()
+        return operation
+
+    def _ui_action_add_button(
+        self,
+        bundle,
+        sequence,
+        model,
+        view,
+        view_type,
+        anchor_name,
+        payload,
+        apply,
+        anchor_kind="field",
+        occurrence=0,
+        anchor_page=False,
+        anchor_string=False,
+        anchor_subview=False,
+    ):
+        """Create an add_button operation calling an existing action."""
+        string = (payload.get("string") or "").strip()
+        if not string:
+            raise UserError(self.env._("A button label is required."))
+        xmlid = self._ui_button_action_xmlid(payload)
+        vals = {
+            "bundle_id": bundle.id,
+            "sequence": sequence,
+            "type": "add_button",
+            "model_id": model.id,
+            "view_id": view.id,
+            "view_type": view_type,
+            "anchor_kind": anchor_kind,
+            "anchor_name": anchor_name,
+            "position": "after",
+            "payload": {
+                "string": string,
+                "action_xmlid": xmlid,
+                "btn_class": (payload.get("btn_class") or "").strip(),
+            },
+        }
+        vals.update(
+            self._ui_anchor_extra(
+                occurrence, anchor_page, anchor_string, anchor_subview
+            )
+        )
         operation = self.env["customization.operation"].create(vals)
         if apply:
             operation.action_apply()

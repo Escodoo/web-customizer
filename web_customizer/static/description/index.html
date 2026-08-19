@@ -442,6 +442,17 @@ in the form but borrowed from another view, Odoo embeds it at render
 time and the client cannot tell; that case is refused with the model
 whose list view to open instead, rather than compiled into an inherit
 that would match nothing.</p>
+<p>A button that calls an action the database already has can be added next
+to any field or button of a form, a list or a kanban, including inside a
+written table and next to the buttons of a form header. The arch keeps
+the XML ID of the action rather than its database id, which is what the
+view validator and the client both accept, so the button survives a
+reinstall of the module owning the action and the export carries a
+readable reference plus the dependency on that module. Anything that is
+not an action, or an action without an XML ID, is refused before it is
+written, and a second button calling the same action on the same view is
+refused as well. Creating the action itself is out of scope: a server
+action is written where server actions belong, then bound here.</p>
 <p>Pivot and graph views compile too. A pivot measure is clickable like any
 other anchor; graph has no per-field DOM to click, since it draws on a
 canvas, so graph operations are written from the backend form and
@@ -551,6 +562,15 @@ lines inline editable, drop its Add a line, or set its default order.
 If the table is not written in the form but taken from another view,
 the dialog says so and names the model whose list view to open
 instead.</li>
+<li>To call an existing action from a view, click a field or a button of
+a form, a list or a kanban and choose <strong>Add button after this one</strong>.
+Pick the action in the selector (a window action opens its view, a
+server action runs on the record) and give the button a label and a
+style. The action must already have an XML ID, which is what gets
+written in the view and what the exported addon depends on; this
+addon does not create actions. Clicking a button of a form header is
+how a button is added to that header. The same action cannot be
+called twice from the same view.</li>
 <li>Some settings belong to the view itself rather than to a node, so
 they have no outline to click. On a form, list or kanban, use <strong>View
 options</strong> in the customization banner. There you can stop users from
@@ -612,6 +632,9 @@ measure.</li>
 <li><strong>Menus</strong> — hide, rename or move one navbar item that has an XML ID.</li>
 <li><strong>View options</strong> — from the banner, drop the Create button on one
 list and colour its rows by a condition.</li>
+<li><strong>Button</strong> — on a form header, add a button calling an action the
+database already has, and check the exported manifest depends on the
+module owning it.</li>
 <li>Click <strong>Apply</strong>. Broken operations show <tt class="docutils literal">broken_reason</tt>; fix the
 anchor and run <strong>Health Check</strong> (or <strong>Re-apply</strong>).</li>
 <li>Click <strong>Export Addon</strong> → <strong>Download ZIP</strong>.</li>
@@ -646,6 +669,10 @@ whitelisted at all.</li>
 <li>Graph operations are written from the backend form only. The view
 draws on a canvas, so there is no field node to click; offering them
 in place needs a side panel listing the arch fields.</li>
+<li>A button binds an action that already exists; writing the server
+action itself is not offered, and neither is a button calling a model
+method, since a method name cannot be validated against user intent
+the way an XML ID can.</li>
 <li>Free XPath anchors stay in the model for export compatibility but are
 not offered in the systray dialog.</li>
 </ul>
@@ -696,6 +723,9 @@ list can set inline editing, a default order or row colours.</li>
 <li>Columns and cards of a table written inside a form are semantic
 anchors on the related model, so order lines and the like are
 customized in place, options of the table included.</li>
+<li>A button calling an action that already exists can be added to a form,
+a list or a kanban; the arch keeps the XML ID, so the export depends
+on the module owning the action.</li>
 </ul>
 </div>
 </div>

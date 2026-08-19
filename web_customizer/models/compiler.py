@@ -89,6 +89,9 @@ PLACEMENT_LABELS = {
     "move_field": "Move Field",
 }
 STRUCTURE_TYPES = ("add_page", "add_group")
+# Classes the form, list and kanban renderers style a button with. Anything
+# else is either inert or breaks the look of the view it lands on.
+BUTTON_CLASSES = ("btn-primary", "btn-secondary", "btn-link", "")
 MENU_TYPES = (
     "hide_menu",
     "set_menu_string",
@@ -864,6 +867,9 @@ def apply_operation(operation):
             _apply_add_filter(operation)
         elif operation.type in STRUCTURE_TYPES:
             _apply_add_structure(operation)
+        elif operation.type == "add_button":
+            assert_no_button_action_conflict(operation)
+            _apply_add_button(operation)
         elif operation.type in ATTRIBUTE_TYPES:
             assert_no_view_write_conflict(operation)
             _apply_attributes(operation)
@@ -1620,6 +1626,99 @@ def _apply_add_structure(operation):
     if string:
         payload["string"] = string
     operation.payload = payload
+
+
+def validated_button_action(env, xmlid):
+    """Return the XML ID of an action a button may call, or raise.
+
+    The arch keeps the XML ID rather than the database id, which is what
+    the view validator and the client both accept, so the compiled button
+    survives a reinstall of the module that owns the action and exports
+    without a numeric id nobody can read.
+    """
+    xmlid = (xmlid or "").strip()
+    if not xmlid:
+        raise UserError(env._("A button needs an action to call."))
+    model, res_id = env["ir.model.data"]._xmlid_to_res_model_res_id(
+        xmlid, raise_if_not_found=False
+    )
+    if not res_id:
+        raise UserError(env._("Action '%s' is missing.") % xmlid)
+    if not issubclass(env.registry[model], env.registry["ir.actions.actions"]):
+        raise UserError(
+            env._(
+                "'%(xmlid)s' is a %(model)s, not an action a button can call.",
+                xmlid=xmlid,
+                model=model,
+            )
+        )
+    return xmlid
+
+
+def _apply_add_button(operation):
+    """Compile add_button into a button node calling an existing action."""
+    payload = dict(_payload(operation))
+    env = operation.env
+    string = (payload.get("string") or "").strip()
+    if not string:
+        raise UserError(env._("A button label is required."))
+    xmlid = validated_button_action(env, payload.get("action_xmlid"))
+    btn_class = (payload.get("btn_class") or "").strip()
+    if btn_class not in BUTTON_CLASSES:
+        raise UserError(env._("Button class '%s' is not supported.") % btn_class)
+    position = operation.position or "after"
+    if position not in FIELD_POSITIONS:
+        raise AnchorError(
+            operation.env._("Position '%s' is not valid for placing a button.")
+            % position
+        )
+    attrs = f'type="action" name="{_xml_attr(xmlid)}" string="{_xml_attr(string)}"'
+    if btn_class:
+        attrs += f' class="{_xml_attr(btn_class)}"'
+    arch = _inherit_arch(operation, f"<button {attrs}/>", position)
+    _upsert_generated_view(operation, arch, active=True)
+    payload.update({"string": string, "action_xmlid": xmlid})
+    operation.payload = payload
+
+
+def button_action_conflicts(operation):
+    """Return another live button calling the same action on the view."""
+    Operation = operation.env["customization.operation"]
+    if operation.type != "add_button" or not operation.view_id:
+        return Operation.browse()
+    xmlid = (_payload(operation).get("action_xmlid") or "").strip()
+    if not xmlid:
+        return Operation.browse()
+    domain = [
+        ("view_id", "=", operation.view_id.id),
+        ("type", "=", "add_button"),
+        ("anchor_subview", "=", operation.anchor_subview or False),
+        ("state", "in", ("draft", "applied")),
+    ]
+    if operation.id:
+        domain.append(("id", "!=", operation.id))
+    others = Operation.search(domain)
+    return others.filtered(
+        lambda rec: (rec.payload or {}).get("action_xmlid") == xmlid
+    )[:1]
+
+
+def button_action_conflict_message(operation, other):
+    """Explain which bundle already calls this action from the view."""
+    return operation.env._(
+        "Bundle '%(bundle)s' already adds a button calling '%(action)s' on "
+        "view '%(view)s'. Two buttons for the same action would just sit "
+        "next to each other.",
+        bundle=other.bundle_id.code,
+        action=(_payload(operation).get("action_xmlid") or "?"),
+        view=operation.view_id.display_name,
+    )
+
+
+def assert_no_button_action_conflict(operation):
+    other = button_action_conflicts(operation)
+    if other:
+        raise UserError(button_action_conflict_message(operation, other))
 
 
 def validated_filter_domain(env, domain):

@@ -326,6 +326,42 @@
                         />
                     </div>
                 </t>
+                <t t-if="state.action === 'add_button'">
+                    <div class="mb-3">
+                        <label class="form-label">Button label</label>
+                        <input
+                            type="text"
+                            class="form-control o_esc_button_label"
+                            t-att-value="state.string"
+                            t-on-input="(ev) => state.string = ev.target.value"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Action to call</label>
+                        <RecordSelector
+                            resId="state.actionId"
+                            resModel="'ir.actions.actions'"
+                            update.bind="onWindowActionUpdate"
+                            fieldString.translate="Action"
+                            placeholder.translate="Search an action..."
+                        />
+                        <div class="form-text">
+                            The action must have an XML ID. A server action runs on
+                            the record; a window action opens its view.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Style</label>
+                        <select
+                            class="form-select o_esc_button_class"
+                            t-model="state.buttonClass"
+                        >
+                            <option value="btn-secondary">Secondary</option>
+                            <option value="btn-primary">Primary</option>
+                            <option value="btn-link">Link</option>
+                        </select>
+                    </div>
+                </t>
                 <t t-if="state.action === 'add_menu' || state.action === 'add_submenu'">
                     <div class="mb-3">
                         <label class="form-label">Menu label</label>

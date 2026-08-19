@@ -16,6 +16,10 @@ Next:
 - Graph operations are written from the backend form only. The view draws
   on a canvas, so there is no field node to click; offering them in place
   needs a side panel listing the arch fields.
+- A button binds an action that already exists; writing the server action
+  itself is not offered, and neither is a button calling a model method,
+  since a method name cannot be validated against user intent the way an
+  XML ID can.
 - Free XPath anchors stay in the model for export compatibility but are
   not offered in the systray dialog.
 

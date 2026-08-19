@@ -1,3 +1,4 @@
+from . import test_add_button
 from . import test_aggregate_views
 from . import test_compiler
 from . import test_export

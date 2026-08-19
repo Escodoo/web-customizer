@@ -93,11 +93,11 @@
                     <notebook>
                         <page string="Payload" name="payload">
                             <group
-                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu', 'add_filter')"
+                                invisible="type not in ('add_field', 'set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu', 'add_filter', 'add_button')"
                             >
                                 <field
                                     name="payload_string"
-                                    required="type in ('set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu')"
+                                    required="type in ('set_string', 'set_menu_string', 'add_page', 'add_group', 'add_menu', 'add_button')"
                                 />
                             </group>
                             <group
@@ -112,6 +112,13 @@
                                     required="type == 'add_menu'"
                                 />
                                 <field name="payload_name" />
+                            </group>
+                            <group string="Add Button" invisible="type != 'add_button'">
+                                <field
+                                    name="payload_action_xmlid"
+                                    required="type == 'add_button'"
+                                />
+                                <field name="payload_btn_class" />
                             </group>
                             <group string="Move Menu" invisible="type != 'move_menu'">
                                 <field

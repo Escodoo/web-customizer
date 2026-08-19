@@ -42,6 +42,10 @@ const FIELD_WIDGETS = [
     "url",
 ];
 
+// Only these renderers draw a button node; a search, pivot or graph arch has
+// nowhere to put one.
+const BUTTON_VIEW_TYPES = ["form", "list", "kanban"];
+
 // An action without a builder here sends an empty payload, which is what the
 // actions carrying their intent in the anchor alone (hide) need.
 const ROOT_ACTION_OPTIONS = [
@@ -64,6 +68,7 @@ const PAYLOAD_BUILDERS = {
     move_as_submenu: "payloadForMenuDestination",
     add_menu: "payloadForNewMenu",
     add_submenu: "payloadForNewMenu",
+    add_button: "payloadForButton",
     set_widget: "payloadForWidget",
     set_optional: "payloadForOptional",
     set_groups: "payloadForGroups",
@@ -106,6 +111,7 @@ export class CustomizationFieldDialog extends Component {
             existingFieldId: false,
             existingFieldName: "",
             actionId: false,
+            buttonClass: "btn-secondary",
             targetMenuId: false,
             widget: "",
             optional: "hide",
@@ -290,6 +296,7 @@ export class CustomizationFieldDialog extends Component {
         }
         if (this.anchorKind === "button") {
             return [
+                {value: "add_button", label: _t("Add button after this one")},
                 {value: "hide", label: _t("Hide this button")},
                 {value: "rename", label: _t("Change label")},
                 {value: "set_groups", label: _t("Restrict to groups")},
@@ -334,6 +341,10 @@ export class CustomizationFieldDialog extends Component {
                 {value: "set_groups", label: _t("Restrict to groups")},
             ];
         }
+        return this.fieldActions;
+    }
+
+    get fieldActions() {
         const fieldActions = [
             {value: "add_after", label: _t("Add field after this one")},
             {value: "place_after", label: _t("Place existing field after this one")},
@@ -364,6 +375,12 @@ export class CustomizationFieldDialog extends Component {
             fieldActions.splice(3, 0, {
                 value: "add_filter",
                 label: _t("Add filter after this one"),
+            });
+        }
+        if (BUTTON_VIEW_TYPES.includes(this.props.viewType || "form")) {
+            fieldActions.push({
+                value: "add_button",
+                label: _t("Add button after this one"),
             });
         }
         if (this.state.fieldSubview) {
@@ -577,6 +594,22 @@ export class CustomizationFieldDialog extends Component {
             return false;
         }
         return this.withOptionalName({string, action_id: this.state.actionId});
+    }
+
+    payloadForButton() {
+        const string = this.requiredLabel(_t("A button label is required."));
+        if (!string) {
+            return false;
+        }
+        if (!this.state.actionId) {
+            this.notifyError(_t("Select the action the button calls."));
+            return false;
+        }
+        return {
+            string,
+            action_id: this.state.actionId,
+            btn_class: this.state.buttonClass,
+        };
     }
 
     payloadForWidget() {
