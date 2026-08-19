@@ -60,11 +60,12 @@ reason instead of a search view nobody can open.
 Some settings live on the view root rather than on a node, and those are
 reached from the customization banner instead of a click. A form, list or
 kanban can drop its Create, Edit, Delete or Duplicate buttons; a list can
-also switch inline editing, set a default order and colour rows from a
-condition. Only options the arch parser of that view type actually reads
-are accepted, and a default order is checked against real stored fields,
-so an option that would be inert or that would break the list is refused
-up front.
+also switch inline editing, allow editing several rows at once, set a
+default order and colour rows from a condition; a kanban can drop
+quick-create and the create, delete or rename of its columns. Only
+options the arch parser of that view type actually reads are accepted,
+and a default order is checked against real stored fields, so an option
+that would be inert or that would break the list is refused up front.
 
 A table written inside a form is customizable in place: click a column
 header of an x2many list, or a field on its card when it renders as a

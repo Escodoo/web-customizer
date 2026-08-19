@@ -99,6 +99,31 @@
                             >Not allowed</option>
                         </select>
                     </div>
+                    <div
+                        class="mb-3"
+                        t-foreach="rootFlagOptions"
+                        t-as="opt"
+                        t-key="opt[0]"
+                    >
+                        <label class="form-label" t-esc="opt[2]" />
+                        <select
+                            t-attf-class="form-select o_esc_root_#{opt[1]}"
+                            t-on-change="(ev) => state[opt[0]] = ev.target.value"
+                        >
+                            <option
+                                value=""
+                                t-att-selected="!state[opt[0]]"
+                            >Leave as is</option>
+                            <option
+                                value="1"
+                                t-att-selected="state[opt[0]] === '1'"
+                            >Allowed</option>
+                            <option
+                                value="0"
+                                t-att-selected="state[opt[0]] === '0'"
+                            >Not allowed</option>
+                        </select>
+                    </div>
                     <div class="mb-3" t-if="isListView">
                         <label class="form-label">Inline editing</label>
                         <select

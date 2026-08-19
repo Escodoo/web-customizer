@@ -9,10 +9,6 @@ Next:
 - The form that opens when a line of an embedded table is expanded
   renders in a dialog, outside the subtree that publishes which x2many
   field holds it, so its fields are not anchors yet.
-- List ``multi_edit`` and kanban ``quick_create`` compile from the
-  operation form but have no control in the banner dialog yet. Kanban
-  grouping flags (``group_create``, ``group_delete``) are not whitelisted
-  at all.
 - Graph operations are written from the backend form only. The view draws
   on a canvas, so there is no field node to click; offering them in place
   needs a side panel listing the arch fields.

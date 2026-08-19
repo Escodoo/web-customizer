@@ -119,6 +119,11 @@ export class CustomizationFieldDialog extends Component {
             rootEdit: "",
             rootDelete: "",
             rootDuplicate: "",
+            rootMultiEdit: "",
+            rootQuickCreate: "",
+            rootGroupCreate: "",
+            rootGroupDelete: "",
+            rootGroupEdit: "",
             rootEditable: "",
             rootDefaultOrder: "",
             rootDecoration: "danger",
@@ -193,6 +198,30 @@ export class CustomizationFieldDialog extends Component {
 
     get isListView() {
         return this.targetViewType === "list";
+    }
+
+    get isKanbanView() {
+        return this.targetViewType === "kanban";
+    }
+
+    get rootFlagOptions() {
+        // Flags the arch parser of this view type reads besides Create /
+        // Edit / Delete / Duplicate. Offering them on another type would
+        // write an attribute nothing looks at.
+        if (this.isListView) {
+            return [
+                ["rootMultiEdit", "multi_edit", _t("Editing several rows at once")],
+            ];
+        }
+        if (this.isKanbanView) {
+            return [
+                ["rootQuickCreate", "quick_create", _t("Quick-creating records")],
+                ["rootGroupCreate", "group_create", _t("Creating columns")],
+                ["rootGroupDelete", "group_delete", _t("Deleting columns")],
+                ["rootGroupEdit", "group_edit", _t("Renaming columns")],
+            ];
+        }
+        return [];
     }
 
     get rootActionOptions() {
@@ -627,7 +656,7 @@ export class CustomizationFieldDialog extends Component {
 
     payloadForViewOptions() {
         const attributes = {};
-        for (const [key, name] of ROOT_ACTION_OPTIONS) {
+        for (const [key, name] of [...ROOT_ACTION_OPTIONS, ...this.rootFlagOptions]) {
             if (this.state[key]) {
                 attributes[name] = this.state[key];
             }

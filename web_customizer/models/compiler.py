@@ -143,12 +143,28 @@ ROOT_DECORATIONS = (
     "success",
     "warning",
 )
+# group_* are read by the kanban parser into activeActions; they only
+# matter once the board is grouped, but writing them on an ungrouped
+# board is still what the arch accepts and is not inert.
 ROOT_ATTRIBUTES = {
     "form": ROOT_ACTION_ATTRIBUTES,
     "list": ROOT_ACTION_ATTRIBUTES + ("editable", "default_order", "multi_edit"),
-    "kanban": ROOT_ACTION_ATTRIBUTES + ("default_order", "quick_create"),
+    "kanban": ROOT_ACTION_ATTRIBUTES
+    + (
+        "default_order",
+        "quick_create",
+        "group_create",
+        "group_delete",
+        "group_edit",
+    ),
 }
-ROOT_BOOLEAN_ATTRIBUTES = ROOT_ACTION_ATTRIBUTES + ("multi_edit", "quick_create")
+ROOT_BOOLEAN_ATTRIBUTES = ROOT_ACTION_ATTRIBUTES + (
+    "multi_edit",
+    "quick_create",
+    "group_create",
+    "group_delete",
+    "group_edit",
+)
 ROOT_EDITABLE_VALUES = ("top", "bottom")
 OPTIONAL_VALUES = ("show", "hide")
 MODIFIER_KEYS = ("invisible", "readonly", "required", "column_invisible")

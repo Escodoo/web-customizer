@@ -122,6 +122,50 @@ class TestCustomizationViewOptions(CustomizationCase):
         kanban_bundle.action_apply()
         self.assertEqual(self._root(self.kanban_view).get("default_order"), "name desc")
 
+    def test_a_list_can_turn_multi_edit_on(self):
+        bundle = self._create_bundle(
+            code="client_root_multi_edit",
+            operations=[self._set_options(self.list_view, "list", {"multi_edit": "1"})],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        self.assertEqual(self._root(self.list_view).get("multi_edit"), "1")
+
+    def test_a_kanban_can_drop_quick_create_and_column_flags(self):
+        bundle = self._create_bundle(
+            code="client_root_kanban_flags",
+            operations=[
+                self._set_options(
+                    self.kanban_view,
+                    "kanban",
+                    {
+                        "quick_create": "0",
+                        "group_create": "0",
+                        "group_delete": "0",
+                        "group_edit": "0",
+                    },
+                )
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.state, "applied")
+        root = self._root(self.kanban_view)
+        self.assertEqual(root.get("quick_create"), "0")
+        self.assertEqual(root.get("group_create"), "0")
+        self.assertEqual(root.get("group_delete"), "0")
+        self.assertEqual(root.get("group_edit"), "0")
+
+    def test_a_column_flag_on_a_list_is_refused(self):
+        bundle = self._create_bundle(
+            code="client_root_list_group",
+            operations=[
+                self._set_options(self.list_view, "list", {"group_create": "0"})
+            ],
+        )
+        bundle.action_apply()
+        self.assertEqual(bundle.operation_ids.state, "broken")
+        self.assertIn("group_create", bundle.operation_ids.broken_reason)
+
     def test_an_option_the_view_type_ignores_is_refused(self):
         bundle = self._create_bundle(
             code="client_root_wrong_type",

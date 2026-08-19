@@ -424,11 +424,12 @@ operation with a reason instead of a search view nobody can open.</p>
 <p>Some settings live on the view root rather than on a node, and those are
 reached from the customization banner instead of a click. A form, list
 or kanban can drop its Create, Edit, Delete or Duplicate buttons; a list
-can also switch inline editing, set a default order and colour rows from
-a condition. Only options the arch parser of that view type actually
-reads are accepted, and a default order is checked against real stored
-fields, so an option that would be inert or that would break the list is
-refused up front.</p>
+can also switch inline editing, allow editing several rows at once, set
+a default order and colour rows from a condition; a kanban can drop
+quick-create and the create, delete or rename of its columns. Only
+options the arch parser of that view type actually reads are accepted,
+and a default order is checked against real stored fields, so an option
+that would be inert or that would break the list is refused up front.</p>
 <p>A table written inside a form is customizable in place: click a column
 header of an x2many list, or a field on its card when it renders as a
 kanban, to add, place, move, rename, hide or narrow a node of the
@@ -575,10 +576,12 @@ called twice from the same view.</li>
 they have no outline to click. On a form, list or kanban, use <strong>View
 options</strong> in the customization banner. There you can stop users from
 creating, editing, deleting or duplicating records; a list can also
-turn inline editing on or off, set a default order and colour its
-rows with a condition. Options left on <em>Leave as is</em> are not written,
-so a bundle only owns what it declares. An option set to an empty
-value drops it from the view, which is how an inline-editable list is
+turn inline editing on or off, allow editing several rows at once,
+set a default order and colour its rows with a condition; a kanban
+can drop quick-create and stop users from creating, deleting or
+renaming columns. Options left on <em>Leave as is</em> are not written, so a
+bundle only owns what it declares. An option set to an empty value
+drops it from the view, which is how an inline-editable list is
 turned back into a read-only one. Only options the arch parser of
 that view type reads are accepted: decorations exist on lists only,
 and pivot, graph and search views have none.</li>
@@ -631,7 +634,8 @@ progressbar.</li>
 measure.</li>
 <li><strong>Menus</strong> — hide, rename or move one navbar item that has an XML ID.</li>
 <li><strong>View options</strong> — from the banner, drop the Create button on one
-list and colour its rows by a condition.</li>
+list, turn multi-edit on, and colour its rows by a condition. On a
+grouped kanban, drop quick-create or the create of a column.</li>
 <li><strong>Button</strong> — on a form header, add a button calling an action the
 database already has, and check the exported manifest depends on the
 module owning it.</li>
@@ -662,10 +666,6 @@ a first field inside it still has to be designed.</li>
 <li>The form that opens when a line of an embedded table is expanded
 renders in a dialog, outside the subtree that publishes which x2many
 field holds it, so its fields are not anchors yet.</li>
-<li>List <tt class="docutils literal">multi_edit</tt> and kanban <tt class="docutils literal">quick_create</tt> compile from the
-operation form but have no control in the banner dialog yet. Kanban
-grouping flags (<tt class="docutils literal">group_create</tt>, <tt class="docutils literal">group_delete</tt>) are not
-whitelisted at all.</li>
 <li>Graph operations are written from the backend form only. The view
 draws on a canvas, so there is no field node to click; offering them
 in place needs a side panel listing the arch fields.</li>
@@ -719,7 +719,9 @@ added with a validated domain or a group by.</li>
 keeping the attributes the base view gave it.</li>
 <li>The view root is a semantic anchor of its own, so a form, list or
 kanban can drop its Create, Edit, Delete or Duplicate buttons, and a
-list can set inline editing, a default order or row colours.</li>
+list can set inline editing, multi-edit, a default order or row
+colours. A kanban can drop quick-create and the create, delete or
+rename of its columns.</li>
 <li>Columns and cards of a table written inside a form are semantic
 anchors on the related model, so order lines and the like are
 customized in place, options of the table included.</li>

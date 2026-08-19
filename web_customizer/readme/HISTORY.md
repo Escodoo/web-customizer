@@ -22,7 +22,9 @@ First public Beta.
   the attributes the base view gave it.
 - The view root is a semantic anchor of its own, so a form, list or kanban
   can drop its Create, Edit, Delete or Duplicate buttons, and a list can
-  set inline editing, a default order or row colours.
+  set inline editing, multi-edit, a default order or row colours. A
+  kanban can drop quick-create and the create, delete or rename of its
+  columns.
 - Columns and cards of a table written inside a form are semantic anchors
   on the related model, so order lines and the like are customized in
   place, options of the table included.

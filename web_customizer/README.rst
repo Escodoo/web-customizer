@@ -84,11 +84,12 @@ operation with a reason instead of a search view nobody can open.
 Some settings live on the view root rather than on a node, and those are
 reached from the customization banner instead of a click. A form, list
 or kanban can drop its Create, Edit, Delete or Duplicate buttons; a list
-can also switch inline editing, set a default order and colour rows from
-a condition. Only options the arch parser of that view type actually
-reads are accepted, and a default order is checked against real stored
-fields, so an option that would be inert or that would break the list is
-refused up front.
+can also switch inline editing, allow editing several rows at once, set
+a default order and colour rows from a condition; a kanban can drop
+quick-create and the create, delete or rename of its columns. Only
+options the arch parser of that view type actually reads are accepted,
+and a default order is checked against real stored fields, so an option
+that would be inert or that would break the list is refused up front.
 
 A table written inside a form is customizable in place: click a column
 header of an x2many list, or a field on its card when it renders as a
@@ -227,10 +228,12 @@ Usage
    they have no outline to click. On a form, list or kanban, use **View
    options** in the customization banner. There you can stop users from
    creating, editing, deleting or duplicating records; a list can also
-   turn inline editing on or off, set a default order and colour its
-   rows with a condition. Options left on *Leave as is* are not written,
-   so a bundle only owns what it declares. An option set to an empty
-   value drops it from the view, which is how an inline-editable list is
+   turn inline editing on or off, allow editing several rows at once,
+   set a default order and colour its rows with a condition; a kanban
+   can drop quick-create and stop users from creating, deleting or
+   renaming columns. Options left on *Leave as is* are not written, so a
+   bundle only owns what it declares. An option set to an empty value
+   drops it from the view, which is how an inline-editable list is
    turned back into a read-only one. Only options the arch parser of
    that view type reads are accepted: decorations exist on lists only,
    and pivot, graph and search views have none.
@@ -284,7 +287,8 @@ leave this module as the production runtime.
     measure.
 7.  **Menus** — hide, rename or move one navbar item that has an XML ID.
 8.  **View options** — from the banner, drop the Create button on one
-    list and colour its rows by a condition.
+    list, turn multi-edit on, and colour its rows by a condition. On a
+    grouped kanban, drop quick-create or the create of a column.
 9.  **Button** — on a form header, add a button calling an action the
     database already has, and check the exported manifest depends on the
     module owning it.
@@ -317,10 +321,6 @@ Next:
 - The form that opens when a line of an embedded table is expanded
   renders in a dialog, outside the subtree that publishes which x2many
   field holds it, so its fields are not anchors yet.
-- List ``multi_edit`` and kanban ``quick_create`` compile from the
-  operation form but have no control in the banner dialog yet. Kanban
-  grouping flags (``group_create``, ``group_delete``) are not
-  whitelisted at all.
 - Graph operations are written from the backend form only. The view
   draws on a canvas, so there is no field node to click; offering them
   in place needs a side panel listing the arch fields.
@@ -375,7 +375,9 @@ First public Beta.
   keeping the attributes the base view gave it.
 - The view root is a semantic anchor of its own, so a form, list or
   kanban can drop its Create, Edit, Delete or Duplicate buttons, and a
-  list can set inline editing, a default order or row colours.
+  list can set inline editing, multi-edit, a default order or row
+  colours. A kanban can drop quick-create and the create, delete or
+  rename of its columns.
 - Columns and cards of a table written inside a form are semantic
   anchors on the related model, so order lines and the like are
   customized in place, options of the table included.

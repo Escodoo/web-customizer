@@ -617,6 +617,92 @@ test("options of a table are written on its own model", async () => {
     ]);
 });
 
+test("list options can turn multi edit on", async () => {
+    mockService("orm", {
+        async call(model, method, args) {
+            if (method === "get_ui_context") {
+                return {
+                    bundles: [{id: 1, name: "Sandbox"}],
+                    anchor_count: 1,
+                    anchor_unique: true,
+                    candidates: [],
+                };
+            }
+            if (method === "create_from_ui") {
+                expect.step(JSON.stringify(args[0].payload));
+                return {operation_ids: [1], broken: []};
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+        async read() {
+            return [];
+        },
+    });
+    const env = await makeDialogMockEnv();
+    await mountWithCleanup(CustomizationFieldDialog, {
+        env,
+        props: {
+            close() {
+                expect.step("close");
+            },
+            fieldName: "",
+            fieldLabel: "",
+            model: "partner",
+            viewId: 1,
+            viewType: "list",
+            anchorKind: "view",
+        },
+    });
+    await contains(".o_esc_root_multi_edit").select("1");
+    await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps(['{"attributes":{"multi_edit":"1"}}', "close"]);
+});
+
+test("kanban options can drop quick create and column flags", async () => {
+    mockService("orm", {
+        async call(model, method, args) {
+            if (method === "get_ui_context") {
+                return {
+                    bundles: [{id: 1, name: "Sandbox"}],
+                    anchor_count: 1,
+                    anchor_unique: true,
+                    candidates: [],
+                };
+            }
+            if (method === "create_from_ui") {
+                expect.step(JSON.stringify(args[0].payload));
+                return {operation_ids: [1], broken: []};
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+        async read() {
+            return [];
+        },
+    });
+    const env = await makeDialogMockEnv();
+    await mountWithCleanup(CustomizationFieldDialog, {
+        env,
+        props: {
+            close() {
+                expect.step("close");
+            },
+            fieldName: "",
+            fieldLabel: "",
+            model: "partner",
+            viewId: 1,
+            viewType: "kanban",
+            anchorKind: "view",
+        },
+    });
+    await contains(".o_esc_root_quick_create").select("0");
+    await contains(".o_esc_root_group_create").select("0");
+    await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps([
+        '{"attributes":{"quick_create":"0","group_create":"0"}}',
+        "close",
+    ]);
+});
+
 test("a button needs an action before it is written", async () => {
     mockService("notification", {
         add(message, options) {
