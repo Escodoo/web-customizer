@@ -531,11 +531,6 @@ def resolve_anchor(
     )
 
 
-def resolve_field_anchor(env, arch_tree, anchor_name):
-    """Backward-compatible wrapper around :func:`resolve_anchor`."""
-    return resolve_anchor(env, arch_tree, anchor_name, "field")
-
-
 def _check_move_source(operation, arch_tree, anchor_node):
     """Refuse a move whose source node the inheritance engine cannot relocate.
 
