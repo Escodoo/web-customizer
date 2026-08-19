@@ -464,9 +464,10 @@ written, and a second button calling the same action on the same view is
 refused as well. Creating the action itself is out of scope: a server
 action is written where server actions belong, then bound here.</p>
 <p>Pivot and graph views compile too. A pivot measure is clickable like any
-other anchor; graph has no per-field DOM to click, since it draws on a
-canvas, so graph operations are written from the backend form and
-compile and export the same way.</p>
+other anchor. A graph draws on a canvas, so there is no field node to
+click: the banner offers <strong>Graph fields</strong>, a panel of the measures and
+groupings the arch already declares. Picking one opens the same dialog
+used on a pivot measure. Compile and export are unchanged.</p>
 <p>Scope stops at the user interface, and not at all of it. Calendar and
 gantt views, creating a model, and report editing are not covered; see
 the roadmap. Approvals stay in <tt class="docutils literal">base_tier_validation</tt>. Automations
@@ -598,7 +599,9 @@ bundle only owns what it declares. An option set to an empty value
 drops it from the view, which is how an inline-editable list is
 turned back into a read-only one. Only options the arch parser of
 that view type reads are accepted: decorations exist on lists only,
-and pivot, graph and search views have none.</li>
+and pivot, graph and search views have none. A graph has no outline
+to click: use <strong>Graph fields</strong> in the banner and pick a measure or
+grouping the arch already declares.</li>
 <li>Or add operations from the bundle form. Fill the payload fields for
 the selected type. The <strong>Raw JSON</strong> tab shows the stored intent. View
 options are written there as one <tt class="docutils literal">name=value</tt> per line.</li>
@@ -649,7 +652,8 @@ with a domain or a group by.</li>
 <li><strong>Kanban</strong> — hide a card field, a header button or the column
 progressbar.</li>
 <li><strong>Pivot</strong> — click a measure header to relabel, hide or add a
-measure.</li>
+measure. On a <strong>graph</strong>, use <strong>Graph fields</strong> in the banner and pick
+a measure or grouping the arch already declares.</li>
 <li><strong>Menus</strong> — hide, rename or move one navbar item that has an XML ID.</li>
 <li><strong>View options</strong> — from the banner, drop the Create button on one
 list, turn multi-edit on, and colour its rows by a condition. On a
@@ -666,8 +670,7 @@ anchor and run <strong>Health Check</strong> (or <strong>Re-apply</strong>).</li
 <li>Install that module on staging (<tt class="docutils literal"><span class="pre">-i</span> &lt;bundle.code&gt;</tt>). Do not
 install <tt class="docutils literal">web_customizer</tt> there unless the wand is still needed.</li>
 </ol>
-<p>Graph operations are written from the operation form rather than in
-place. Calendar and gantt stay out of this pilot.</p>
+<p>Calendar and gantt stay out of this pilot.</p>
 <p>Generated field names always start with <tt class="docutils literal">x_cust_</tt> and cannot contain
 <tt class="docutils literal">__</tt>. Selection fields take one option per line as <tt class="docutils literal">value:Label</tt>.
 Monetary fields need <tt class="docutils literal">currency_id</tt> or <tt class="docutils literal">x_currency_id</tt> on the model,
@@ -684,9 +687,6 @@ welcome.</p>
 on, so those views cannot be customized until one field exists. The
 view root is an anchor now, but it only carries option writes; placing
 a first field inside it still has to be designed.</li>
-<li>Graph operations are written from the backend form only. The view
-draws on a canvas, so there is no field node to click; offering them
-in place needs a side panel listing the arch fields.</li>
 <li>A button binds an action that already exists; writing the server
 action itself is not offered, and neither is a button calling a model
 method, since a method name cannot be validated against user intent
@@ -752,6 +752,8 @@ on the module owning the action.</li>
 validated, related fields are refused, and the export writes
 <tt class="docutils literal">data/ir_default.xml</tt>. Unlink restores a native default the bundle
 overwrote.</li>
+<li>Graph fields are listed from the banner, so a measure or grouping can
+be customized in place even though the chart draws on a canvas.</li>
 </ul>
 </div>
 </div>

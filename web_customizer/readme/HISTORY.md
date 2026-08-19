@@ -36,3 +36,5 @@ First public Beta.
   validated, related fields are refused, and the export writes
   ``data/ir_default.xml``. Unlink restores a native default the bundle
   overwrote.
+- Graph fields are listed from the banner, so a measure or grouping can
+  be customized in place even though the chart draws on a canvas.

@@ -265,44 +265,54 @@ export class CustomizationFieldDialog extends Component {
     }
 
     get title() {
-        const label = this.props.fieldLabel || this.props.fieldName;
+        return this._titleFor(this.props.fieldLabel || this.props.fieldName);
+    }
+
+    _titleForKind(label) {
+        switch (this.anchorKind) {
+            case "page":
+                return _t("Customize page %s", label);
+            case "group":
+                return _t("Customize group %s", label);
+            case "button":
+                if (this.props.viewType === "kanban") {
+                    return _t("Customize kanban button %s", label);
+                }
+                return _t("Customize button %s", label);
+            case "menu":
+                return _t("Customize menu %s", label);
+            case "filter":
+                return _t("Customize filter %s", label);
+            default:
+                return null;
+        }
+    }
+
+    _titleForViewType(label) {
+        switch (this.props.viewType) {
+            case "list":
+                return _t("Customize list field %s", label);
+            case "kanban":
+                return _t("Customize kanban field %s", label);
+            case "search":
+                return _t("Customize search field %s", label);
+            case "pivot":
+                return _t("Customize pivot measure %s", label);
+            case "graph":
+                return _t("Customize graph field %s", label);
+            default:
+                return _t("Customize field %s", label);
+        }
+    }
+
+    _titleFor(label) {
         if (this.anchorKind === "view") {
             return _t("Options of this %s view", this.props.viewType || "");
         }
         if (this.props.anchorSubview) {
             return _t("Customize column %s", label);
         }
-        if (this.anchorKind === "page") {
-            return _t("Customize page %s", label);
-        }
-        if (this.anchorKind === "group") {
-            return _t("Customize group %s", label);
-        }
-        if (this.anchorKind === "button") {
-            if (this.props.viewType === "kanban") {
-                return _t("Customize kanban button %s", label);
-            }
-            return _t("Customize button %s", label);
-        }
-        if (this.anchorKind === "menu") {
-            return _t("Customize menu %s", label);
-        }
-        if (this.props.viewType === "list") {
-            return _t("Customize list field %s", label);
-        }
-        if (this.props.viewType === "kanban") {
-            return _t("Customize kanban field %s", label);
-        }
-        if (this.anchorKind === "filter") {
-            return _t("Customize filter %s", label);
-        }
-        if (this.props.viewType === "search") {
-            return _t("Customize search field %s", label);
-        }
-        if (this.props.viewType === "pivot") {
-            return _t("Customize pivot measure %s", label);
-        }
-        return _t("Customize field %s", label);
+        return this._titleForKind(label) || this._titleForViewType(label);
     }
 
     get actions() {
@@ -375,6 +385,21 @@ export class CustomizationFieldDialog extends Component {
                 {value: "place_after", label: _t("Place existing field as measure")},
                 {value: "move_after", label: _t("Move an existing measure here")},
                 {value: "hide", label: _t("Hide this measure")},
+                {value: "rename", label: _t("Change label")},
+                {value: "set_widget", label: _t("Set widget")},
+                {value: "set_groups", label: _t("Restrict to groups")},
+                ...this.defaultActionOption,
+            ];
+        }
+        if (this.props.viewType === "graph") {
+            return [
+                {value: "add_after", label: _t("Add field after this one")},
+                {
+                    value: "place_after",
+                    label: _t("Place existing field after this one"),
+                },
+                {value: "move_after", label: _t("Move an existing field here")},
+                {value: "hide", label: _t("Hide this field")},
                 {value: "rename", label: _t("Change label")},
                 {value: "set_widget", label: _t("Set widget")},
                 {value: "set_groups", label: _t("Restrict to groups")},

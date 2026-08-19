@@ -104,9 +104,10 @@ refused as well. Creating the action itself is out of scope: a server
 action is written where server actions belong, then bound here.
 
 Pivot and graph views compile too. A pivot measure is clickable like any
-other anchor; graph has no per-field DOM to click, since it draws on a
-canvas, so graph operations are written from the backend form and compile
-and export the same way.
+other anchor. A graph draws on a canvas, so there is no field node to
+click: the banner offers **Graph fields**, a panel of the measures and
+groupings the arch already declares. Picking one opens the same dialog
+used on a pivot measure. Compile and export are unchanged.
 
 Scope stops at the user interface, and not at all of it. Calendar and
 gantt views, creating a model, and report editing are not covered; see

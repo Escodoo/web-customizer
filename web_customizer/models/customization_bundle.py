@@ -221,6 +221,32 @@ class CustomizationBundle(models.Model):
             "field_related": field_info.get("related") or False,
         }
 
+    @api.model
+    def list_arch_fields(self, view_id):
+        """Return the field nodes of a view arch, for the graph field panel.
+
+        A graph draws on a canvas, so there is no DOM node to click. The
+        panel lists what the arch actually declares; session-only groupbys
+        are not customizable.
+        """
+        self._check_ui_access()
+        view = self.env["ir.ui.view"].browse(view_id)
+        if not view.exists():
+            raise UserError(self.env._("The target view is missing."))
+        tree = arch_tree(view.with_context(lang=None))
+        fields = []
+        for node in tree.xpath(".//field[@name]"):
+            name = node.get("name")
+            role = (node.get("type") or "").strip()
+            if view.type == "graph" and not role:
+                role = "groupby"
+            string = (node.get("string") or "").strip()
+            if not string:
+                field = self.env["ir.model.fields"]._get(view.model, name)
+                string = field.field_description if field else name
+            fields.append({"name": name, "string": string, "role": role})
+        return fields
+
     def _ui_field_info(self, view, name, kind, subview):
         """Describe the clicked field so the dialog can offer a typed default."""
         if kind != "field" or not name or not view.exists():

@@ -592,6 +592,87 @@ test("banner stays quiet on a view type without root options", async () => {
     expect(".o_esc_customization_banner_options").toHaveCount(0);
 });
 
+test("banner offers graph fields once a graph view is registered", async () => {
+    enableCustomization();
+    await mountWithCleanup(MainComponentsContainer);
+    getService("web_customizer").registerView({
+        model: "partner",
+        viewId: 7,
+        viewType: "graph",
+    });
+    await animationFrame();
+    expect(".o_esc_customization_banner_graph").toHaveCount(1);
+    expect(".o_esc_customization_banner_options").toHaveCount(0);
+    expect(".o_esc_customization_banner_hint").toHaveText(
+        "Open Graph fields — the chart has no node to click"
+    );
+});
+
+test("graph field panel lists arch fields and opens one", async () => {
+    mockService("orm", {
+        async call(model, method, args) {
+            if (method === "list_arch_fields") {
+                expect.step(`list:${args[0]}`);
+                return [
+                    {name: "color", string: "Color", role: "measure"},
+                    {name: "company_type", string: "Company Type", role: "groupby"},
+                ];
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+    });
+    enableCustomization();
+    await mountWithCleanup(MainComponentsContainer);
+    getService("web_customizer").registerView({
+        model: "partner",
+        viewId: 7,
+        viewType: "graph",
+    });
+    await animationFrame();
+    await contains(".o_esc_customization_banner_graph").click();
+    expect(".o_esc_graph_field[data-name='color']").toHaveCount(1);
+    expect(".o_esc_graph_field[data-name='company_type']").toHaveCount(1);
+    await contains(".o_esc_graph_field[data-name='color']").click();
+    expect.verifySteps(["list:7", "field:color"]);
+});
+
+test("graph field dialog offers field actions without modifiers", async () => {
+    mockService("orm", {
+        async call(model, method) {
+            if (method === "get_ui_context") {
+                return {
+                    bundles: [{id: 1, name: "Sandbox"}],
+                    anchor_count: 1,
+                    anchor_unique: true,
+                    candidates: [],
+                };
+            }
+            throw new Error(`Unexpected ORM call ${model}.${method}`);
+        },
+        async read() {
+            return [];
+        },
+    });
+    const env = await makeDialogMockEnv();
+    await mountWithCleanup(CustomizationFieldDialog, {
+        env,
+        props: {
+            close() {
+                // Unused: this test only inspects the offered actions.
+            },
+            fieldName: "color",
+            fieldLabel: "Color",
+            model: "partner",
+            viewId: 1,
+            viewType: "graph",
+        },
+    });
+    expect(".modal-title").toHaveText("Customize graph field Color");
+    expect(".o_esc_action_select option[value='set_modifier']").toHaveCount(0);
+    expect(".o_esc_action_select option[value='hide']").toHaveCount(1);
+    expect(".o_esc_action_select option[value='add_page']").toHaveCount(0);
+});
+
 test("options of a table are written on its own model", async () => {
     mockService("orm", {
         async call(model, method, args) {

@@ -15,6 +15,12 @@
                 t-esc="viewOptionsLabel"
             />
             <button
+                t-if="graphTarget"
+                class="btn btn-sm btn-light o_esc_customization_banner_graph"
+                t-on-click="openGraphFields"
+                t-esc="graphFieldsLabel"
+            />
+            <button
                 class="btn btn-sm btn-light o_esc_customization_banner_exit"
                 t-on-click="exit"
                 t-esc="exitLabel"

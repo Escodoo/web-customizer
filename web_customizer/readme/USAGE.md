@@ -69,7 +69,9 @@
    from the view, which is how an inline-editable list is turned back
    into a read-only one. Only options the arch parser of that view type
    reads are accepted: decorations exist on lists only, and pivot, graph
-   and search views have none.
+   and search views have none. A graph has no outline to click: use
+   **Graph fields** in the banner and pick a measure or grouping the
+   arch already declares.
 6. Or add operations from the bundle form. Fill the payload fields for the
    selected type. The **Raw JSON** tab shows the stored intent. View
    options are written there as one `name=value` per line.
@@ -118,6 +120,8 @@ leave this module as the production runtime.
    domain or a group by.
 5. **Kanban** — hide a card field, a header button or the column progressbar.
 6. **Pivot** — click a measure header to relabel, hide or add a measure.
+   On a **graph**, use **Graph fields** in the banner and pick a measure
+   or grouping the arch already declares.
 7. **Menus** — hide, rename or move one navbar item that has an XML ID.
 8. **View options** — from the banner, drop the Create button on one list,
    turn multi-edit on, and colour its rows by a condition. On a grouped
@@ -134,8 +138,7 @@ leave this module as the production runtime.
 13. Install that module on staging (`-i <bundle.code>`). Do not install
    `web_customizer` there unless the wand is still needed.
 
-Graph operations are written from the operation form rather than in
-place. Calendar and gantt stay out of this pilot.
+Calendar and gantt stay out of this pilot.
 
 Generated field names always start with `x_cust_` and cannot contain `__`.
 Selection fields take one option per line as `value:Label`. Monetary

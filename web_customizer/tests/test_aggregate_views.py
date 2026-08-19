@@ -4,6 +4,7 @@
 from lxml import etree
 
 from odoo import Command
+from odoo.exceptions import AccessError, UserError
 from odoo.tests import tagged
 
 from .common import CustomizationCase
@@ -217,3 +218,58 @@ class TestCustomizationAggregateViews(CustomizationCase):
         self.assertEqual(bundle.state, "applied")
         node = self._field_node(self.graph_view, "color")
         self.assertEqual(node.get("string"), "Colour Index")
+
+    def test_list_arch_fields_on_graph(self):
+        fields = self.env["customization.bundle"].list_arch_fields(self.graph_view.id)
+        by_name = {item["name"]: item for item in fields}
+        self.assertIn("company_type", by_name)
+        self.assertIn("color", by_name)
+        self.assertEqual(by_name["company_type"]["role"], "groupby")
+        self.assertEqual(by_name["color"]["role"], "measure")
+
+    def test_list_arch_fields_empty_graph(self):
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "customization.tester.partner.graph.empty",
+                "model": "res.partner",
+                "type": "graph",
+                "arch": "<graph/>",
+            }
+        )
+        self.assertEqual(self.env["customization.bundle"].list_arch_fields(view.id), [])
+
+    def test_list_arch_fields_requires_manager(self):
+        user = self.env["res.users"].create(
+            {
+                "name": "No Manager",
+                "login": "esc_cust_graph_nomgr",
+                "groups_id": [(6, 0, [self.env.ref("base.group_user").id])],
+            }
+        )
+        with self.assertRaises(AccessError):
+            self.env["customization.bundle"].with_user(user).list_arch_fields(
+                self.graph_view.id
+            )
+
+    def test_list_arch_fields_missing_view(self):
+        with self.assertRaises(UserError):
+            self.env["customization.bundle"].list_arch_fields(0)
+
+    def test_create_from_ui_hides_a_graph_field(self):
+        bundle = self._create_bundle(code="client_graph_ui")
+        self.env["customization.bundle"].create_from_ui(
+            {
+                "bundle_id": bundle.id,
+                "action": "hide",
+                "model": "res.partner",
+                "view_id": self.graph_view.id,
+                "view_type": "graph",
+                "anchor_kind": "field",
+                "anchor_name": "color",
+                "payload": {},
+                "apply": True,
+            }
+        )
+        self.assertEqual(bundle.state, "applied")
+        node = self._field_node(self.graph_view, "color")
+        self.assertEqual(node.get("invisible"), "True")

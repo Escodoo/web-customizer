@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="web_customizer.GraphFieldsDialog">
+        <Dialog title="title" size="'md'">
+            <div class="o_esc_graph_fields">
+                <p class="text-danger" t-if="state.loadError" t-esc="state.loadError" />
+                <p
+                    class="text-muted"
+                    t-if="!state.loadError and !state.fields.length"
+                    t-esc="emptyMessage"
+                />
+                <p class="text-muted" t-if="state.fields.length" t-esc="hint" />
+                <div class="list-group" t-if="state.fields.length">
+                    <button
+                        t-foreach="state.fields"
+                        t-as="field"
+                        t-key="field.name"
+                        type="button"
+                        class="list-group-item list-group-item-action o_esc_graph_field"
+                        t-att-data-name="field.name"
+                        t-on-click="() => this.openField(field)"
+                    >
+                        <span class="fw-semibold" t-esc="field.string or field.name" />
+                        <span
+                            class="text-muted small ms-2"
+                            t-esc="roleLabel(field.role)"
+                        />
+                    </button>
+                </div>
+            </div>
+            <t t-set-slot="footer">
+                <button
+                    class="btn btn-secondary"
+                    t-on-click="() => props.close()"
+                    t-esc="closeLabel"
+                />
+            </t>
+        </Dialog>
+    </t>
+</templates>
