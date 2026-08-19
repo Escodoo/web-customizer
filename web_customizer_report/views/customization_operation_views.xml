@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_customization_operation_form" model="ir.ui.view">
+        <field name="name">customization.operation.form.report</field>
+        <field name="model">customization.operation</field>
+        <field
+            name="inherit_id"
+            ref="web_customizer.view_customization_operation_form"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payload_field_name']" position="after">
+                <div class="text-muted" colspan="2" invisible="view_type != 'qweb'">
+                    On a report template, a placement prints a QWeb expression
+                    (for example <code>o.x_cust_po_number</code>) and a move
+                    names the node to relocate (for example
+                    <code>td_quantity</code>).
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
