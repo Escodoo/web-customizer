@@ -199,19 +199,31 @@ def _view_record(view, operation):
     )
     arch = _pretty_arch(view)
     view_type = operation.view_type or view.type
-    return (
-        f'    <record id="{xmlid}" model="ir.ui.view">\n'
-        f'        <field name="name">{escape(view.name)}</field>\n'
-        f'        <field name="model">{escape(view.model)}</field>\n'
-        f'        <field name="type">{escape(view_type)}</field>\n'
-        f'        <field name="inherit_id" ref="{inherit_xmlid}"/>\n'
-        '        <field name="mode">extension</field>\n'
-        f'        <field name="priority">{int(view.priority or 16)}</field>\n'
-        '        <field name="arch" type="xml">\n'
-        f"{_indent(arch, '            ')}\n"
-        "        </field>\n"
-        "    </record>"
+    lines = [
+        f'    <record id="{xmlid}" model="ir.ui.view">',
+        f'        <field name="name">{escape(view.name)}</field>',
+    ]
+    # A report inherit rides on a template, which carries no model. Writing
+    # an empty one would make the installed view claim a model it has not.
+    if view.model:
+        lines.append(f'        <field name="model">{escape(view.model)}</field>')
+    lines.append(f'        <field name="type">{escape(view_type)}</field>')
+    # ir.ui.view refuses a qweb view without a key, and create() would
+    # otherwise mint a random one on every install of the exported addon.
+    if view_type == "qweb" and view.key:
+        lines.append(f'        <field name="key">{escape(view.key)}</field>')
+    lines.extend(
+        [
+            f'        <field name="inherit_id" ref="{inherit_xmlid}"/>',
+            '        <field name="mode">extension</field>',
+            f'        <field name="priority">{int(view.priority or 16)}</field>',
+            '        <field name="arch" type="xml">',
+            _indent(arch, "            "),
+            "        </field>",
+            "    </record>",
+        ]
     )
+    return "\n".join(lines)
 
 
 def _pretty_arch(view):

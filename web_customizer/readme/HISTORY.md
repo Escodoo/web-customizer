@@ -38,3 +38,7 @@ First public Beta.
   overwrote.
 - Graph fields are listed from the banner, so a measure or grouping can
   be customized in place even though the chart draws on a canvas.
+- Compiling and health-checking one operation are extension points, and
+  the export writes a view without a model and with a key when the
+  target has none, so a sibling addon can own another view type.
+  ``web_customizer_report`` uses both for QWeb reports.

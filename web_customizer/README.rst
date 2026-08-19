@@ -133,10 +133,12 @@ click: the banner offers **Graph fields**, a panel of the measures and
 groupings the arch already declares. Picking one opens the same dialog
 used on a pivot measure. Compile and export are unchanged.
 
-Scope stops at the user interface, and not at all of it. Calendar and
-gantt views, creating a model, and report editing are not covered; see
-the roadmap. Approvals stay in ``base_tier_validation``. Automations
-stay in ``base.automation`` / ``automation_oca``.
+Scope stops at the backend user interface, and not at all of it.
+Calendar and gantt views and creating a model are not covered; see the
+roadmap. QWeb PDF reports run on the same ledger but need their own
+anchors, so they live in the sibling addon ``web_customizer_report``.
+Approvals stay in ``base_tier_validation``. Automations stay in
+``base.automation`` / ``automation_oca``.
 
 **Table of contents**
 
@@ -359,9 +361,10 @@ Later:
 
 Deliberately out of this addon:
 
-- Report editing. It is a large surface with anchor semantics of its own
-  and belongs in a separate ``web_customizer_report`` addon rather than
-  in this one.
+- Report editing. QWeb templates have anchor semantics of their own, and
+  the patches here only see form, list, kanban and search archs. It
+  lives in the sibling addon ``web_customizer_report``, on the same
+  ledger.
 - Approvals and automations, which already have community answers in
   ``base_tier_validation`` and ``base.automation`` / ``automation_oca``.
 
@@ -411,6 +414,10 @@ First public Beta.
   overwrote.
 - Graph fields are listed from the banner, so a measure or grouping can
   be customized in place even though the chart draws on a canvas.
+- Compiling and health-checking one operation are extension points, and
+  the export writes a view without a model and with a key when the
+  target has none, so a sibling addon can own another view type.
+  ``web_customizer_report`` uses both for QWeb reports.
 
 Bug Tracker
 ===========

@@ -109,7 +109,9 @@ click: the banner offers **Graph fields**, a panel of the measures and
 groupings the arch already declares. Picking one opens the same dialog
 used on a pivot measure. Compile and export are unchanged.
 
-Scope stops at the user interface, and not at all of it. Calendar and
-gantt views, creating a model, and report editing are not covered; see
-the roadmap. Approvals stay in `base_tier_validation`. Automations stay
-in `base.automation` / `automation_oca`.
+Scope stops at the backend user interface, and not at all of it. Calendar
+and gantt views and creating a model are not covered; see the roadmap.
+QWeb PDF reports run on the same ledger but need their own anchors, so
+they live in the sibling addon `web_customizer_report`. Approvals stay in
+`base_tier_validation`. Automations stay in `base.automation` /
+`automation_oca`.

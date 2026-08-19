@@ -845,13 +845,31 @@ class CustomizationOperation(models.Model):
         self.env["customization.bundle"]._check_manager_access()
         return self._apply()
 
+    def _compile(self):
+        """Turn this operation into Odoo artifacts.
+
+        Sibling addons that own another view type override this to route
+        their operations to their own compiler instead of the form, list
+        and menu one.
+        """
+        self.ensure_one()
+        apply_operation(self)
+
+    def _resolve_health(self):
+        """Return ``(ok, reason)`` for this operation without writing.
+
+        Extension point paired with :meth:`_compile`.
+        """
+        self.ensure_one()
+        return health_check_operation(self)
+
     def _apply(self):
         """Compile without an extra ACL check (bundle actions already checked)."""
         for operation in self:
             if operation.state == "archived":
                 continue
             try:
-                apply_operation(operation)
+                operation._compile()
             except (AnchorError, UserError, ValidationError, ValueError) as err:
                 reason = getattr(err, "reason", None) or str(err)
                 operation._mark_broken(reason)
@@ -878,7 +896,7 @@ class CustomizationOperation(models.Model):
                 if operation.generated_field_id:
                     operation._mark_applied()
                 continue
-            ok, reason = health_check_operation(operation)
+            ok, reason = operation._resolve_health()
             if ok:
                 if operation.state == "broken":
                     operation._apply()
