@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-19 03:40+0000\n"
-"PO-Revision-Date: 2026-08-19 03:40+0000\n"
+"POT-Creation-Date: 2026-08-19 04:12+0000\n"
+"PO-Revision-Date: 2026-08-19 04:12+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -220,7 +220,7 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "A subview anchor targets a list or a kanban, not a %s."
+msgid "A subview anchor targets a list, a kanban or a form, not a %s."
 msgstr ""
 
 #. module: web_customizer
@@ -1254,6 +1254,12 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Filters cannot be added inside the '%s' table."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Filters only exist on search views."
@@ -1894,7 +1900,7 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
-msgid "Pages, groups and filters cannot be added inside the '%s' table."
+msgid "Pages and groups cannot be added inside the '%s' table."
 msgstr ""
 
 #. module: web_customizer
