@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-19 04:12+0000\n"
-"PO-Revision-Date: 2026-08-19 04:12+0000\n"
+"POT-Creation-Date: 2026-08-19 19:23+0000\n"
+"PO-Revision-Date: 2026-08-19 19:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -114,6 +114,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "A field is required to set a default."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A field type or a related path is required."
 msgstr ""
 
@@ -179,6 +185,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "A model is required to create a field."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
+msgid "A model is required to set a default."
 msgstr ""
 
 #. module: web_customizer
@@ -527,7 +540,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/exporter.py:0
 msgid ""
-"Applied operations in bundle '%s' did not generate fields, views or menus."
+"Applied operations in bundle '%s' did not generate fields, views, menus or "
+"defaults."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"Applies to every new record. Leave empty for an empty\n"
+"                        text default. Unlink the operation to drop it."
 msgstr ""
 
 #. module: web_customizer
@@ -567,6 +589,12 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__boolean
 msgid "Boolean"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Boolean default must be true or false, not '%s'."
 msgstr ""
 
 #. module: web_customizer
@@ -628,6 +656,12 @@ msgstr ""
 #: code:addons/web_customizer/models/compiler.py:0
 msgid ""
 "Bundle '%(bundle)s' already has a %(type)s operation on menu '%(menu)s'."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Bundle '%(bundle)s' already sets a default on '%(model)s.%(field)s'."
 msgstr ""
 
 #. module: web_customizer
@@ -748,6 +782,8 @@ msgid "Click an outlined item"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_export_wizard_form
 msgid "Close"
 msgstr ""
@@ -793,6 +829,18 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Could not load customization context."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid "Could not load the graph fields."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Could not write the default for '%s'."
 msgstr ""
 
 #. module: web_customizer
@@ -912,6 +960,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize graph field %s"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize group %s"
 msgstr ""
 
@@ -979,9 +1033,37 @@ msgid "Datetime"
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_value_xmlid
+msgid "Default Record"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_value
+msgid "Default Value"
+msgstr ""
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Default order (optional)"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Default record"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Default value"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Default values can only be set on fields."
 msgstr ""
 
 #. module: web_customizer
@@ -1106,7 +1188,14 @@ msgid "Export Customization Bundle"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "False"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__field
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Field"
 msgstr ""
 
@@ -1149,6 +1238,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%(model)s.%(field)s' is missing."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Field '%s' appears more than once in the target view."
 msgstr ""
 
@@ -1162,6 +1257,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Field '%s' does not exist on %s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/exporter.py:0
+msgid "Field '%s' has no XML ID and cannot be exported."
 msgstr ""
 
 #. module: web_customizer
@@ -1271,8 +1372,19 @@ msgid "Float"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Float default '%s' is invalid."
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__form
 msgid "Form"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__generated_default_id
+msgid "Generated Default"
 msgstr ""
 
 #. module: web_customizer
@@ -1305,6 +1417,13 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__graph
 msgid "Graph"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_banner.js:0
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid "Graph fields"
 msgstr ""
 
 #. module: web_customizer
@@ -1343,6 +1462,8 @@ msgid "Group label"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__groupby
 msgid "Grouping"
 msgstr ""
@@ -1463,7 +1584,19 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "Integer default '%s' is invalid."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Intermediate field '%(name)s' on %(model)s must be a many2one."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Invalid default for %(model)s.%(field)s: %(value)s"
 msgstr ""
 
 #. module: web_customizer
@@ -1553,6 +1686,8 @@ msgid "Many2one"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__measure
 msgid "Measure"
 msgstr ""
@@ -1635,6 +1770,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/exporter.py:0
 msgid "Model %s has no XML ID; it cannot be exported."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Model '%s' is missing."
 msgstr ""
 
 #. module: web_customizer
@@ -1817,6 +1958,12 @@ msgid "Only invisible can be set on a %(view)s view, not %(keys)s."
 msgstr ""
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_banner.js:0
+msgid "Open Graph fields — the chart has no node to click"
+msgstr ""
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "Operation '%(type)s' is not supported on a %(view)s view."
@@ -1870,8 +2017,8 @@ msgstr ""
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_bundle__company_id
 msgid ""
-"Optional tag to filter this bundle. Compiled fields, views and menus stay "
-"global; they are not scoped by company."
+"Optional tag to filter this bundle. Compiled fields, views, menus and "
+"defaults stay global; they are not scoped by company."
 msgstr ""
 
 #. module: web_customizer
@@ -2057,8 +2204,26 @@ msgid "Readonly"
 msgstr ""
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Record '%(xmlid)s' is a %(got)s, not a %(want)s."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Record '%s' is missing."
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_related
 msgid "Related Path"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Related field '%(model)s.%(field)s' ignores defaults."
 msgstr ""
 
 #. module: web_customizer
@@ -2185,6 +2350,12 @@ msgstr ""
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Search a record..."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Search a window action..."
 msgstr ""
 
@@ -2213,6 +2384,12 @@ msgstr ""
 #: code:addons/web_customizer/models/customization_bundle.py:0
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select a destination menu with an XML ID."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Select a record or an XML ID for this default."
 msgstr ""
 
 #. module: web_customizer
@@ -2280,6 +2457,12 @@ msgid "Sequence"
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_default
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Set Default"
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_groups
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Set Groups"
@@ -2335,6 +2518,12 @@ msgstr ""
 #: code:addons/web_customizer/models/customization_bundle.py:0
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set at least one view option."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Set default value"
 msgstr ""
 
 #. module: web_customizer
@@ -2465,6 +2654,13 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid ""
+"The chart is drawn on a canvas. Pick a field the view already declares."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid ""
 "The column moves to the list column picker, so users\n"
@@ -2572,6 +2768,13 @@ msgstr ""
 
 #. module: web_customizer
 #. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid ""
+"This graph has no field in its arch, so there is nothing to customize yet."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "True"
 msgstr ""
@@ -2615,6 +2818,13 @@ msgstr ""
 #. module: web_customizer
 #: model:res.groups,name:web_customizer.group_customization_user
 msgid "User"
+msgstr ""
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_value
+msgid ""
+"Value stored as a global ir.default. Leave empty for an empty char default. "
+"Many2one also accepts a record XML ID below."
 msgstr ""
 
 #. module: web_customizer
@@ -2688,6 +2898,11 @@ msgid "XML ID of the destination menu, for example base.menu_administration."
 msgstr ""
 
 #. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_value_xmlid
+msgid "XML ID of the many2one default, for example base.main_company."
+msgstr ""
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__xpath
 msgid "XPath"
 msgstr ""
@@ -2726,6 +2941,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "after %s"
+msgstr ""
+
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "base.main_company"
 msgstr ""
 
 #. module: web_customizer
@@ -2821,6 +3041,13 @@ msgstr ""
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
+msgid "set_default requires payload.field_name."
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_groups requires payload.groups."
 msgstr ""
 
@@ -2890,6 +3117,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "user_id"
+msgstr ""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "value_xmlid is only valid on a many2one field."
 msgstr ""
 
 #. module: web_customizer

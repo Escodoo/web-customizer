@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 06:44+0000\n"
-"PO-Revision-Date: 2026-08-14 06:44+0000\n"
+"POT-Creation-Date: 2026-08-19 19:23+0000\n"
+"PO-Revision-Date: 2026-08-19 19:24+0000\n"
 "Last-Translator: Marcel Savegnago <marcel.savegnago@escodoo.com.br>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -23,6 +23,46 @@ msgid "\" matches"
 msgstr "\" corresponde a"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"\" table is not written\n"
+"                    in this view, so it cannot be customized from here. Open the"
+msgstr ""
+"\" não está escrita\n"
+"                    nesta view, então não pode ser personalizada daqui. Abra a"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "%s requires payload.field_name."
+msgstr "%s exige payload.field_name."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "'%(name)s' is not a decoration. Use one of: %(allowed)s."
+msgstr "'%(name)s' não é uma decoração. Use uma destas: %(allowed)s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "'%(xmlid)s' is a %(model)s, not an action a button can call."
+msgstr "'%(xmlid)s' é um %(model)s, não uma ação que um botão possa chamar."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "'%s' is not a sort direction."
+msgstr "'%s' não é uma direção de ordenação."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "'%s' is not a valid default order."
+msgstr "'%s' não é uma ordenação padrão válida."
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "(empty)"
@@ -36,14 +76,83 @@ msgstr "(ausente)"
 
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__anchor_occurrence
-msgid "1-based occurrence when the name is not unique. 0 means the name must be unique."
-msgstr "Ocorrência a partir de 1 quando o nome não é único. 0 exige que o nome seja único."
+msgid ""
+"1-based occurrence when the name is not unique. 0 means the name must be "
+"unique."
+msgstr ""
+"Ocorrência a partir de 1 quando o nome não é único. 0 exige que o nome seja único."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A %(ttype)s field cannot be grouped by."
+msgstr "Um campo %(ttype)s não pode ser usado para agrupar."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A %(view)s view can only anchor on a field, not on a %(kind)s."
+msgstr "Uma view %(view)s só pode ancorar em um campo, não em um %(kind)s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A %s view has no root options to set."
+msgstr "Uma view %s não tem opções de raiz para definir."
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "A button label is required."
+msgstr "O rótulo do botão é obrigatório."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A button needs an action to call."
+msgstr "O botão precisa de uma ação para chamar."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "A field is required to set a default."
+msgstr "É necessário um campo para definir um valor padrão."
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A field type or a related path is required."
 msgstr "É necessário um tipo de campo ou um caminho related."
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "A filter carries either a domain or a grouping."
+msgstr "Um filtro leva um domínio ou um agrupamento."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"A filter either narrows the records with a domain or\n"
+"                            groups them by a field, never both."
+msgstr ""
+"Um filtro ou restringe os registros com um domínio ou\n"
+"                            os agrupa por um campo, nunca os dois."
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "A filter label is required."
+msgstr "O rótulo do filtro é obrigatório."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -86,6 +195,13 @@ msgstr "É necessário um modelo para criar um campo."
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
+msgid "A model is required to set a default."
+msgstr "É necessário um modelo para definir um valor padrão."
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "A model is required."
 msgstr "Um modelo é obrigatório."
@@ -110,9 +226,22 @@ msgstr "Um título de página é obrigatório."
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "A progressbar can only be hidden."
+msgstr "Uma barra de progresso só pode ser ocultada."
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "A relation model is required for %s fields."
 msgstr "É necessário um modelo relacionado para campos %s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "A subview anchor targets a list, a kanban or a form, not a %s."
+msgstr ""
+"Uma âncora de subview aponta para uma lista, um kanban ou um formulário, não para um %s."
 
 #. module: web_customizer
 #. odoo-python
@@ -135,6 +264,7 @@ msgstr "Um nome de widget é obrigatório."
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_action_xmlid
 msgid "Action"
 msgstr "Ação"
 
@@ -152,10 +282,34 @@ msgid "Action '%s' is missing."
 msgstr "A ação '%s' não existe."
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Action to call"
+msgstr "Ação a chamar"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Active Customers"
+msgstr "Clientes ativos"
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_button
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Add Button"
+msgstr "Adicionar botão"
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_field
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Add Field"
 msgstr "Adicionar campo"
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_filter
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Add Filter"
+msgstr "Adicionar filtro"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__add_group
@@ -179,10 +333,22 @@ msgid "Add Page or Group"
 msgstr "Adicionar página ou grupo"
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Add a filter next to a search field or another filter."
+msgstr "Adicione um filtro ao lado de um campo de pesquisa ou de outro filtro."
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add at least one selection option."
 msgstr "Adicione pelo menos uma opção de seleção."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Add button after this one"
+msgstr "Adicionar botão depois deste"
 
 #. module: web_customizer
 #. odoo-javascript
@@ -205,6 +371,12 @@ msgstr "Adicionar campo nesta página"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Add filter after this one"
+msgstr "Adicionar filtro depois deste"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add group after this one"
 msgstr "Adicionar grupo depois deste"
 
@@ -213,6 +385,12 @@ msgstr "Adicionar grupo depois deste"
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Add group in this page"
 msgstr "Adicionar grupo nesta página"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Add measure after this one"
+msgstr "Adicionar medida depois desta"
 
 #. module: web_customizer
 #. odoo-javascript
@@ -238,6 +416,23 @@ msgid "After"
 msgstr "Depois"
 
 #. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_field_type
+msgid "Aggregate Role"
+msgstr "Papel agregado"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Allowed"
+msgstr "Permitido"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "An anchor inside a subview must have a technical name."
+msgstr "Uma âncora dentro de uma subview precisa de um nome técnico."
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_operation.py:0
 msgid "An anchor name or title is required."
@@ -258,14 +453,19 @@ msgstr "A âncora %(kind)s '%(name)s' não tem a ocorrência %(index)s."
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Anchor %(kind)s '%(name)s' is ambiguous (%(count)s matches in the target view)."
-msgstr "A âncora %(kind)s '%(name)s' é ambígua (%(count)s ocorrências na view de destino)."
+msgid ""
+"Anchor %(kind)s '%(name)s' is ambiguous (%(count)s matches in the target "
+"view)."
+msgstr ""
+"A âncora %(kind)s '%(name)s' é ambígua (%(count)s ocorrências na view de destino)."
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Anchor %(kind)s '%(name)s' occurrence %(index)s is not on page '%(page)s'."
-msgstr "A âncora %(kind)s '%(name)s' ocorrência %(index)s não está na página '%(page)s'."
+msgid ""
+"Anchor %(kind)s '%(name)s' occurrence %(index)s is not on page '%(page)s'."
+msgstr ""
+"A âncora %(kind)s '%(name)s' ocorrência %(index)s não está na página '%(page)s'."
 
 #. module: web_customizer
 #. odoo-python
@@ -305,6 +505,11 @@ msgid "Anchor String"
 msgstr "Título da âncora"
 
 #. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__anchor_subview
+msgid "Anchor Subview"
+msgstr "Subview da âncora"
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "Anchor kind '%s' is not supported yet."
@@ -329,6 +534,12 @@ msgid "Anchor name is missing."
 msgstr "O nome da âncora está ausente."
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Anchor on a column, a button or the '%s' table itself."
+msgstr "Ancore em uma coluna, um botão ou na própria tabela '%s'."
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_bundle__state__applied
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__applied
 msgid "Applied"
@@ -337,8 +548,21 @@ msgstr "Aplicado"
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/exporter.py:0
-msgid "Applied operations in bundle '%s' did not generate fields, views or menus."
-msgstr "As operações aplicadas no pacote '%s' não geraram campos, views ou menus."
+msgid ""
+"Applied operations in bundle '%s' did not generate fields, views, menus or "
+"defaults."
+msgstr ""
+"As operações aplicadas no pacote '%s' não geraram campos, views, menus ou padrões."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"Applies to every new record. Leave empty for an empty\n"
+"                        text default. Unlink the operation to drop it."
+msgstr ""
+"Aplica-se a cada novo registro. Deixe vazio para um padrão\n"
+"                        de texto vazio. Desvincule a operação para removê-lo."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -380,6 +604,12 @@ msgid "Boolean"
 msgstr "Booleano"
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Boolean default must be true or false, not '%s'."
+msgstr "O padrão booleano deve ser true ou false, não '%s'."
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__broken
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Broken"
@@ -411,20 +641,52 @@ msgstr "Pacote"
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Bundle '%(bundle)s' already has a %(type)s operation on '%(anchor)s' in view '%(view)s'."
-msgstr "O pacote '%(bundle)s' já tem uma operação %(type)s em '%(anchor)s' na view '%(view)s'."
+msgid ""
+"Bundle '%(bundle)s' already adds a button calling '%(action)s' on view "
+"'%(view)s'. Two buttons for the same action would just sit next to each "
+"other."
+msgstr ""
+"O pacote '%(bundle)s' já adiciona um botão que chama '%(action)s' na view '%(view)s'. Dois botões para a mesma ação ficariam um ao lado do outro."
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Bundle '%(bundle)s' already has a %(type)s operation on menu '%(menu)s'."
+msgid ""
+"Bundle '%(bundle)s' already has a %(type)s operation for '%(field)s' in view"
+" '%(view)s'."
+msgstr ""
+"O pacote '%(bundle)s' já tem uma operação %(type)s para '%(field)s' na view '%(view)s'."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Bundle '%(bundle)s' already has a %(type)s operation on '%(anchor)s' in view"
+" '%(view)s'."
+msgstr ""
+"O pacote '%(bundle)s' já tem uma operação %(type)s em '%(anchor)s' na view '%(view)s'."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Bundle '%(bundle)s' already has a %(type)s operation on menu '%(menu)s'."
 msgstr "O pacote '%(bundle)s' já tem uma operação %(type)s no menu '%(menu)s'."
 
 #. module: web_customizer
 #. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Bundle '%(bundle)s' already sets a default on '%(model)s.%(field)s'."
+msgstr "O pacote '%(bundle)s' já define um padrão em '%(model)s.%(field)s'."
+
+#. module: web_customizer
+#. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
-msgid "Bundle code must start with a letter and contain only lowercase letters, digits and underscores."
-msgstr "O código do pacote deve começar com uma letra e conter apenas letras minúsculas, dígitos e sublinhados."
+msgid ""
+"Bundle code must start with a letter and contain only lowercase letters, "
+"digits and underscores."
+msgstr ""
+"O código do pacote deve começar com uma letra e conter apenas letras minúsculas, dígitos e sublinhados."
 
 #. module: web_customizer
 #: model:ir.actions.act_window,name:web_customizer.action_customization_bundle
@@ -436,6 +698,29 @@ msgstr "Pacotes"
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__button
 msgid "Button"
 msgstr "Botão"
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_btn_class
+msgid "Button Style"
+msgstr "Estilo do botão"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Button class '%s' is not supported."
+msgstr "A classe de botão '%s' não é suportada."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Button label"
+msgstr "Rótulo do botão"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Buttons can only be added on forms, lists and kanbans."
+msgstr "Botões só podem ser adicionados em formulários, listas e kanbans."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -462,6 +747,23 @@ msgid "Change page title"
 msgstr "Alterar título da página"
 
 #. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_ttype
+msgid ""
+"Changing the type and clicking Re-apply deletes values already stored in "
+"this field."
+msgstr ""
+"Alterar o tipo e clicar em Reaplicar apaga os valores já gravados neste campo."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid ""
+"Changing this type later and clicking Re-apply deletes values already stored"
+" in the field."
+msgstr ""
+"Alterar este tipo depois e clicar em Reaplicar apaga os valores já gravados no campo."
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__char
 msgid "Char"
 msgstr "Char"
@@ -482,6 +784,12 @@ msgstr "Escolha um campo diferente do que você clicou."
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Choose whether the column shows or hides."
+msgstr "Escolha se a coluna aparece ou fica oculta."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Click a field, page, group or button to set the anchor."
 msgstr "Clique em um campo, página, grupo ou botão para definir a âncora."
 
@@ -492,6 +800,8 @@ msgid "Click an outlined item"
 msgstr "Clique em um item destacado"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_export_wizard_form
 msgid "Close"
 msgstr "Fechar"
@@ -502,9 +812,20 @@ msgid "Code"
 msgstr "Código"
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__col
+msgid "Column Grouping"
+msgstr "Agrupamento de coluna"
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_mod_column_invisible
 msgid "Column Invisible"
 msgstr "Coluna invisível"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Column visibility"
+msgstr "Visibilidade da coluna"
 
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_groups
@@ -515,6 +836,30 @@ msgstr "XML IDs separados por vírgula, por exemplo base.group_user."
 #: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__company_id
 msgid "Company"
 msgstr "Empresa"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Could not apply customization."
+msgstr "Não foi possível aplicar a personalização."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Could not load customization context."
+msgstr "Não foi possível carregar o contexto de personalização."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid "Could not load the graph fields."
+msgstr "Não foi possível carregar os campos do gráfico."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Could not write the default for '%s'."
+msgstr "Não foi possível gravar o padrão de '%s'."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -530,18 +875,6 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:web_customizer.action_customization_bundle
 msgid "Create a customization bundle"
 msgstr "Criar um pacote de personalização"
-
-#. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid "Could not apply customization."
-msgstr "Não foi possível aplicar a personalização."
-
-#. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid "Could not load customization context."
-msgstr "Não foi possível carregar o contexto de personalização."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -562,6 +895,18 @@ msgstr "Criado por"
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__create_date
 msgid "Created on"
 msgstr "Criado em"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Creating columns"
+msgstr "Criar colunas"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Creating records"
+msgstr "Criar registros"
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_currency_field
@@ -617,8 +962,26 @@ msgstr "Personalizar botão %s"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize column %s"
+msgstr "Personalizar coluna %s"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize field %s"
 msgstr "Personalizar campo %s"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize filter %s"
+msgstr "Personalizar filtro %s"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize graph field %s"
+msgstr "Personalizar campo do gráfico %s"
 
 #. module: web_customizer
 #. odoo-javascript
@@ -659,6 +1022,12 @@ msgstr "Personalizar página %s"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Customize pivot measure %s"
+msgstr "Personalizar medida do pivot %s"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Customize search field %s"
 msgstr "Personalizar campo de pesquisa %s"
 
@@ -682,6 +1051,52 @@ msgstr "Data"
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__datetime
 msgid "Datetime"
 msgstr "Data e hora"
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_value_xmlid
+msgid "Default Record"
+msgstr "Registro padrão"
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_value
+msgid "Default Value"
+msgstr "Valor padrão"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Default order (optional)"
+msgstr "Ordenação padrão (opcional)"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Default record"
+msgstr "Registro padrão"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Default value"
+msgstr "Valor padrão"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Default values can only be set on fields."
+msgstr "Valores padrão só podem ser definidos em campos."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Deleting columns"
+msgstr "Excluir colunas"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Deleting records"
+msgstr "Excluir registros"
 
 #. module: web_customizer
 #. odoo-python
@@ -709,6 +1124,12 @@ msgid "Display Name"
 msgstr "Nome de exibição"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Domain"
+msgstr "Domínio"
+
+#. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_related
 msgid "Dotted path to an existing field, for example parent_id.email."
 msgstr "Caminho pontilhado até um campo existente, por exemplo parent_id.email."
@@ -723,6 +1144,30 @@ msgstr "Baixar ZIP"
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__state__draft
 msgid "Draft"
 msgstr "Rascunho"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Duplicating records"
+msgstr "Duplicar registros"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Editing records"
+msgstr "Editar registros"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Editing several rows at once"
+msgstr "Editar várias linhas de uma vez"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Enter a domain or a field to group by."
+msgstr "Informe um domínio ou um campo para agrupar."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -763,15 +1208,104 @@ msgid "Export Customization Bundle"
 msgstr "Exportar pacote de personalização"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "False"
+msgstr "Falso"
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__field
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Field"
 msgstr "Campo"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Field '%(field)s' appears %(count)s times in the target view, so the node to"
+" move is ambiguous."
+msgstr ""
+"O campo '%(field)s' aparece %(count)s vezes na view de destino, então o nó a mover é ambíguo."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%(field)s' does not exist on %(model)s."
+msgstr "O campo '%(field)s' não existe em %(model)s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Field '%(field)s' has no %(tag)s written in this view. Its table comes from "
+"a %(model)s view, so customize that view instead."
+msgstr ""
+"O campo '%(field)s' não tem um %(tag)s escrito nesta view. A tabela vem de uma view de %(model)s; personalize essa view."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%(field)s' is a %(ttype)s, so it holds no subview."
+msgstr "O campo '%(field)s' é um %(ttype)s, então não contém subview."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Field '%(field)s' points at %(relation)s, but the operation targets "
+"%(model)s."
+msgstr ""
+"O campo '%(field)s' aponta para %(relation)s, mas a operação tem como alvo %(model)s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%(model)s.%(field)s' is missing."
+msgstr "O campo '%(model)s.%(field)s' não existe."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' appears more than once in the target view."
+msgstr "O campo '%s' aparece mais de uma vez na view de destino."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' cannot be moved next to itself."
+msgstr "O campo '%s' não pode ser movido para ao lado de si mesmo."
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Field '%s' does not exist on %s."
 msgstr "O campo '%s' não existe em %s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/exporter.py:0
+msgid "Field '%s' has no XML ID and cannot be exported."
+msgstr "O campo '%s' não tem XML ID e não pode ser exportado."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' is not in the target view, so it cannot be moved."
+msgstr "O campo '%s' não está na view de destino, então não pode ser movido."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' is not in the target view."
+msgstr "O campo '%s' não está na view de destino."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Field '%s' is not stored, so records cannot be ordered by it."
+msgstr ""
+"O campo '%s' não é armazenado, então os registros não podem ser ordenados por ele."
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_field_name
@@ -784,41 +1318,39 @@ msgid "Field Type"
 msgstr "Tipo de campo"
 
 #. module: web_customizer
-#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_ttype
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid ""
-"Changing the type and clicking Re-apply deletes values already stored in "
-"this field."
+"Field name '%s' is invalid. Use lowercase letters, digits and single "
+"underscores after the x_cust_ prefix."
 msgstr ""
-"Alterar o tipo e clicar em Reaplicar apaga os valores já gravados neste "
-"campo."
-
-#. module: web_customizer
-#. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid ""
-"Changing this type later and clicking Re-apply deletes values already stored "
-"in the field."
-msgstr ""
-"Alterar este tipo depois e clicar em Reaplicar apaga os valores já gravados "
-"no campo."
+"O nome de campo '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado após o prefixo x_cust_."
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Field name '%s' is invalid. Use lowercase letters, digits and single underscores after the x_cust_ prefix."
-msgstr "O nome de campo '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado após o prefixo x_cust_."
+msgid "Field name '%s' is not valid."
+msgstr "O nome de campo '%s' não é válido."
 
 #. module: web_customizer
-#. odoo-python
-#: code:addons/web_customizer/models/compiler.py:0
-msgid "Field name '%s' is not valid for placing a field."
-msgstr "O nome de campo '%s' não é válido para posicionar um campo."
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_group_by
+msgid "Field name to group by. Leave the domain empty when set."
+msgstr "Nome do campo para agrupar. Deixe o domínio vazio quando preenchido."
 
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Field type"
 msgstr "Tipo de campo"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Field type '%(type)s' is not valid on a %(view)s view. Use one of: "
+"%(allowed)s."
+msgstr ""
+"O tipo de campo '%(type)s' não é válido em uma view %(view)s. Use um destes: %(allowed)s."
 
 #. module: web_customizer
 #. odoo-python
@@ -832,14 +1364,54 @@ msgid "Filename"
 msgstr "Nome do arquivo"
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__filter
+msgid "Filter"
+msgstr "Filtro"
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_domain
+msgid "Filter Domain"
+msgstr "Domínio do filtro"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Filter label"
+msgstr "Rótulo do filtro"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Filters cannot be added inside the '%s' table."
+msgstr "Filtros não podem ser adicionados dentro da tabela '%s'."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Filters only exist on search views."
+msgstr "Filtros só existem em views de pesquisa."
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__float
 msgid "Float"
 msgstr "Float"
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Float default '%s' is invalid."
+msgstr "O padrão float '%s' é inválido."
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__form
 msgid "Form"
 msgstr "Formulário"
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__generated_default_id
+msgid "Generated Default"
+msgstr "Padrão gerado"
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__generated_field_id
@@ -869,6 +1441,18 @@ msgid "Generated view '%s' has an empty arch."
 msgstr "A view gerada '%s' tem um arch vazio."
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__graph
+msgid "Graph"
+msgstr "Gráfico"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_banner.js:0
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid "Graph fields"
+msgstr "Campos do gráfico"
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__group
 msgid "Group"
 msgstr "Grupo"
@@ -878,6 +1462,17 @@ msgstr "Grupo"
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Group '%s' has no XML ID and cannot be used in a view."
 msgstr "O grupo '%s' não tem XML ID e não pode ser usado em uma view."
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_group_by
+msgid "Group By Field"
+msgstr "Campo de agrupamento"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Group by '%s' is not a valid field name."
+msgstr "O agrupamento '%s' não é um nome de campo válido."
 
 #. module: web_customizer
 #: model_terms:ir.actions.act_window,help:web_customizer.action_customization_bundle
@@ -896,6 +1491,13 @@ msgstr "Rótulo do grupo"
 
 #. module: web_customizer
 #. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__groupby
+msgid "Grouping"
+msgstr "Agrupamento"
+
+#. module: web_customizer
+#. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_groups
 msgid "Groups"
@@ -911,6 +1513,13 @@ msgstr "Verificação de saúde"
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_help
 msgid "Help"
 msgstr "Ajuda"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_optional__hide
+msgid "Hidden by default"
+msgstr "Oculta por padrão"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__hide_field
@@ -946,14 +1555,20 @@ msgstr "Ocultar este campo"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
-msgid "Hide this progressbar"
-msgstr "Ocultar esta barra de progresso"
+msgid "Hide this filter"
+msgstr "Ocultar este filtro"
 
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Hide this group"
 msgstr "Ocultar este grupo"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Hide this measure"
+msgstr "Ocultar esta medida"
 
 #. module: web_customizer
 #. odoo-javascript
@@ -968,11 +1583,23 @@ msgid "Hide this page"
 msgstr "Ocultar esta página"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Hide this progressbar"
+msgstr "Ocultar esta barra de progresso"
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__id
 #: model:ir.model.fields,field_description:web_customizer.field_customization_export_wizard__id
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__id
 msgid "ID"
 msgstr "ID"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Inline editing"
+msgstr "Edição em linha"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__inside
@@ -987,8 +1614,20 @@ msgstr "Inteiro"
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "Integer default '%s' is invalid."
+msgstr "O padrão inteiro '%s' é inválido."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Intermediate field '%(name)s' on %(model)s must be a many2one."
 msgstr "O campo intermediário '%(name)s' em %(model)s deve ser many2one."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Invalid default for %(model)s.%(field)s: %(value)s"
+msgstr "Padrão inválido para %(model)s.%(field)s: %(value)s"
 
 #. module: web_customizer
 #. odoo-python
@@ -1030,9 +1669,38 @@ msgid "Last Updated on"
 msgstr "Última atualização em"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"Leave an option untouched to keep what the view already\n"
+"                        does."
+msgstr ""
+"Deixe uma opção sem alteração para manter o que a view já\n"
+"                        faz."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Leave as is"
+msgstr "Deixar como está"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_btn_class__btn-link
+msgid "Link"
+msgstr "Link"
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__list
 msgid "List"
 msgstr "Lista"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Make column optional"
+msgstr "Tornar a coluna opcional"
 
 #. module: web_customizer
 #: model:res.groups,name:web_customizer.group_customization_manager
@@ -1048,6 +1716,13 @@ msgstr "Many2many"
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__many2one
 msgid "Many2one"
 msgstr "Many2one"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__measure
+msgid "Measure"
+msgstr "Medida"
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__menu_id
@@ -1095,8 +1770,11 @@ msgstr "O menu '%s' não existe."
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Menu XML ID '%s' is invalid. Use lowercase letters, digits and single underscores, starting with a letter."
-msgstr "O XML ID de menu '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado, começando com uma letra."
+msgid ""
+"Menu XML ID '%s' is invalid. Use lowercase letters, digits and single "
+"underscores, starting with a letter."
+msgstr ""
+"O XML ID de menu '%s' é inválido. Use letras minúsculas, dígitos e um único sublinhado, começando com uma letra."
 
 #. module: web_customizer
 #. odoo-python
@@ -1114,7 +1792,8 @@ msgstr "Rótulo do menu"
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Menus can only be hidden, renamed, restricted, added or moved."
-msgstr "Menus só podem ser ocultados, renomeados, restringidos, adicionados ou movidos."
+msgstr ""
+"Menus só podem ser ocultados, renomeados, restringidos, adicionados ou movidos."
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__model_id
@@ -1126,6 +1805,12 @@ msgstr "Modelo"
 #: code:addons/web_customizer/models/exporter.py:0
 msgid "Model %s has no XML ID; it cannot be exported."
 msgstr "O modelo %s não tem XML ID; não pode ser exportado."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Model '%s' is missing."
+msgstr "O modelo '%s' não existe."
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__model
@@ -1145,8 +1830,16 @@ msgstr "Monetário"
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Monetary fields need a currency field on the model (currency_id or x_currency_id)."
-msgstr "Campos monetários precisam de um campo de moeda no modelo (currency_id ou x_currency_id)."
+msgid ""
+"Monetary fields need a currency field on the model (currency_id or "
+"x_currency_id)."
+msgstr ""
+"Campos monetários precisam de um campo de moeda no modelo (currency_id ou x_currency_id)."
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__move_field
+msgid "Move Field"
+msgstr "Mover campo"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__move_menu
@@ -1163,8 +1856,32 @@ msgstr "Mover para depois de outro menu"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move an existing field here"
+msgstr "Mover um campo existente para cá"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move an existing measure here"
+msgstr "Mover uma medida existente para cá"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Move as submenu of another menu"
 msgstr "Mover como submenu de outro menu"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move existing field to this group"
+msgstr "Mover campo existente para este grupo"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Move existing field to this page"
+msgstr "Mover campo existente para esta página"
 
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_name
@@ -1178,6 +1895,15 @@ msgid "Name"
 msgstr "Nome"
 
 #. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__anchor_subview
+msgid ""
+"Name of the x2many field whose embedded subview holds the anchor. The "
+"operation then targets the related model, while the view stays the parent "
+"one."
+msgstr ""
+"Nome do campo x2many cuja subview embutida contém a âncora. A operação passa a ter como alvo o modelo relacionado, e a view continua sendo a do pai."
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_bundle__state__needs_reapply
 msgid "Needs Re-apply"
 msgstr "Precisa reaplicar"
@@ -1189,10 +1915,53 @@ msgid "New label"
 msgstr "Novo rótulo"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "New rows at the bottom"
+msgstr "Novas linhas no final"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "New rows on top"
+msgstr "Novas linhas no topo"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Not allowed"
+msgstr "Não permitido"
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_domain
+msgid "Odoo domain, for example [('active', '=', True)]."
+msgstr "Domínio Odoo, por exemplo [('active', '=', True)]."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Off"
+msgstr "Desligado"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_systray.js:0
+msgid "On"
+msgstr "Ativo"
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "One of the selected groups does not exist."
 msgstr "Um dos grupos selecionados não existe."
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_attributes
+msgid ""
+"One option per line as name=value, for example create=0. An empty value "
+"drops the option from the view."
+msgstr ""
+"Uma opção por linha no formato name=value, por exemplo create=0. Um valor vazio remove a opção da view."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -1200,6 +1969,12 @@ msgstr "Um dos grupos selecionados não existe."
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_selection
 msgid "One option per line as value:Label."
 msgstr "Uma opção por linha no formato valor:Rótulo."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Only a column can be made optional."
+msgstr "Só uma coluna pode ser tornada opcional."
 
 #. module: web_customizer
 #. odoo-python
@@ -1214,10 +1989,22 @@ msgid "Only customization managers can edit forms in place."
 msgstr "Somente gerentes de personalização podem editar formulários no lugar."
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Only invisible can be set on a %(view)s view, not %(keys)s."
+msgstr "Em uma view %(view)s só se pode definir invisible, não %(keys)s."
+
+#. module: web_customizer
 #. odoo-javascript
-#: code:addons/web_customizer/static/src/customization_systray.js:0
-msgid "On"
-msgstr "Ativo"
+#: code:addons/web_customizer/static/src/customization_banner.js:0
+msgid "Open Graph fields — the chart has no node to click"
+msgstr "Abra Campos do gráfico — o gráfico não tem nó para clicar"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Operation '%(type)s' is not supported on a %(view)s view."
+msgstr "A operação '%(type)s' não é suportada em uma view %(view)s."
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__operation_count
@@ -1231,6 +2018,53 @@ msgstr "Quantidade de operações"
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_bundle_form
 msgid "Operations"
 msgstr "Operações"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid ""
+"Option '%(name)s' is not available on a %(view)s view. Use one of: "
+"%(allowed)s."
+msgstr ""
+"A opção '%(name)s' não está disponível em uma view %(view)s. Use uma destas: %(allowed)s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Option '%(name)s' takes 0 or 1, not '%(value)s'."
+msgstr "A opção '%(name)s' aceita 0 ou 1, não '%(value)s'."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Option 'editable' takes %(allowed)s, not '%(value)s'."
+msgstr "A opção 'editable' aceita %(allowed)s, não '%(value)s'."
+
+#. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_optional
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Optional Column"
+msgstr "Coluna opcional"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Optional columns only exist on list views."
+msgstr "Colunas opcionais só existem em views de lista."
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_bundle__company_id
+msgid ""
+"Optional tag to filter this bundle. Compiled fields, views, menus and "
+"defaults stay global; they are not scoped by company."
+msgstr ""
+"Etiqueta opcional para filtrar este pacote. Campos, views, menus e padrões compilados continuam globais; não são isolados por empresa."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Options of this %s view"
+msgstr "Opções desta view %s"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__page
@@ -1248,6 +2082,12 @@ msgstr "Título da página"
 #: code:addons/web_customizer/models/customization_bundle.py:0
 msgid "Pages and groups can only be added on forms."
 msgstr "Páginas e grupos só podem ser adicionados em formulários."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "Pages and groups cannot be added inside the '%s' table."
+msgstr "Páginas e grupos não podem ser adicionados dentro da tabela '%s'."
 
 #. module: web_customizer
 #. odoo-python
@@ -1271,6 +2111,11 @@ msgstr "Nome da página do notebook pai, usado para desambiguar a âncora."
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Payload"
 msgstr "Payload"
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__pivot
+msgid "Pivot"
+msgstr "Pivot"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__place_field
@@ -1299,6 +2144,12 @@ msgstr "Posicionar campo existente depois deste"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Place existing field as measure"
+msgstr "Posicionar campo existente como medida"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Place existing field in this group"
 msgstr "Posicionar campo existente neste grupo"
 
@@ -1322,8 +2173,49 @@ msgstr "A posição '%(position)s' não é válida para posicionar um %(tag)s."
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "Position '%s' is not valid for adding a filter."
+msgstr "A posição '%s' não é válida para adicionar um filtro."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Position '%s' is not valid for moving a field."
+msgstr "A posição '%s' não é válida para mover um campo."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Position '%s' is not valid for placing a button."
+msgstr "A posição '%s' não é válida para posicionar um botão."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "Position '%s' is not valid for placing a field."
 msgstr "A posição '%s' não é válida para posicionar um campo."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_btn_class__btn-primary
+msgid "Primary"
+msgstr "Primário"
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__progressbar
+msgid "Progressbar"
+msgstr "Barra de progresso"
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_optional
+msgid "Put the column in the list column picker instead of pinning it."
+msgstr "Coloca a coluna no seletor de colunas da lista em vez de fixá-la."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Quick-creating records"
+msgstr "Criação rápida de registros"
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_json
@@ -1342,8 +2234,7 @@ msgid ""
 "Re-apply recreates a field if its type or relation changed. Existing values "
 "in that column are deleted."
 msgstr ""
-"Reaplicar recria o campo se o tipo ou a relação mudou. Os valores já "
-"gravados nessa coluna são apagados."
+"Reaplicar recria o campo se o tipo ou a relação mudou. Os valores já gravados nessa coluna são apagados."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -1353,9 +2244,27 @@ msgid "Readonly"
 msgstr "Somente leitura"
 
 #. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Record '%(xmlid)s' is a %(got)s, not a %(want)s."
+msgstr "O registro '%(xmlid)s' é um %(got)s, não um %(want)s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Record '%s' is missing."
+msgstr "O registro '%s' não existe."
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_related
 msgid "Related Path"
 msgstr "Caminho related"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Related field '%(model)s.%(field)s' ignores defaults."
+msgstr "O campo related '%(model)s.%(field)s' ignora padrões."
 
 #. module: web_customizer
 #. odoo-python
@@ -1372,8 +2281,11 @@ msgstr "O tipo de campo related '%s' não é suportado."
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid "Related path '%s' is invalid. Use dotted field names, for example parent_id.email."
-msgstr "O caminho related '%s' é inválido. Use nomes de campo pontilhados, por exemplo parent_id.email."
+msgid ""
+"Related path '%s' is invalid. Use dotted field names, for example "
+"parent_id.email."
+msgstr ""
+"O caminho related '%s' é inválido. Use nomes de campo pontilhados, por exemplo parent_id.email."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -1391,6 +2303,12 @@ msgstr "Modelo relacionado"
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Relation model"
 msgstr "Modelo relacionado"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Renaming columns"
+msgstr "Renomear colunas"
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__position__replace
@@ -1426,9 +2344,29 @@ msgid "Restrict to groups"
 msgstr "Restringir a grupos"
 
 #. module: web_customizer
-#: model:customization.bundle,name:web_customizer.bundle_sandbox
-msgid "Sandbox"
-msgstr "Sandbox"
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_field_type
+msgid ""
+"Role of the field on a pivot or graph view. Pivot accepts measure, row and "
+"col; graph accepts measure and grouping."
+msgstr ""
+"Papel do campo em uma view pivot ou gráfico. Pivot aceita measure, row e col; gráfico aceita measure e grouping."
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_field_type__row
+msgid "Row Grouping"
+msgstr "Agrupamento de linha"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Row colour (optional)"
+msgstr "Cor da linha (opcional)"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Row decorations are only read on a list view."
+msgstr "Decorações de linha só são lidas em uma view de lista."
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__view_type__search
@@ -1456,8 +2394,27 @@ msgstr "Buscar um menu..."
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Search a record..."
+msgstr "Buscar um registro..."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Search a window action..."
 msgstr "Buscar uma ação de janela..."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Search an action..."
+msgstr "Buscar uma ação..."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_btn_class__btn-secondary
+msgid "Secondary"
+msgstr "Secundário"
 
 #. module: web_customizer
 #. odoo-python
@@ -1472,6 +2429,12 @@ msgstr "Selecione primeiro um pacote de personalização."
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select a destination menu with an XML ID."
 msgstr "Selecione um menu de destino com XML ID."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "Select a record or an XML ID for this default."
+msgstr "Selecione um registro ou um XML ID para este padrão."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -1496,6 +2459,14 @@ msgstr "Selecione um campo existente para posicionar."
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Select at least one group."
 msgstr "Selecione pelo menos um grupo."
+
+#. module: web_customizer
+#. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Select the action the button calls."
+msgstr "Selecione a ação que o botão chama."
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__selection
@@ -1530,6 +2501,12 @@ msgid "Sequence"
 msgstr "Sequência"
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_default
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "Set Default"
+msgstr "Definir padrão"
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_groups
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Set Groups"
@@ -1556,6 +2533,16 @@ msgid "Set Modifier"
 msgstr "Definir modificador"
 
 #. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_optional
+msgid "Set Optional Column"
+msgstr "Definir coluna opcional"
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_view_attribute
+msgid "Set View Options"
+msgstr "Definir opções da view"
+
+#. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__type__set_widget
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "Set Widget"
@@ -1571,6 +2558,20 @@ msgstr "Defina pelo menos um modificador."
 
 #. module: web_customizer
 #. odoo-javascript
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Set at least one view option."
+msgstr "Defina pelo menos uma opção da view."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Set default value"
+msgstr "Definir valor padrão"
+
+#. module: web_customizer
+#. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set modifiers"
 msgstr "Definir modificadores"
@@ -1578,8 +2579,27 @@ msgstr "Definir modificadores"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Set options of this table"
+msgstr "Definir opções desta tabela"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
+msgid "Set view options"
+msgstr "Definir opções da view"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.js:0
 msgid "Set widget"
 msgstr "Definir widget"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_optional__show
+msgid "Shown by default"
+msgstr "Visível por padrão"
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_bundle__state
@@ -1600,14 +2620,24 @@ msgstr "Armazenar valor related"
 
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_store
-msgid "Store the related value in the database. Leave off for a computed-only related field."
-msgstr "Armazene o valor related no banco. Deixe desligado para um campo related apenas calculado."
+msgid ""
+"Store the related value in the database. Leave off for a computed-only "
+"related field."
+msgstr ""
+"Armazene o valor related no banco. Deixe desligado para um campo related apenas calculado."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "Style"
+msgstr "Estilo"
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/exporter.py:0
 msgid "Target view '%s' has no XML ID. Export needs a stable inherit_id."
-msgstr "A view de destino '%s' não tem XML ID. A exportação precisa de um inherit_id estável."
+msgstr ""
+"A view de destino '%s' não tem XML ID. A exportação precisa de um inherit_id estável."
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_name
@@ -1627,8 +2657,11 @@ msgstr "Nome técnico (opcional)"
 
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_bundle__code
-msgid "Technical slug used later as the exported addon name (for example client_acme)."
-msgstr "Slug técnico usado depois como nome do addon exportado (por exemplo client_acme)."
+msgid ""
+"Technical slug used later as the exported addon name (for example "
+"client_acme)."
+msgstr ""
+"Slug técnico usado depois como nome do addon exportado (por exemplo client_acme)."
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__payload_ttype__text
@@ -1638,13 +2671,65 @@ msgstr "Texto"
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "The \""
+msgstr "A \""
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "The action is missing."
+msgstr "A ação não existe."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "The action must have an XML ID."
 msgstr "A ação precisa ter um XML ID."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"The action must have an XML ID. A server action runs on\n"
+"                            the record; a window action opens its view."
+msgstr ""
+"A ação precisa ter um XML ID. Uma ação de servidor roda no\n"
+"                            registro; uma ação de janela abre a view."
 
 #. module: web_customizer
 #: model:ir.model.constraint,message:web_customizer.constraint_customization_bundle_code_unique
 msgid "The bundle code must be unique."
 msgstr "O código do pacote deve ser único."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid ""
+"The chart is drawn on a canvas. Pick a field the view already declares."
+msgstr ""
+"O gráfico é desenhado em um canvas. Escolha um campo que a view já declara."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"The column moves to the list column picker, so users\n"
+"                            can turn it on themselves."
+msgstr ""
+"A coluna vai para o seletor de colunas da lista, para que os\n"
+"                            usuários possam ativá-la."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "The condition is evaluated against each record."
+msgstr "A condição é avaliada em cada registro."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "The condition of '%(name)s' is not valid Python: %(error)s"
+msgstr "A condição de '%(name)s' não é Python válido: %(error)s"
 
 #. module: web_customizer
 #. odoo-python
@@ -1657,6 +2742,34 @@ msgstr "O menu de destino não existe."
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "The destination menu must have an XML ID."
 msgstr "O menu de destino precisa ter um XML ID."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"The field must already be in this view. It is\n"
+"                            relocated, not duplicated."
+msgstr ""
+"O campo já precisa estar nesta view. Ele é\n"
+"                            relocado, não duplicado."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "The filter domain is malformed: %s"
+msgstr "O domínio do filtro está malformado: %s"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "The filter domain is not valid Python: %s"
+msgstr "O domínio do filtro não é Python válido: %s"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "The filter domain must be a list of conditions."
+msgstr "O domínio do filtro deve ser uma lista de condições."
 
 #. module: web_customizer
 #. odoo-python
@@ -1704,8 +2817,22 @@ msgstr "Não há operações aplicadas para exportar no pacote '%s'."
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
-msgid "True"
+msgid "These options apply to the"
+msgstr "Estas opções se aplicam à"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_graph_dialog.js:0
+msgid ""
+"This graph has no field in its arch, so there is nothing to customize yet."
 msgstr ""
+"Este gráfico não tem campo no arch, então ainda não há o que personalizar."
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "True"
+msgstr "Verdadeiro"
 
 #. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__type
@@ -1751,14 +2878,45 @@ msgid "User"
 msgstr "Usuário"
 
 #. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_value
+msgid ""
+"Value stored as a global ir.default. Leave empty for an empty char default. "
+"Many2one also accepts a record XML ID below."
+msgstr ""
+"Valor gravado como ir.default global. Deixe vazio para um padrão char vazio. Many2one também aceita o XML ID do registro abaixo."
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__view_id
 msgid "View"
 msgstr "View"
 
 #. module: web_customizer
+#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_attributes
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "View Options"
+msgstr "Opções da view"
+
+#. module: web_customizer
+#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__view
+msgid "View Root"
+msgstr "Raiz da view"
+
+#. module: web_customizer
 #: model:ir.model.fields,field_description:web_customizer.field_customization_operation__view_type
 msgid "View Type"
 msgstr "Tipo de view"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_banner.js:0
+msgid "View options"
+msgstr "Opções da view"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/customization_bundle.py:0
+msgid "View options are set on the view itself, not on a node."
+msgstr "As opções da view são definidas na própria view, não em um nó."
 
 #. module: web_customizer
 #. odoo-javascript
@@ -1780,15 +2938,18 @@ msgid "Widgets can only be set on fields."
 msgstr "Widgets só podem ser definidos em campos."
 
 #. module: web_customizer
-#: model:ir.model.fields,field_description:web_customizer.field_customization_operation__payload_action_xmlid
-msgid "Window Action"
-msgstr "Ação de janela"
-
-#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "Window action"
 msgstr "Ação de janela"
+
+#. module: web_customizer
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_action_xmlid
+msgid ""
+"XML ID of the action, for example base.action_partner_form. A menu needs a "
+"window action; a button also takes a server action."
+msgstr ""
+"XML ID da ação, por exemplo base.action_partner_form. Um menu precisa de uma ação de janela; um botão também aceita ação de servidor."
 
 #. module: web_customizer
 #: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_target_xmlid
@@ -1796,9 +2957,9 @@ msgid "XML ID of the destination menu, for example base.menu_administration."
 msgstr "XML ID do menu de destino, por exemplo base.menu_administration."
 
 #. module: web_customizer
-#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_action_xmlid
-msgid "XML ID of the window action, for example base.action_partner_form."
-msgstr "XML ID da ação de janela, por exemplo base.action_partner_form."
+#: model:ir.model.fields,help:web_customizer.field_customization_operation__payload_value_xmlid
+msgid "XML ID of the many2one default, for example base.main_company."
+msgstr "XML ID do padrão many2one, por exemplo base.main_company."
 
 #. module: web_customizer
 #: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__xpath
@@ -1806,10 +2967,22 @@ msgid "XPath"
 msgstr "XPath"
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "[('active', '=', True)]"
+msgstr "[('active', '=', True)]"
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/customization_operation.py:0
 msgid "add_field requires a field type or a related path."
 msgstr "add_field exige um tipo de campo ou um caminho related."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "add_filter requires a domain or a grouping."
+msgstr "add_filter exige um domínio ou um agrupamento."
 
 #. module: web_customizer
 #. odoo-python
@@ -1830,30 +3003,62 @@ msgid "after %s"
 msgstr "depois de %s"
 
 #. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid "base.main_company"
+msgstr "base.main_company"
+
+#. module: web_customizer
+#: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
+msgid ""
+"create=0\n"
+"default_order=name desc"
+msgstr ""
+"create=0\n"
+"default_order=name desc"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "create_date desc"
+msgstr "create_date desc"
+
+#. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "currency_id"
-msgstr ""
+msgstr "currency_id"
 
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "draft:Draft"
-msgstr ""
+msgstr "draft:Draft"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "list view instead."
+msgstr "lista em vez disso."
 
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "many2many_tags"
-msgstr ""
+msgstr "many2many_tags"
 
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "menu_people"
-msgstr ""
+msgstr "menu_people"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "move_field requires payload.field_name."
+msgstr "move_field exige payload.field_name."
 
 #. module: web_customizer
 #. odoo-python
@@ -1872,6 +3077,12 @@ msgstr ""
 "                    personalizar."
 
 #. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "or group by field"
+msgstr "ou campo para agrupar"
+
+#. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
 msgid "page %s"
@@ -1882,19 +3093,20 @@ msgstr "página %s"
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 #: model_terms:ir.ui.view,arch_db:web_customizer.view_customization_operation_form
 msgid "parent_id.email"
-msgstr ""
-
-#. module: web_customizer
-#. odoo-python
-#: code:addons/web_customizer/models/compiler.py:0
-msgid "place_field requires payload.field_name."
-msgstr "place_field exige payload.field_name."
+msgstr "parent_id.email"
 
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
 msgid "res.partner"
-msgstr ""
+msgstr "res.partner"
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+#: code:addons/web_customizer/models/customization_operation.py:0
+msgid "set_default requires payload.field_name."
+msgstr "set_default exige payload.field_name."
 
 #. module: web_customizer
 #. odoo-python
@@ -1923,8 +3135,20 @@ msgstr "set_modifier exige payload.modifiers."
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
+msgid "set_optional requires payload.optional to be one of: %s."
+msgstr "set_optional exige que payload.optional seja um de: %s."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
 msgid "set_string requires payload.string."
 msgstr "set_string exige payload.string."
+
+#. module: web_customizer
+#. odoo-python
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "set_view_attribute requires payload.attributes."
+msgstr "set_view_attribute exige payload.attributes."
 
 #. module: web_customizer
 #. odoo-python
@@ -1935,35 +3159,39 @@ msgstr "set_widget exige payload.widget."
 #. module: web_customizer
 #. odoo-javascript
 #: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
-msgid "x_cust_..."
+msgid "state == 'draft'"
+msgstr "state == 'draft'"
+
+#. module: web_customizer
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid ""
+"table,\n"
+"                        not to the record around it."
 msgstr ""
+"tabela,\n"
+"                        não ao registro ao redor."
 
 #. module: web_customizer
 #. odoo-python
 #: code:addons/web_customizer/models/compiler.py:0
-msgid ""
-"Bundle '%(bundle)s' already has a Place Field operation for "
-"'%(field)s' in view '%(view)s'."
-msgstr ""
-"O pacote '%(bundle)s' já tem uma operação Place Field para "
-"'%(field)s' na view '%(view)s'."
+msgid "the view root"
+msgstr "a raiz da view"
 
 #. module: web_customizer
-#: model:ir.model.fields,help:web_customizer.field_customization_bundle__company_id
-msgid ""
-"Optional tag to filter this bundle. Compiled fields, views "
-"and menus stay global; they are not scoped by company."
-msgstr ""
-"Etiqueta opcional para filtrar este pacote. Campos, views e "
-"menus compilados continuam globais; não são isolados por empresa."
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "user_id"
+msgstr "user_id"
 
 #. module: web_customizer
 #. odoo-python
-#: code:addons/web_customizer/models/customization_bundle.py:0
-msgid "A progressbar can only be hidden."
-msgstr "Uma barra de progresso só pode ser ocultada."
+#: code:addons/web_customizer/models/compiler.py:0
+msgid "value_xmlid is only valid on a many2one field."
+msgstr "value_xmlid só é válido em um campo many2one."
 
 #. module: web_customizer
-#: model:ir.model.fields.selection,name:web_customizer.selection__customization_operation__anchor_kind__progressbar
-msgid "Progressbar"
-msgstr "Barra de progresso"
+#. odoo-javascript
+#: code:addons/web_customizer/static/src/customization_field_dialog.xml:0
+msgid "x_cust_..."
+msgstr "x_cust_..."
