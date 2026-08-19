@@ -181,7 +181,7 @@ class CustomizationBundle(models.Model):
             if title and not name:
                 title = source_unnamed_page_string(view, title)
             tree = arch_tree(view.with_context(lang=None))
-            candidates = list_anchor_candidates(tree, name, kind, title)
+            candidates = list_anchor_candidates(self.env, tree, name, kind, title)
         count = len(candidates)
         bundles = self.search_read(
             [],
@@ -428,7 +428,7 @@ class CustomizationBundle(models.Model):
         action_xmlid = self._ui_action_xmlid(payload)
         name = (payload.get("name") or "").strip()
         if name:
-            name = ensure_menu_xmlid_name(name)
+            name = ensure_menu_xmlid_name(self.env, name)
         position = "inside" if action == "add_submenu" else "after"
         menu_payload = {
             "string": string,
@@ -557,7 +557,7 @@ class CustomizationBundle(models.Model):
         requested = payload.get("name") or slugify_field_suffix(
             payload.get("string") or (payload.get("related") or "").split(".")[-1]
         )
-        field_name = ensure_field_name(requested)
+        field_name = ensure_field_name(self.env, requested)
         payload["name"] = field_name
         add_op = self.env["customization.operation"].create(
             {
@@ -683,7 +683,7 @@ class CustomizationBundle(models.Model):
         if not string:
             raise UserError(self.env._("A label is required."))
         requested = payload.get("name") or slugify_field_suffix(string)
-        name = ensure_field_name(requested)
+        name = ensure_field_name(self.env, requested)
         position = (
             "inside" if action == "add_group" and anchor_kind == "page" else "after"
         )

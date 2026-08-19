@@ -8,7 +8,6 @@ from xml.sax.saxutils import escape
 
 from lxml import etree
 
-from odoo import _
 from odoo.exceptions import UserError
 
 from .compiler import MENU_TYPES, field_xmlid_name, menu_xmlid_name, view_xmlid_name
@@ -42,7 +41,8 @@ def export_bundle_files(bundle):
     )
     if not operations:
         raise UserError(
-            _("There are no applied operations to export in bundle '%s'.") % bundle.code
+            bundle.env._("There are no applied operations to export in bundle '%s'.")
+            % bundle.code
         )
 
     fields = operations.mapped("generated_field_id").exists()
@@ -50,7 +50,7 @@ def export_bundle_files(bundle):
     menu_ops = operations.filtered(lambda o: o.type in MENU_TYPES and o.menu_id)
     if not fields and not views and not menu_ops:
         raise UserError(
-            _(
+            bundle.env._(
                 "Applied operations in bundle '%s' did not generate "
                 "fields, views or menus."
             )
@@ -115,7 +115,7 @@ def _field_record(field):
     xmlid = _field_xmlid(field)
     model_xmlid = _record_xmlid(
         field.model_id,
-        _("Model %s has no XML ID; it cannot be exported.") % field.model,
+        field.env._("Model %s has no XML ID; it cannot be exported.") % field.model,
     )
     lines = [
         f'    <record id="{xmlid}" model="ir.model.fields">',
@@ -177,7 +177,7 @@ def _view_record(view, operation):
     xmlid = view_xmlid_name(operation)
     inherit_xmlid = _record_xmlid(
         view.inherit_id,
-        _("Target view '%s' has no XML ID. Export needs a stable inherit_id.")
+        view.env._("Target view '%s' has no XML ID. Export needs a stable inherit_id.")
         % (view.inherit_id.display_name if view.inherit_id else view.display_name),
     )
     arch = _pretty_arch(view)
@@ -200,7 +200,9 @@ def _view_record(view, operation):
 def _pretty_arch(view):
     arch = view.arch_db or view.arch
     if not arch:
-        raise UserError(_("Generated view '%s' has an empty arch.") % view.display_name)
+        raise UserError(
+            view.env._("Generated view '%s' has an empty arch.") % view.display_name
+        )
     if isinstance(arch, bytes):
         arch = arch.decode()
     tree = etree.fromstring(arch.encode() if isinstance(arch, str) else arch)
@@ -292,7 +294,8 @@ def _menu_record(operation):
     menu = operation.menu_id
     xmlid = _record_xmlid(
         menu,
-        _("Menu '%s' has no XML ID and cannot be exported.") % menu.display_name,
+        operation.env._("Menu '%s' has no XML ID and cannot be exported.")
+        % menu.display_name,
     )
     payload = operation.payload or {}
     lines = [f'    <record id="{escape(xmlid)}" model="ir.ui.menu">']
@@ -309,7 +312,8 @@ def _menu_record(operation):
         )
         if not refs:
             raise UserError(
-                _("Menu groups operation '%s' has no group XML IDs.") % operation.name
+                operation.env._("Menu groups operation '%s' has no group XML IDs.")
+                % operation.name
             )
         lines.append(f'        <field name="groups_id" eval="[(6, 0, [{refs}])]"/>')
     elif operation.type == "move_menu":
@@ -336,7 +340,8 @@ def _add_menu_record(operation):
     action_xmlid = (payload.get("action_xmlid") or "").strip()
     if not action_xmlid:
         raise UserError(
-            _("Menu '%s' has no window action XML ID.") % operation.display_name
+            operation.env._("Menu '%s' has no window action XML ID.")
+            % operation.display_name
         )
     position = operation.position or "after"
     anchor = operation.menu_id
@@ -346,7 +351,7 @@ def _add_menu_record(operation):
     if parent:
         parent_xmlid = _record_xmlid(
             parent,
-            _("Parent menu '%s' has no XML ID and cannot be exported.")
+            operation.env._("Parent menu '%s' has no XML ID and cannot be exported.")
             % parent.display_name,
         )
         lines.append(f'        <field name="parent_id" ref="{escape(parent_xmlid)}"/>')

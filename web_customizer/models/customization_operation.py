@@ -681,13 +681,13 @@ class CustomizationOperation(models.Model):
                 self.env._("add_field requires a field type or a related path.")
             )
         if payload.get("name"):
-            ensure_field_name(payload["name"])
+            ensure_field_name(self.env, payload["name"])
 
     def _check_menu_operation(self):
         if not self.menu_id:
             raise ValidationError(self.env._("A menu is required."))
         if self.type == "add_menu" and (self.payload or {}).get("name"):
-            ensure_menu_xmlid_name(self.payload["name"])
+            ensure_menu_xmlid_name(self.env, self.payload["name"])
         if self.state in ("draft", "applied"):
             other = menu_write_conflicts(self)
             if other:
@@ -705,7 +705,7 @@ class CustomizationOperation(models.Model):
         ):
             raise ValidationError(self.env._("An anchor name or title is required."))
         if self.type in STRUCTURE_TYPES and (self.payload or {}).get("name"):
-            ensure_field_name(self.payload["name"])
+            ensure_field_name(self.env, self.payload["name"])
         if self.state not in ("draft", "applied"):
             return
         if self.type in ATTRIBUTE_TYPES:

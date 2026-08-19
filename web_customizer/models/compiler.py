@@ -9,7 +9,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 from lxml import etree
 
-from odoo import Command, _
+from odoo import Command
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression
 from odoo.tools import sql
@@ -181,26 +181,26 @@ def slugify_field_suffix(label):
     return slug or "field"
 
 
-def ensure_field_name(name):
+def ensure_field_name(env, name):
     """Normalize and validate a generated field technical name."""
     name = (name or "").strip()
     if name and not name.startswith(FIELD_PREFIX):
         name = FIELD_PREFIX + name
     if not name:
         raise ValidationError(
-            _("Generated field names must start with '%s'.") % FIELD_PREFIX
+            env._("Generated field names must start with '%s'.") % FIELD_PREFIX
         )
     if "__" in name:
         raise ValidationError(
-            _("Custom field names cannot contain double underscores.")
+            env._("Custom field names cannot contain double underscores.")
         )
     if not name.startswith(FIELD_PREFIX):
         raise ValidationError(
-            _("Generated field names must start with '%s'.") % FIELD_PREFIX
+            env._("Generated field names must start with '%s'.") % FIELD_PREFIX
         )
     if not re.match(rf"^{re.escape(FIELD_PREFIX)}[a-z0-9_]+$", name):
         raise ValidationError(
-            _(
+            env._(
                 "Field name '%s' is invalid. Use lowercase letters, digits and "
                 "single underscores after the x_cust_ prefix."
             )
@@ -209,11 +209,11 @@ def ensure_field_name(name):
     return name
 
 
-def ensure_menu_xmlid_name(name):
+def ensure_menu_xmlid_name(env, name):
     """Normalize and validate an exported menu XML ID (client addon)."""
     name = (name or "").strip()
     if not name:
-        raise ValidationError(_("A menu XML ID is required."))
+        raise ValidationError(env._("A menu XML ID is required."))
     name = name.split(".", 1)[-1]
     name = re.sub(r"[^a-zA-Z0-9_]+", "_", name).strip("_").lower()
     name = re.sub(r"_+", "_", name)
@@ -221,11 +221,11 @@ def ensure_menu_xmlid_name(name):
         name = f"menu_{name}"
     if not re.match(r"^[a-z][a-z0-9_]*$", name) or "__" in name:
         raise ValidationError(
-            _(
+            env._(
                 "Menu XML ID '%s' is invalid. Use lowercase letters, digits "
                 "and single underscores, starting with a letter."
             )
-            % (name or _("(empty)"))
+            % (name or env._("(empty)"))
         )
     return name
 
@@ -309,7 +309,7 @@ def resolve_related_field(env, model_name, related):
     related = (related or "").strip()
     if not related or not re.match(r"^[\w]+(?:\.[\w]+)*$", related):
         raise UserError(
-            _(
+            env._(
                 "Related path '%s' is invalid. Use dotted field names, "
                 "for example parent_id.email."
             )
@@ -322,7 +322,7 @@ def resolve_related_field(env, model_name, related):
         dest = env["ir.model.fields"]._get(current_model, name)
         if not dest:
             raise UserError(
-                _(
+                env._(
                     "Related field '%(name)s' was not found on %(model)s.",
                     name=name,
                     model=current_model,
@@ -332,7 +332,7 @@ def resolve_related_field(env, model_name, related):
             break
         if dest.ttype != "many2one" or not dest.relation:
             raise UserError(
-                _(
+                env._(
                     "Intermediate field '%(name)s' on %(model)s must be a many2one.",
                     name=name,
                     model=current_model,
@@ -340,7 +340,7 @@ def resolve_related_field(env, model_name, related):
             )
         current_model = dest.relation
     if dest.ttype not in SUPPORTED_TTYPES:
-        raise UserError(_("Related field type '%s' is not supported.") % dest.ttype)
+        raise UserError(env._("Related field type '%s' is not supported.") % dest.ttype)
     return dest
 
 
@@ -382,7 +382,7 @@ def combined_arch_for_operation(view, operation):
 
 
 def list_anchor_candidates(
-    arch_tree, anchor_name, anchor_kind="field", anchor_string=None
+    env, arch_tree, anchor_name, anchor_kind="field", anchor_string=None
 ):
     """Describe every node that matches the semantic anchor name or title."""
     kind = anchor_kind or "field"
@@ -401,9 +401,9 @@ def list_anchor_candidates(
             after = previous.get("name") or previous.get("string") or ""
         extras = []
         if page:
-            extras.append(_("page %s") % page)
+            extras.append(env._("page %s") % page)
         if after:
-            extras.append(_("after %s") % after)
+            extras.append(env._("after %s") % after)
         suffix = f" ({', '.join(extras)})" if extras else ""
         candidates.append(
             {
@@ -439,6 +439,7 @@ def _anchor_nodes(arch_tree, tag, anchor_name, anchor_string=None):
 
 
 def resolve_anchor(
+    env,
     arch_tree,
     anchor_name,
     anchor_kind="field",
@@ -458,19 +459,19 @@ def resolve_anchor(
         return arch_tree
     tag = ANCHOR_TAGS.get(kind)
     if not tag:
-        raise AnchorError(_("Anchor kind '%s' is not supported yet.") % kind)
+        raise AnchorError(env._("Anchor kind '%s' is not supported yet.") % kind)
     name = (anchor_name or "").strip()
     title = (anchor_string or "").strip()
     if name and not re.match(r"^[\w.]+$", name):
-        raise AnchorError(_("Anchor name '%s' is invalid.") % name)
+        raise AnchorError(env._("Anchor name '%s' is invalid.") % name)
     if not name and not title:
-        raise AnchorError(_("Anchor name is missing."))
+        raise AnchorError(env._("Anchor name is missing."))
     nodes = _anchor_nodes(arch_tree, tag, name, title)
     label = name or title
     page = (anchor_page or "").strip()
     if not nodes:
         raise AnchorError(
-            _(
+            env._(
                 "Anchor %(kind)s '%(name)s' was not found in the target view.",
                 kind=kind,
                 name=label,
@@ -480,7 +481,7 @@ def resolve_anchor(
         index = int(occurrence) - 1
         if not 0 <= index < len(nodes):
             raise AnchorError(
-                _(
+                env._(
                     "Anchor %(kind)s '%(name)s' has no occurrence %(index)s.",
                     kind=kind,
                     name=label,
@@ -492,7 +493,7 @@ def resolve_anchor(
             node_page = (node.xpath("ancestor::page[@name][1]/@name") or [""])[0]
             if node_page != page:
                 raise AnchorError(
-                    _(
+                    env._(
                         "Anchor %(kind)s '%(name)s' occurrence %(index)s "
                         "is not on page '%(page)s'.",
                         kind=kind,
@@ -510,7 +511,7 @@ def resolve_anchor(
         ]
         if not nodes:
             raise AnchorError(
-                _(
+                env._(
                     "Anchor %(kind)s '%(name)s' was not found on page '%(page)s'.",
                     kind=kind,
                     name=label,
@@ -520,7 +521,7 @@ def resolve_anchor(
     if len(nodes) == 1:
         return nodes[0]
     raise AnchorError(
-        _(
+        env._(
             "Anchor %(kind)s '%(name)s' is ambiguous "
             "(%(count)s matches in the target view).",
             kind=kind,
@@ -530,9 +531,9 @@ def resolve_anchor(
     )
 
 
-def resolve_field_anchor(arch_tree, anchor_name):
+def resolve_field_anchor(env, arch_tree, anchor_name):
     """Backward-compatible wrapper around :func:`resolve_anchor`."""
-    return resolve_anchor(arch_tree, anchor_name, "field")
+    return resolve_anchor(env, arch_tree, anchor_name, "field")
 
 
 def _check_move_source(operation, arch_tree, anchor_node):
@@ -544,18 +545,20 @@ def _check_move_source(operation, arch_tree, anchor_node):
     """
     field_name = (_payload(operation).get("field_name") or "").strip()
     if not field_name:
-        raise AnchorError(_("move_field requires payload.field_name."))
+        raise AnchorError(operation.env._("move_field requires payload.field_name."))
     if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
-        raise AnchorError(_("Field name '%s' is not valid.") % field_name)
+        raise AnchorError(operation.env._("Field name '%s' is not valid.") % field_name)
     nodes = arch_tree.xpath(f"//field[@name={xpath_quote(field_name)}]")
     if not nodes:
         raise AnchorError(
-            _("Field '%s' is not in the target view, so it cannot be moved.")
+            operation.env._(
+                "Field '%s' is not in the target view, so it cannot be moved."
+            )
             % field_name
         )
     if len(nodes) > 1:
         raise AnchorError(
-            _(
+            operation.env._(
                 "Field '%(field)s' appears %(count)s times in the target view, "
                 "so the node to move is ambiguous.",
                 field=field_name,
@@ -563,7 +566,9 @@ def _check_move_source(operation, arch_tree, anchor_node):
             )
         )
     if nodes[0] is anchor_node:
-        raise AnchorError(_("Field '%s' cannot be moved next to itself.") % field_name)
+        raise AnchorError(
+            operation.env._("Field '%s' cannot be moved next to itself.") % field_name
+        )
 
 
 def health_check_operation(operation):
@@ -576,14 +581,15 @@ def health_check_operation(operation):
     if operation.type in MENU_TYPES:
         return _health_check_menu(operation)
     if operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
-        return False, _("Anchor kind '%s' is not supported yet.") % (
+        return False, operation.env._("Anchor kind '%s' is not supported yet.") % (
             operation.anchor_kind
         )
     if not operation.view_id:
-        return False, _("A target view is required.")
+        return False, operation.env._("A target view is required.")
     try:
         arch_tree = combined_arch_for_operation(operation.view_id, operation)
         anchor_node = resolve_anchor(
+            operation.env,
             arch_tree,
             operation.anchor_name,
             operation.anchor_kind,
@@ -723,7 +729,7 @@ def assert_aggregate_support(operation):
     kind = operation.anchor_kind or "field"
     if kind != "field":
         raise AnchorError(
-            _(
+            operation.env._(
                 "A %(view)s view can only anchor on a field, not on a %(kind)s.",
                 view=view_type,
                 kind=kind,
@@ -731,7 +737,7 @@ def assert_aggregate_support(operation):
         )
     if operation.type not in AGGREGATE_OPERATION_TYPES:
         raise UserError(
-            _(
+            operation.env._(
                 "Operation '%(type)s' is not supported on a %(view)s view.",
                 type=operation.type,
                 view=view_type,
@@ -747,7 +753,8 @@ def apply_operation(operation):
         _apply_menu(operation)
     elif operation.anchor_kind not in SUPPORTED_ANCHOR_KINDS:
         raise AnchorError(
-            _("Anchor kind '%s' is not supported yet.") % operation.anchor_kind
+            operation.env._("Anchor kind '%s' is not supported yet.")
+            % operation.anchor_kind
         )
     else:
         assert_aggregate_support(operation)
@@ -768,37 +775,45 @@ def apply_operation(operation):
             assert_no_view_write_conflict(operation)
             _apply_attributes(operation)
         else:
-            raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+            raise UserError(
+                operation.env._("Unsupported operation type '%s'.") % operation.type
+            )
     bind_generated_xmlids(operation)
 
 
 def _health_check_menu(operation):
     menu = operation.menu_id
     if not menu:
-        return False, _("A menu is required.")
+        return False, operation.env._("A menu is required.")
     if not menu.exists():
-        return False, _("The target menu is missing.")
+        return False, operation.env._("The target menu is missing.")
     xmlid = menu.get_external_id().get(menu.id)
     if not xmlid:
-        return False, _("Menu '%s' has no XML ID.") % menu.display_name
+        return False, operation.env._("Menu '%s' has no XML ID.") % menu.display_name
     if operation.type == "add_menu":
         action_xmlid = (_payload(operation).get("action_xmlid") or "").strip()
         if not action_xmlid:
-            return False, _("add_menu requires a window action with an XML ID.")
+            return False, operation.env._(
+                "add_menu requires a window action with an XML ID."
+            )
         try:
             operation.env.ref(action_xmlid)
         except ValueError:
-            return False, _("Action '%s' is missing.") % action_xmlid
+            return False, operation.env._("Action '%s' is missing.") % action_xmlid
     if operation.type == "move_menu":
         target_xmlid = (_payload(operation).get("target_xmlid") or "").strip()
         if not target_xmlid:
-            return False, _("move_menu requires a destination menu with an XML ID.")
+            return False, operation.env._(
+                "move_menu requires a destination menu with an XML ID."
+            )
         try:
             target = operation.env.ref(target_xmlid)
         except ValueError:
-            return False, _("Menu '%s' is missing.") % target_xmlid
+            return False, operation.env._("Menu '%s' is missing.") % target_xmlid
         if target._name != "ir.ui.menu":
-            return False, _("Destination '%s' is not a menu.") % target_xmlid
+            return False, operation.env._(
+                "Destination '%s' is not a menu."
+            ) % target_xmlid
     return True, ""
 
 
@@ -962,18 +977,20 @@ def _apply_menu(operation):
     elif operation.type == "set_menu_string":
         string = (payload.get("string") or "").strip()
         if not string:
-            raise UserError(_("set_menu_string requires payload.string."))
+            raise UserError(operation.env._("set_menu_string requires payload.string."))
         previous.setdefault("name", menu.name)
         menu.write({"name": string})
     elif operation.type == "set_menu_groups":
         groups = payload.get("groups")
         if not groups:
-            raise UserError(_("set_menu_groups requires payload.groups."))
+            raise UserError(operation.env._("set_menu_groups requires payload.groups."))
         previous.setdefault("groups", _menu_groups_xmlids(menu))
         group_recs = groups_from_xmlids(operation.env, groups)
         menu.write({"groups_id": [Command.set(group_recs.ids)]})
     else:
-        raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+        raise UserError(
+            operation.env._("Unsupported operation type '%s'.") % operation.type
+        )
     payload["xmlid"] = xmlid
     payload["previous"] = previous
     operation.payload = payload
@@ -985,7 +1002,7 @@ def _apply_add_menu(operation):
     payload = dict(_payload(operation))
     string = (payload.get("string") or "").strip()
     if not string:
-        raise UserError(_("add_menu requires payload.string."))
+        raise UserError(operation.env._("add_menu requires payload.string."))
     position = operation.position or "after"
     if position == "inside":
         parent = anchor
@@ -995,10 +1012,14 @@ def _apply_add_menu(operation):
         sequence = (anchor.sequence or 10) + 1
     action_xmlid = (payload.get("action_xmlid") or "").strip()
     if not action_xmlid:
-        raise UserError(_("add_menu requires a window action with an XML ID."))
+        raise UserError(
+            operation.env._("add_menu requires a window action with an XML ID.")
+        )
     action = operation.env.ref(action_xmlid)
     if action._name != "ir.actions.act_window":
-        raise UserError(_("add_menu requires a window action with an XML ID."))
+        raise UserError(
+            operation.env._("add_menu requires a window action with an XML ID.")
+        )
     vals = {
         "name": string,
         "parent_id": parent.id if parent else False,
@@ -1013,10 +1034,10 @@ def _apply_add_menu(operation):
         operation.generated_menu_id = menu
     if not (payload.get("name") or "").strip():
         payload["name"] = ensure_menu_xmlid_name(
-            f"menu_{slugify_field_suffix(string)}_{operation.id}"
+            operation.env, f"menu_{slugify_field_suffix(string)}_{operation.id}"
         )
     else:
-        payload["name"] = ensure_menu_xmlid_name(payload["name"])
+        payload["name"] = ensure_menu_xmlid_name(operation.env, payload["name"])
     payload["xmlid"] = f"{operation.bundle_id.code}.{payload['name']}"
     payload["action_xmlid"] = action_xmlid
     operation.payload = payload
@@ -1025,11 +1046,11 @@ def _apply_add_menu(operation):
 def _assert_safe_menu_move(menu, target):
     """Refuse moving a menu onto itself or into its own subtree."""
     if menu == target:
-        raise UserError(_("Choose a different menu as the destination."))
+        raise UserError(menu.env._("Choose a different menu as the destination."))
     current = target
     while current:
         if current == menu:
-            raise UserError(_("A menu cannot be moved under itself."))
+            raise UserError(menu.env._("A menu cannot be moved under itself."))
         current = current.parent_id
 
 
@@ -1039,10 +1060,14 @@ def _apply_move_menu(operation):
     payload = dict(_payload(operation))
     target_xmlid = (payload.get("target_xmlid") or "").strip()
     if not target_xmlid:
-        raise UserError(_("move_menu requires a destination menu with an XML ID."))
+        raise UserError(
+            operation.env._("move_menu requires a destination menu with an XML ID.")
+        )
     target = operation.env.ref(target_xmlid)
     if target._name != "ir.ui.menu":
-        raise UserError(_("Destination '%s' is not a menu.") % target_xmlid)
+        raise UserError(
+            operation.env._("Destination '%s' is not a menu.") % target_xmlid
+        )
     _assert_safe_menu_move(menu, target)
     position = operation.position or "after"
     if position == "inside":
@@ -1055,7 +1080,9 @@ def _apply_move_menu(operation):
     if parent:
         parent_xmlid = parent.get_external_id().get(parent.id)
         if not parent_xmlid:
-            raise UserError(_("Parent menu '%s' has no XML ID.") % parent.display_name)
+            raise UserError(
+                operation.env._("Parent menu '%s' has no XML ID.") % parent.display_name
+            )
     else:
         parent_xmlid = False
     previous = dict(payload.get("previous") or {})
@@ -1147,7 +1174,7 @@ def _update_generated_field(field, ttype, related, payload):
     if ttype == "selection" and not related:
         selection = payload.get("selection") or []
         if not selection:
-            raise UserError(_("Selection fields need at least one option."))
+            raise UserError(field.env._("Selection fields need at least one option."))
         vals["selection_ids"] = _selection_commands(field, selection)
     if ttype == "monetary":
         currency_field = payload.get("currency_field")
@@ -1197,12 +1224,16 @@ def _add_field_vals(operation, name, ttype, related, payload):
     if ttype in ("many2one", "many2many"):
         relation = payload.get("relation")
         if not relation:
-            raise UserError(_("A relation model is required for %s fields.") % ttype)
+            raise UserError(
+                operation.env._("A relation model is required for %s fields.") % ttype
+            )
         vals["relation"] = relation
     if ttype == "selection" and not related:
         selection = payload.get("selection") or []
         if not selection:
-            raise UserError(_("Selection fields need at least one option."))
+            raise UserError(
+                operation.env._("Selection fields need at least one option.")
+            )
         vals["selection_ids"] = [
             Command.create(
                 {
@@ -1222,7 +1253,7 @@ def _add_field_vals(operation, name, ttype, related, payload):
             or operation.env["ir.model.fields"]._get(operation.model, "x_currency_id")
         ):
             raise UserError(
-                _(
+                operation.env._(
                     "Monetary fields need a currency field on the model "
                     "(currency_id or x_currency_id)."
                 )
@@ -1234,11 +1265,13 @@ def _apply_add_field(operation):
     payload = dict(_payload(operation))
     model_name = operation.model
     if not model_name:
-        raise UserError(_("A model is required to create a field."))
+        raise UserError(operation.env._("A model is required to create a field."))
     Model = operation.env[model_name]
     table_kind = sql.table_kind(operation.env.cr, Model._table)
     if table_kind != sql.TableKind.Regular:
-        raise UserError(_("The model %s does not support adding fields.") % model_name)
+        raise UserError(
+            operation.env._("The model %s does not support adding fields.") % model_name
+        )
 
     related = (payload.get("related") or "").strip() or False
     if related:
@@ -1253,13 +1286,14 @@ def _apply_add_field(operation):
     ttype = payload.get("ttype")
     if ttype not in SUPPORTED_TTYPES:
         raise UserError(
-            _("Field type '%s' is not supported.") % (ttype or _("(missing)"))
+            operation.env._("Field type '%s' is not supported.")
+            % (ttype or operation.env._("(missing)"))
         )
 
     requested = payload.get("name") or slugify_field_suffix(
         payload.get("string") or (related and related.split(".")[-1]) or ""
     )
-    name = ensure_field_name(requested)
+    name = ensure_field_name(operation.env, requested)
     done, reused_name = _handle_existing_generated_field(
         operation, ttype, related, payload
     )
@@ -1277,7 +1311,7 @@ def _apply_add_field(operation):
     operation.payload = payload
 
 
-def _unnamed_node_expr(arch_tree, node):
+def _unnamed_node_expr(env, arch_tree, node):
     """Inherit xpath for a page or group without ``@name``.
 
     Odoo rejects ``@string`` in inherit specs because it is translated.
@@ -1296,7 +1330,7 @@ def _unnamed_node_expr(arch_tree, node):
     try:
         index = unnamed.index(node) + 1
     except ValueError as err:
-        raise AnchorError(_("Unnamed %s anchor was not found.") % tag) from err
+        raise AnchorError(env._("Unnamed %s anchor was not found.") % tag) from err
     return f"(//{tag}[not(@name)])[{index}]"
 
 
@@ -1307,6 +1341,7 @@ def _button_type_expr(operation, arch_tree, tag, anchor, page, occurrence):
     if arch_tree is None:
         arch_tree = combined_arch_for_operation(operation.view_id, operation)
     node = resolve_anchor(
+        operation.env,
         arch_tree,
         operation.anchor_name,
         operation.anchor_kind,
@@ -1341,6 +1376,7 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
         if arch_tree is None:
             arch_tree = combined_arch_for_operation(operation.view_id, operation)
         node = resolve_anchor(
+            operation.env,
             arch_tree,
             operation.anchor_name,
             operation.anchor_kind,
@@ -1348,7 +1384,7 @@ def _inherit_arch(operation, inner_xml, position, arch_tree=None):
             operation.anchor_page,
             operation.anchor_string,
         )
-        expr = _unnamed_node_expr(arch_tree, node)
+        expr = _unnamed_node_expr(operation.env, arch_tree, node)
         return (
             f'<xpath expr="{_xml_attr(expr)}" position="{position}">'
             f"{inner_xml}</xpath>"
@@ -1416,9 +1452,9 @@ def _apply_add_structure(operation):
     payload = dict(_payload(operation))
     string = (payload.get("string") or "").strip()
     if tag == "page" and not string:
-        raise UserError(_("A page title is required."))
+        raise UserError(operation.env._("A page title is required."))
     requested = payload.get("name") or slugify_field_suffix(string or tag)
-    name = ensure_field_name(requested)
+    name = ensure_field_name(operation.env, requested)
     arch_tree = combined_arch_for_operation(operation.view_id, operation)
     name = unique_node_name(arch_tree, name)
     attrs = f'name="{name}"'
@@ -1431,10 +1467,10 @@ def _apply_add_structure(operation):
         "inside" if tag == "group" and operation.anchor_kind == "page" else "after"
     )
     if tag == "page" and position == "inside":
-        raise UserError(_("A page cannot be placed inside another page."))
+        raise UserError(operation.env._("A page cannot be placed inside another page."))
     if position not in FIELD_POSITIONS:
         raise AnchorError(
-            _(
+            operation.env._(
                 "Position '%(position)s' is not valid for placing a %(tag)s.",
                 position=position,
                 tag=tag,
@@ -1448,7 +1484,7 @@ def _apply_add_structure(operation):
     operation.payload = payload
 
 
-def validated_filter_domain(domain):
+def validated_filter_domain(env, domain):
     """Refuse a domain that would otherwise fail later, at search time.
 
     A dynamic domain (``context_today()`` and friends) cannot be evaluated
@@ -1457,21 +1493,23 @@ def validated_filter_domain(domain):
     """
     domain = (domain or "").strip()
     if not domain:
-        raise UserError(_("add_filter requires a domain or a grouping."))
+        raise UserError(env._("add_filter requires a domain or a grouping."))
     try:
         ast.parse(domain, mode="eval")
     except SyntaxError as err:
-        raise UserError(_("The filter domain is not valid Python: %s") % err) from err
+        raise UserError(
+            env._("The filter domain is not valid Python: %s") % err
+        ) from err
     try:
         literal = ast.literal_eval(domain)
     except (ValueError, SyntaxError):
         return domain
     if not isinstance(literal, list | tuple):
-        raise UserError(_("The filter domain must be a list of conditions."))
+        raise UserError(env._("The filter domain must be a list of conditions."))
     try:
         expression.normalize_domain(list(literal))
     except (ValueError, AssertionError) as err:
-        raise UserError(_("The filter domain is malformed: %s") % err) from err
+        raise UserError(env._("The filter domain is malformed: %s") % err) from err
     return domain
 
 
@@ -1479,11 +1517,13 @@ def validated_group_by(operation, field_name):
     """Return a field name that the client will accept as a grouping."""
     field_name = (field_name or "").strip()
     if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
-        raise UserError(_("Group by '%s' is not a valid field name.") % field_name)
+        raise UserError(
+            operation.env._("Group by '%s' is not a valid field name.") % field_name
+        )
     field = operation.env["ir.model.fields"]._get(operation.model, field_name)
     if not field:
         raise UserError(
-            _(
+            operation.env._(
                 "Field '%(field)s' does not exist on %(model)s.",
                 field=field_name,
                 model=operation.model,
@@ -1491,7 +1531,7 @@ def validated_group_by(operation, field_name):
         )
     if field.ttype not in GROUPABLE_TTYPES:
         raise UserError(
-            _(
+            operation.env._(
                 "A %(ttype)s field cannot be grouped by.",
                 ttype=field.ttype,
             )
@@ -1502,28 +1542,33 @@ def validated_group_by(operation, field_name):
 def _apply_add_filter(operation):
     """Compile add_filter into a <filter> node on a search view."""
     if operation.view_type != "search":
-        raise UserError(_("Filters only exist on search views."))
+        raise UserError(operation.env._("Filters only exist on search views."))
     payload = dict(_payload(operation))
     string = (payload.get("string") or "").strip()
     if not string:
-        raise UserError(_("A filter label is required."))
-    name = ensure_field_name(payload.get("name") or slugify_field_suffix(string))
+        raise UserError(operation.env._("A filter label is required."))
+    name = ensure_field_name(
+        operation.env, payload.get("name") or slugify_field_suffix(string)
+    )
     group_by = (payload.get("group_by") or "").strip()
     domain = (payload.get("domain") or "").strip()
     if group_by and domain:
-        raise UserError(_("A filter carries either a domain or a grouping."))
+        raise UserError(
+            operation.env._("A filter carries either a domain or a grouping.")
+        )
     head = f'<filter name="{_xml_attr(name)}" string="{_xml_attr(string)}"'
     if group_by:
         group_by = validated_group_by(operation, group_by)
         context = f"{{'group_by': '{group_by}'}}"
         inner = f'{head} context="{_xml_attr(context)}"/>'
     else:
-        domain = validated_filter_domain(domain)
+        domain = validated_filter_domain(operation.env, domain)
         inner = f'{head} domain="{_xml_attr(domain)}"/>'
     position = operation.position or "after"
     if position not in FIELD_POSITIONS:
         raise AnchorError(
-            _("Position '%s' is not valid for adding a filter.") % position
+            operation.env._("Position '%s' is not valid for adding a filter.")
+            % position
         )
     arch = _inherit_arch(operation, inner, position)
     _upsert_generated_view(operation, arch, active=True)
@@ -1545,7 +1590,7 @@ def aggregate_field_type(operation):
     field_type = (_payload(operation).get("field_type") or "measure").strip()
     if field_type not in allowed:
         raise UserError(
-            _(
+            operation.env._(
                 "Field type '%(type)s' is not valid on a %(view)s view. "
                 "Use one of: %(allowed)s.",
                 type=field_type,
@@ -1561,10 +1606,11 @@ def placement_field_name(operation):
     field_name = _payload(operation).get("field_name")
     if not field_name:
         raise UserError(
-            _("%s requires payload.field_name.") % (operation.type or "place_field")
+            operation.env._("%s requires payload.field_name.")
+            % (operation.type or "place_field")
         )
     if not re.match(r"^[a-z_][a-z0-9_]*$", field_name):
-        raise UserError(_("Field name '%s' is not valid.") % field_name)
+        raise UserError(operation.env._("Field name '%s' is not valid.") % field_name)
     return field_name
 
 
@@ -1574,7 +1620,7 @@ def _apply_move_field(operation):
     position = operation.position or "after"
     if position not in MOVE_POSITIONS:
         raise AnchorError(
-            _("Position '%s' is not valid for moving a field.") % position
+            operation.env._("Position '%s' is not valid for moving a field.") % position
         )
     arch = _inherit_arch(
         operation,
@@ -1589,7 +1635,8 @@ def _apply_place_field(operation):
     position = operation.position or "after"
     if position not in FIELD_POSITIONS:
         raise AnchorError(
-            _("Position '%s' is not valid for placing a field.") % position
+            operation.env._("Position '%s' is not valid for placing a field.")
+            % position
         )
     field_type = aggregate_field_type(operation)
     type_attr = f' type="{_xml_attr(field_type)}"' if field_type else ""
@@ -1606,34 +1653,34 @@ def _attribute_xml(name, value):
 def _set_string_parts(operation):
     string = _payload(operation).get("string")
     if not string:
-        raise UserError(_("set_string requires payload.string."))
+        raise UserError(operation.env._("set_string requires payload.string."))
     return [_attribute_xml("string", string)]
 
 
 def _set_widget_parts(operation):
     widget = _payload(operation).get("widget")
     if not widget:
-        raise UserError(_("set_widget requires payload.widget."))
+        raise UserError(operation.env._("set_widget requires payload.widget."))
     return [_attribute_xml("widget", widget)]
 
 
 def _set_groups_parts(operation):
     groups = _payload(operation).get("groups")
     if not groups:
-        raise UserError(_("set_groups requires payload.groups."))
+        raise UserError(operation.env._("set_groups requires payload.groups."))
     return [_attribute_xml("groups", groups)]
 
 
 def _set_modifier_parts(operation):
     modifiers = _payload(operation).get("modifiers") or {}
     if not modifiers:
-        raise UserError(_("set_modifier requires payload.modifiers."))
+        raise UserError(operation.env._("set_modifier requires payload.modifiers."))
     if operation.view_type in AGGREGATE_VIEW_TYPES:
         # Those parsers read invisible only, and only as a literal.
         unsupported = sorted(set(modifiers) - {"invisible"})
         if unsupported:
             raise UserError(
-                _(
+                operation.env._(
                     "Only invisible can be set on a %(view)s view, not %(keys)s.",
                     view=operation.view_type,
                     keys=", ".join(unsupported),
@@ -1648,13 +1695,13 @@ def _set_optional_parts(operation):
     # Only the list renderer builds a column picker, so the attribute is inert
     # anywhere else.
     if operation.view_type != "list":
-        raise UserError(_("Optional columns only exist on list views."))
+        raise UserError(operation.env._("Optional columns only exist on list views."))
     if (operation.anchor_kind or "field") != "field":
-        raise UserError(_("Only a column can be made optional."))
+        raise UserError(operation.env._("Only a column can be made optional."))
     optional = (_payload(operation).get("optional") or "").strip()
     if optional not in OPTIONAL_VALUES:
         raise UserError(
-            _(
+            operation.env._(
                 "set_optional requires payload.optional to be one of: %s.",
                 ", ".join(OPTIONAL_VALUES),
             )
@@ -1667,11 +1714,13 @@ def _assert_root_attribute_name(operation, name):
     view_type = operation.view_type or ""
     if name.startswith("decoration-"):
         if view_type != "list":
-            raise UserError(_("Row decorations are only read on a list view."))
+            raise UserError(
+                operation.env._("Row decorations are only read on a list view.")
+            )
         decoration = name[len("decoration-") :]
         if decoration not in ROOT_DECORATIONS:
             raise UserError(
-                _(
+                operation.env._(
                     "'%(name)s' is not a decoration. Use one of: %(allowed)s.",
                     name=name,
                     allowed=", ".join(ROOT_DECORATIONS),
@@ -1680,10 +1729,13 @@ def _assert_root_attribute_name(operation, name):
         return
     allowed = ROOT_ATTRIBUTES.get(view_type)
     if not allowed:
-        raise UserError(_("A %s view has no root options to set.") % (view_type or "?"))
+        raise UserError(
+            operation.env._("A %s view has no root options to set.")
+            % (view_type or "?")
+        )
     if name not in allowed:
         raise UserError(
-            _(
+            operation.env._(
                 "Option '%(name)s' is not available on a %(view)s view. "
                 "Use one of: %(allowed)s.",
                 name=name,
@@ -1698,11 +1750,13 @@ def _validated_root_default_order(operation, value):
     for part in value.split(","):
         tokens = part.split()
         if not tokens or len(tokens) > 2:
-            raise UserError(_("'%s' is not a valid default order.") % part.strip())
+            raise UserError(
+                operation.env._("'%s' is not a valid default order.") % part.strip()
+            )
         field = operation.env["ir.model.fields"]._get(operation.model, tokens[0])
         if not field:
             raise UserError(
-                _(
+                operation.env._(
                     "Field '%(field)s' does not exist on %(model)s.",
                     field=tokens[0],
                     model=operation.model,
@@ -1710,11 +1764,15 @@ def _validated_root_default_order(operation, value):
             )
         if not field.store:
             raise UserError(
-                _("Field '%s' is not stored, so records cannot be ordered by it.")
+                operation.env._(
+                    "Field '%s' is not stored, so records cannot be ordered by it."
+                )
                 % tokens[0]
             )
         if len(tokens) == 2 and tokens[1].lower() not in ("asc", "desc"):
-            raise UserError(_("'%s' is not a sort direction.") % tokens[1])
+            raise UserError(
+                operation.env._("'%s' is not a sort direction.") % tokens[1]
+            )
     return value
 
 
@@ -1727,14 +1785,16 @@ def _validated_root_value(operation, name, value):
             ast.parse(value, mode="eval")
         except SyntaxError as err:
             raise UserError(
-                _("The condition of '%(name)s' is not valid Python: %(error)s")
+                operation.env._(
+                    "The condition of '%(name)s' is not valid Python: %(error)s"
+                )
                 % {"name": name, "error": err}
             ) from err
         return value
     if name in ROOT_BOOLEAN_ATTRIBUTES:
         if value not in ("0", "1"):
             raise UserError(
-                _(
+                operation.env._(
                     "Option '%(name)s' takes 0 or 1, not '%(value)s'.",
                     name=name,
                     value=value,
@@ -1744,7 +1804,7 @@ def _validated_root_value(operation, name, value):
     if name == "editable":
         if value not in ROOT_EDITABLE_VALUES:
             raise UserError(
-                _(
+                operation.env._(
                     "Option 'editable' takes %(allowed)s, not '%(value)s'.",
                     allowed=" or ".join(ROOT_EDITABLE_VALUES),
                     value=value,
@@ -1759,7 +1819,9 @@ def _validated_root_value(operation, name, value):
 def _set_view_attribute_parts(operation):
     attributes = _payload(operation).get("attributes") or {}
     if not attributes:
-        raise UserError(_("set_view_attribute requires payload.attributes."))
+        raise UserError(
+            operation.env._("set_view_attribute requires payload.attributes.")
+        )
     parts = []
     for name in sorted(attributes):
         raw = attributes[name]
@@ -1800,6 +1862,8 @@ def _apply_attributes(operation):
         return
     build = ATTRIBUTE_PARTS.get(operation.type)
     if not build:
-        raise UserError(_("Unsupported operation type '%s'.") % operation.type)
+        raise UserError(
+            operation.env._("Unsupported operation type '%s'.") % operation.type
+        )
     arch = _inherit_arch(operation, "".join(build(operation)), "attributes")
     _upsert_generated_view(operation, arch, active=True)
